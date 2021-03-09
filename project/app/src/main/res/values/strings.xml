@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">PhotoVideoViewer</string>
+
+    <string name="photos_tab">Photos</string>
+    <string name="videos_tab">Videos</string>
+    <string name="albums_tab">Albums</string>
+    <string name="explore_tab">Explore</string>
+
+    <string name="hello_photos_fragment">This is Photos fragment</string>
+    <string name="hello_videos_fragment">This is Videos fragment</string>
+    <string name="hello_albums_fragment">This is Albums fragment</string>
+    <string name="hello_explore_fragment">This is Explore fragment</string>
+</resources>
