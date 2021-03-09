@@ -12,6 +12,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.CodeBoy.MediaFacer.MediaFacer;
+import com.CodeBoy.MediaFacer.PictureGet;
+import com.CodeBoy.MediaFacer.mediaHolders.pictureContent;
+
+import java.util.ArrayList;
+
 public class AlbumsFragment extends Fragment {
 
 	private AlbumsViewModel mViewModel;
@@ -31,6 +37,7 @@ public class AlbumsFragment extends Fragment {
 		super.onActivityCreated(savedInstanceState);
 		mViewModel = new ViewModelProvider(this).get(AlbumsViewModel.class);
 		// TODO: Use the ViewModel
+
 	}
 
 }
