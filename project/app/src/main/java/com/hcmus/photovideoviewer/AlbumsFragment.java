@@ -51,11 +51,6 @@ public class AlbumsFragment extends Fragment {
 	@Override
 	public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
 	                         @Nullable Bundle savedInstanceState) {
-//		recyclerView = recyclerView.findViewById(R.id.glide_image_list_recycle_view);
-//		gridLayoutManager = new GridLayoutManager(this.getContext(), 3, GridLayoutManager.VERTICAL, false);
-//		recyclerView.setLayoutManager(gridLayoutManager);
-//		recyclerView.setHasFixedSize(true);
-//		getAlbumData();
 		View rootView = inflater.inflate(R.layout.albums_fragment, container, false);
 		rootView.setTag("RecyclerViewFragment");
 		mRecyclerView = (RecyclerView) rootView.findViewById(R.id.glide_image_list_recycle_view);
@@ -82,13 +77,6 @@ public class AlbumsFragment extends Fragment {
 		mViewModel = new ViewModelProvider(this).get(AlbumsViewModel.class);
 		// TODO: Use the ViewModel
 	}
-//	private void getAlbumData()
-//	{
-//		albumsList = new ArrayList<>();
-//		albumsList = AlbumList.setAlbumsData();
-//		albumAdapter = new AlbumAdapter(this.getContext(), albumsList);
-//		recyclerView.setAdapter(albumAdapter);
-//	}
 public void setRecyclerViewLayoutManager(LayoutManagerType layoutManagerType) {
 	int scrollPosition = 0;
 

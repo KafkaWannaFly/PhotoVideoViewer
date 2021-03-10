@@ -1,4 +1,6 @@
 package com.hcmus.photovideoviewer.ui.main;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,10 +12,16 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.hcmus.photovideoviewer.R;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+
 /**
  * Provide views to RecyclerView with data from mDataSet.
  */
-public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ViewHolder> {
+public class ExploreAdapter extends RecyclerView.Adapter<ExploreAdapter.ViewHolder> {
     private static final String TAG = "CustomAdapter";
 
     private String[] mDataSet;
@@ -24,9 +32,6 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ViewHolder> 
      */
     public static class ViewHolder extends RecyclerView.ViewHolder {
         private final TextView title_of_album;
-        private final ImageView imgTitle_of_album;
-
-
         public ViewHolder(View v) {
             super(v);
             // Define click listener for the ViewHolder's View.
@@ -37,16 +42,12 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ViewHolder> 
                 }
             });
             title_of_album = (TextView) v.findViewById(R.id.title_of_album);
-            imgTitle_of_album = (ImageView) v.findViewById(R.id.my_image_glide);
-
         }
 
         public TextView getTextView() {
             return title_of_album;
         }
-        public ImageView getImageView(){
-            return imgTitle_of_album;
-        }
+
     }
     // END_INCLUDE(recyclerViewSampleViewHolder)
 
@@ -55,7 +56,7 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ViewHolder> 
      *
      * @param dataSet String[] containing the data to populate views to be used by RecyclerView.
      */
-    public AlbumAdapter(String[] dataSet) {
+    public ExploreAdapter(String[] dataSet) {
         mDataSet = dataSet;
     }
 
@@ -80,9 +81,6 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ViewHolder> 
         // Get element from your dataset at this position and replace the contents of the view
         // with that element
         viewHolder.getTextView().setText(mDataSet[position]);
-        //        viewHolder.getImageView().setImageBitmap(getBitmapFromURL("/storage/emulated/0/Download/1.jpg"));
-//        viewHolder.getImageView().setImageResource(R.drawable.ic_launcher_background);
-
     }
     // END_INCLUDE(recyclerViewOnBindViewHolder)
 
@@ -90,5 +88,22 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ViewHolder> 
     @Override
     public int getItemCount() {
         return mDataSet.length;
+    }
+    public static Bitmap getBitmapFromURL(String src) {
+        try {
+            Log.e("src",src);
+            URL url = new URL(src);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setDoInput(true);
+            connection.connect();
+            InputStream input = connection.getInputStream();
+            Bitmap myBitmap = BitmapFactory.decodeStream(input);
+            Log.e("Bitmap","returned");
+            return myBitmap;
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.e("Exception",e.getMessage());
+            return null;
+        }
     }
 }
