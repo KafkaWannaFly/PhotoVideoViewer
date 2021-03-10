@@ -1,6 +1,5 @@
 package com.hcmus.photovideoviewer.views;
 
-import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,7 +24,7 @@ public class PhotoViewAdapter extends RecyclerView.Adapter<PhotoViewAdapter.View
 	@Override
 	public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 		View v = LayoutInflater.from(parent.getContext())
-				         .inflate(R.layout.photo_item_view, parent, false);
+				         .inflate(R.layout.photo_item, parent, false);
 		return new ViewHolder(v);
 	}
 

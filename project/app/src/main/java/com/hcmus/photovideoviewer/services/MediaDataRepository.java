@@ -92,7 +92,7 @@ public class MediaDataRepository {
 
 	@RequiresApi(api = Build.VERSION_CODES.Q)
 	private void fetchVideos() {
-		Uri uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
+		Uri _uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
 		String[] projection = new String[]{
 				MediaStore.Video.Media._ID,
 				MediaStore.Video.Media.DISPLAY_NAME,
@@ -102,7 +102,7 @@ public class MediaDataRepository {
 		};
 
 		ContentResolver contentResolver = context.getContentResolver();
-		try (Cursor cursor = contentResolver.query(uri,
+		try (Cursor cursor = contentResolver.query(_uri,
 				projection,
 				null,
 				null,
@@ -127,6 +127,7 @@ public class MediaDataRepository {
 						size = _size;
 						dateModified = new Date(date * 1000);
 						duration = _duration/1000;
+						uri = ContentUris.withAppendedId(_uri, id);
 					}
 				};
 

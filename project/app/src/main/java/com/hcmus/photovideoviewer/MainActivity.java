@@ -37,6 +37,8 @@ public class MainActivity extends AppCompatActivity {
 	static final int READ_EXTERNAL_CODE = 1;
 	static public boolean EXTERNAL_PERMISSION = false;
 
+	public static final int SPAN_COUNT = 4; // Number of displayed columns in view
+
 	public static DisplayMetrics displayMetrics = new DisplayMetrics();
 
 	@Override

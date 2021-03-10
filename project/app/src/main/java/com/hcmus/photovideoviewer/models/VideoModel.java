@@ -1,5 +1,7 @@
 package com.hcmus.photovideoviewer.models;
 
+import android.net.Uri;
+
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Date;
@@ -10,6 +12,7 @@ public class VideoModel {
 	public long size; //bytes
 	public Date dateModified;
 	public long duration; //seconds
+	public Uri uri;
 
 	@NotNull
 	@Override
@@ -20,6 +23,7 @@ public class VideoModel {
 				       ", size=" + size +
 				       ", dateModified=" + dateModified +
 				       ", duration=" + duration +
+				       ", uri=" + uri +
 				       '}';
 	}
 }

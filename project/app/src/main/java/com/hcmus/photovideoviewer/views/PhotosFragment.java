@@ -15,15 +15,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.hcmus.photovideoviewer.MainActivity;
 import com.hcmus.photovideoviewer.viewmodels.PhotosViewModel;
 import com.hcmus.photovideoviewer.R;
 
 import java.util.Objects;
 
 public class PhotosFragment extends Fragment {
-
-	public static final int SPAN_COUNT = 4;
-
 	private RecyclerView recyclerView;
 	private RecyclerView.LayoutManager layoutManager;
 
@@ -52,7 +50,7 @@ public class PhotosFragment extends Fragment {
 		photoViewAdapter = new PhotoViewAdapter(photosViewModel.getPhotoModels());
 		recyclerView.setAdapter(photoViewAdapter);
 
-		layoutManager = new GridLayoutManager(getActivity(), SPAN_COUNT);
+		layoutManager = new GridLayoutManager(getActivity(), MainActivity.SPAN_COUNT);
 		recyclerView.setLayoutManager(layoutManager);
 	}
 
