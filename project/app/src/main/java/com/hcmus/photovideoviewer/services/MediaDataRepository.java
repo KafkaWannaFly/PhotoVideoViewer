@@ -2,11 +2,15 @@ package com.hcmus.photovideoviewer.services;
 
 import android.annotation.SuppressLint;
 import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.provider.MediaStore;
 import android.util.Log;
+
+import androidx.annotation.RequiresApi;
 
 import com.hcmus.photovideoviewer.MainApplication;
 import com.hcmus.photovideoviewer.models.PhotoModel;
@@ -18,7 +22,7 @@ import java.util.Date;
 public class MediaDataRepository {
 	@SuppressLint("StaticFieldLeak")
 	private static MediaDataRepository instance = null;
-	private Context context;
+	private final Context context;
 	private ArrayList<PhotoModel> photoModels = new ArrayList<>();
 	private ArrayList<VideoModel> videoModels = new ArrayList<>();
 
@@ -44,7 +48,7 @@ public class MediaDataRepository {
 	}
 
 	private void fetchPhotos() {
-		Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+		Uri _uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
 		String[] projection = new String[]{
 				MediaStore.Images.Media._ID,
 				MediaStore.Images.Media.DISPLAY_NAME,
@@ -53,7 +57,7 @@ public class MediaDataRepository {
 		};
 
 		ContentResolver contentResolver = context.getContentResolver();
-		try (Cursor cursor = contentResolver.query(uri,
+		try (Cursor cursor = contentResolver.query(_uri,
 				projection,
 				null,
 				null,
@@ -75,6 +79,7 @@ public class MediaDataRepository {
 						displayName = name;
 						size = _size;
 						dateModified = new Date(date * 1000);
+						uri = ContentUris.withAppendedId(_uri, id);
 					}
 				};
 
@@ -85,6 +90,7 @@ public class MediaDataRepository {
 		Log.d("Images", "Found " + photoModels.size() + " photos");
 	}
 
+	@RequiresApi(api = Build.VERSION_CODES.Q)
 	private void fetchVideos() {
 		Uri uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
 		String[] projection = new String[]{

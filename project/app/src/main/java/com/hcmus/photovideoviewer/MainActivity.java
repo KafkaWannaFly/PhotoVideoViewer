@@ -19,6 +19,7 @@ import androidx.core.content.ContextCompat;
 import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -30,10 +31,13 @@ import com.hcmus.photovideoviewer.services.MediaDataRepository;
 import com.hcmus.photovideoviewer.ui.main.SectionsPagerAdapter;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
 	static final int READ_EXTERNAL_CODE = 1;
 	static public boolean EXTERNAL_PERMISSION = false;
+
+	public static DisplayMetrics displayMetrics = new DisplayMetrics();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -45,12 +49,14 @@ public class MainActivity extends AppCompatActivity {
 		TabLayout tabs = findViewById(R.id.tabs);
 		tabs.setupWithViewPager(viewPager);
 
+		this.getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+
 		checkPermission();
 
-		ArrayList<PhotoModel> photoModels = MediaDataRepository.getInstance().getPhotoModels();
-		Log.d("Photos", photoModels.toString());
-		ArrayList<VideoModel> videoModels = MediaDataRepository.getInstance().getVideoModels();
-		Log.d("Videos", videoModels.toString());
+//		ArrayList<PhotoModel> photoModels = MediaDataRepository.getInstance().getPhotoModels();
+//		Log.d("Photos", photoModels.toString());
+//		ArrayList<VideoModel> videoModels = MediaDataRepository.getInstance().getVideoModels();
+//		Log.d("Videos", videoModels.toString());
 
 //		FloatingActionButton fab = findViewById(R.id.fab);
 //		fab.setOnClickListener(new View.OnClickListener() {
@@ -61,30 +67,24 @@ public class MainActivity extends AppCompatActivity {
 //			}
 //		});
 
-//		//get all images in the MediaStore.
+		//get all images in the MediaStore.
 //		ArrayList<pictureContent> allPhotos;
 //
 //		allPhotos = MediaFacer
 //				.withPictureContex(MainActivity.this)
 //				.getAllPictureContents(PictureGet.externalContentUri);
+//		System.out.println("All IMGs: " + allPhotos.size());
 //
 //		//get all folders containing pictures
 //		ArrayList<pictureFolderContent> pictureFolders = new ArrayList<>();
 //		pictureFolders.addAll(MediaFacer.withPictureContex(MainActivity.this).getPictureFolders());
+//
 //		//now load images for the first pictureFolderContent object
 //		pictureFolders.get(0)
 //				.setPhotos(MediaFacer
 //						.withPictureContex(MainActivity.this)
 //						.getAllPictureContentByBucket_id(pictureFolders.get(0).getBucket_id()));
-//		//get all folders containing videos
-//		ArrayList<videoFolderContent> videoFolders = new ArrayList<>();
-//
-//		videoFolders.addAll(MediaFacer.withVideoContex(MainActivity.this).getVideoFolders(VideoGet.externalContentUri));
-//
-////now load videos for the first videoFolderContent object
-//		videoFolders.get(0)
-//				.setVideoFiles(MediaFacer.withVideoContex(MainActivity.this)
-//						.getAllVideoContentByBucket_id(videoFolders.get(0).getBucket_id()));
+//		System.out.println("All Folders Contains IMG: " + pictureFolders.size());
 	}
 
 	private void checkPermission() {
