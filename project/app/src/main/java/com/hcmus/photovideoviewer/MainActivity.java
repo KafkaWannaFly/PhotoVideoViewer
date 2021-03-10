@@ -6,8 +6,10 @@ import android.os.Bundle;
 
 import com.CodeBoy.MediaFacer.MediaFacer;
 import com.CodeBoy.MediaFacer.PictureGet;
+import com.CodeBoy.MediaFacer.VideoGet;
 import com.CodeBoy.MediaFacer.mediaHolders.pictureContent;
 import com.CodeBoy.MediaFacer.mediaHolders.pictureFolderContent;
+import com.CodeBoy.MediaFacer.mediaHolders.videoFolderContent;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
@@ -59,24 +61,30 @@ public class MainActivity extends AppCompatActivity {
 //			}
 //		});
 
-		//get all images in the MediaStore.
-		ArrayList<pictureContent> allPhotos;
-
-		allPhotos = MediaFacer
-				.withPictureContex(MainActivity.this)
-				.getAllPictureContents(PictureGet.externalContentUri);
-		System.out.println("All IMGs: " + allPhotos.size());
-
-		//get all folders containing pictures
-		ArrayList<pictureFolderContent> pictureFolders = new ArrayList<>();
-		pictureFolders.addAll(MediaFacer.withPictureContex(MainActivity.this).getPictureFolders());
-
-		//now load images for the first pictureFolderContent object
-		pictureFolders.get(0)
-				.setPhotos(MediaFacer
-						.withPictureContex(MainActivity.this)
-						.getAllPictureContentByBucket_id(pictureFolders.get(0).getBucket_id()));
-		System.out.println("All Folders Contains IMG: " + pictureFolders.size());
+//		//get all images in the MediaStore.
+//		ArrayList<pictureContent> allPhotos;
+//
+//		allPhotos = MediaFacer
+//				.withPictureContex(MainActivity.this)
+//				.getAllPictureContents(PictureGet.externalContentUri);
+//
+//		//get all folders containing pictures
+//		ArrayList<pictureFolderContent> pictureFolders = new ArrayList<>();
+//		pictureFolders.addAll(MediaFacer.withPictureContex(MainActivity.this).getPictureFolders());
+//		//now load images for the first pictureFolderContent object
+//		pictureFolders.get(0)
+//				.setPhotos(MediaFacer
+//						.withPictureContex(MainActivity.this)
+//						.getAllPictureContentByBucket_id(pictureFolders.get(0).getBucket_id()));
+//		//get all folders containing videos
+//		ArrayList<videoFolderContent> videoFolders = new ArrayList<>();
+//
+//		videoFolders.addAll(MediaFacer.withVideoContex(MainActivity.this).getVideoFolders(VideoGet.externalContentUri));
+//
+////now load videos for the first videoFolderContent object
+//		videoFolders.get(0)
+//				.setVideoFiles(MediaFacer.withVideoContex(MainActivity.this)
+//						.getAllVideoContentByBucket_id(videoFolders.get(0).getBucket_id()));
 	}
 
 	private void checkPermission() {
