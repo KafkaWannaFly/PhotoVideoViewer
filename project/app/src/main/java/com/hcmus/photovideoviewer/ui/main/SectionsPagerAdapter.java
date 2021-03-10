@@ -10,9 +10,9 @@ import androidx.fragment.app.FragmentPagerAdapter;
 
 import com.hcmus.photovideoviewer.AlbumsFragment;
 import com.hcmus.photovideoviewer.ExploreFragment;
-import com.hcmus.photovideoviewer.PhotosFragment;
+import com.hcmus.photovideoviewer.views.PhotosFragment;
 import com.hcmus.photovideoviewer.R;
-import com.hcmus.photovideoviewer.VideosFragment;
+import com.hcmus.photovideoviewer.views.VideosFragment;
 
 /**
  * A [FragmentPagerAdapter] that returns a fragment corresponding to

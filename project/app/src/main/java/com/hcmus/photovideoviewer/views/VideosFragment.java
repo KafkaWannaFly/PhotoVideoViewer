@@ -1,4 +1,4 @@
-package com.hcmus.photovideoviewer;
+package com.hcmus.photovideoviewer.views;
 
 import androidx.lifecycle.ViewModelProvider;
 
@@ -12,24 +12,27 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-public class PhotosFragment extends Fragment {
+import com.hcmus.photovideoviewer.R;
+import com.hcmus.photovideoviewer.viewmodels.VideosViewModel;
 
-	private PhotosViewModel mViewModel;
+public class VideosFragment extends Fragment {
 
-	public static PhotosFragment newInstance() {
-		return new PhotosFragment();
+	private VideosViewModel mViewModel;
+
+	public static VideosFragment newInstance() {
+		return new VideosFragment();
 	}
 
 	@Override
 	public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
 	                         @Nullable Bundle savedInstanceState) {
-		return inflater.inflate(R.layout.photos_fragment, container, false);
+		return inflater.inflate(R.layout.videos_fragment, container, false);
 	}
 
 	@Override
 	public void onActivityCreated(@Nullable Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		mViewModel = new ViewModelProvider(this).get(PhotosViewModel.class);
+		mViewModel = new ViewModelProvider(this).get(VideosViewModel.class);
 		// TODO: Use the ViewModel
 	}
 
