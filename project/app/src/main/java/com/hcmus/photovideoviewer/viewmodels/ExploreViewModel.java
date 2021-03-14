@@ -1,4 +1,4 @@
-package com.hcmus.photovideoviewer;
+package com.hcmus.photovideoviewer.viewmodels;
 
 import androidx.lifecycle.ViewModel;
 

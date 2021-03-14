@@ -10,16 +10,14 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.hcmus.photovideoviewer.MainActivity;
+import com.hcmus.photovideoviewer.adapters.PhotoViewAdapter;
 import com.hcmus.photovideoviewer.viewmodels.PhotosViewModel;
 import com.hcmus.photovideoviewer.R;
-
-import java.util.Objects;
 
 public class PhotosFragment extends Fragment {
 	private RecyclerView recyclerView;
@@ -47,7 +45,7 @@ public class PhotosFragment extends Fragment {
 		super.onActivityCreated(savedInstanceState);
 
 		photosViewModel = new ViewModelProvider(this).get(PhotosViewModel.class);
-		photoViewAdapter = new PhotoViewAdapter(photosViewModel.getPhotoModels());
+		photoViewAdapter = new PhotoViewAdapter(recyclerView.getContext(), photosViewModel.getPhotoModels());
 		recyclerView.setAdapter(photoViewAdapter);
 
 		layoutManager = new GridLayoutManager(getActivity(), MainActivity.SPAN_COUNT);

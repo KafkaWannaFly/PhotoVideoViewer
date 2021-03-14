@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_height="match_parent"
     android:layout_width="match_parent"
-    tools:context=".AlbumsFragment"
+    tools:context=".views.AlbumsFragment"
     >
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/glide_image_list_recycle_view"

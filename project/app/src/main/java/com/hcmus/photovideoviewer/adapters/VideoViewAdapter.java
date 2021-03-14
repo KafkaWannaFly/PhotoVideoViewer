@@ -1,36 +1,27 @@
-package com.hcmus.photovideoviewer.views;
+package com.hcmus.photovideoviewer.adapters;
 
+import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.VideoView;
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.hcmus.photovideoviewer.R;
 import com.hcmus.photovideoviewer.models.VideoModel;
 
 import java.util.ArrayList;
 
 public class VideoViewAdapter extends RecyclerView.Adapter<VideoViewAdapter.ViewHolder> {
-	public static class ViewHolder extends RecyclerView.ViewHolder {
-		private VideoView videoView = null;
-
-		public ViewHolder(@NonNull View itemView) {
-			super(itemView);
-			videoView = itemView.findViewById(R.id.videoView);
-		}
-
-		public VideoView getVideoView() {
-			return videoView;
-		}
-	}
-
 	private ArrayList<VideoModel> videoModels = null;
+	private Context context = null;
 
-	public VideoViewAdapter(ArrayList<VideoModel> videoModels) {
+	public VideoViewAdapter(Context context, ArrayList<VideoModel> videoModels) {
+		this.context = context;
 		this.videoModels = videoModels;
 	}
 
@@ -43,11 +34,15 @@ public class VideoViewAdapter extends RecyclerView.Adapter<VideoViewAdapter.View
 
 	@Override
 	public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-		VideoView videoView = holder.getVideoView();
+		ImageView videoView = holder.getVideoView();
 
 		VideoModel videoModel = videoModels.get(position);
-		videoView.setVideoURI(videoModel.uri);
-		videoView.seekTo((int) (videoModel.duration/2*1000));
+
+		Glide.with(context)
+				.load(videoModel.uri)
+				.thumbnail(0.1f)
+				.placeholder(R.mipmap.ic_launcher_round)
+				.into(videoView);
 
 		Log.d("Videos", videoModels.get(position).toString());
 	}
@@ -57,6 +52,18 @@ public class VideoViewAdapter extends RecyclerView.Adapter<VideoViewAdapter.View
 		return videoModels.size();
 	}
 
+	public static class ViewHolder extends RecyclerView.ViewHolder {
+		private ImageView videoView = null;
+
+		public ViewHolder(@NonNull View itemView) {
+			super(itemView);
+			videoView = itemView.findViewById(R.id.videoView);
+		}
+
+		public ImageView getVideoView() {
+			return videoView;
+		}
+	}
 
 
 }

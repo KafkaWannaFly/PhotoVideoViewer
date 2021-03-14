@@ -8,8 +8,8 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 
-import com.hcmus.photovideoviewer.AlbumsFragment;
-import com.hcmus.photovideoviewer.ExploreFragment;
+import com.hcmus.photovideoviewer.views.AlbumsFragment;
+import com.hcmus.photovideoviewer.views.ExploreFragment;
 import com.hcmus.photovideoviewer.views.PhotosFragment;
 import com.hcmus.photovideoviewer.R;
 import com.hcmus.photovideoviewer.views.VideosFragment;

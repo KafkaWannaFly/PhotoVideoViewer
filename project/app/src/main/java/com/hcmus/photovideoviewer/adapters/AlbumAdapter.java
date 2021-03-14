@@ -1,4 +1,4 @@
-package com.hcmus.photovideoviewer.ui.main;
+package com.hcmus.photovideoviewer.adapters;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;

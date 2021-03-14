@@ -1,22 +1,28 @@
-package com.hcmus.photovideoviewer.views;
+package com.hcmus.photovideoviewer.adapters;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.hcmus.photovideoviewer.R;
 import com.hcmus.photovideoviewer.models.PhotoModel;
 
 import java.util.ArrayList;
 
 public class PhotoViewAdapter extends RecyclerView.Adapter<PhotoViewAdapter.ViewHolder> {
-	private ArrayList<PhotoModel> photoModels;
+	private ArrayList<PhotoModel> photoModels = null;
+	private Fragment fragment = null;
+	Context context = null;
 
-	public PhotoViewAdapter(ArrayList<PhotoModel> photoModels) {
+	public PhotoViewAdapter(Context context, ArrayList<PhotoModel> photoModels) {
+		this.context = context;
 		this.photoModels = photoModels;
 	}
 
@@ -31,15 +37,11 @@ public class PhotoViewAdapter extends RecyclerView.Adapter<PhotoViewAdapter.View
 	@Override
 	public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
 		ImageView imageView = holder.getImageView();
-		imageView.setImageURI(photoModels.get(position).uri);
+		Glide.with(context)
+				.load(photoModels.get(position).uri)
+				.placeholder(R.mipmap.ic_launcher_round)
+				.into(imageView);
 
-//		DisplayMetrics displayMetrics = PhotosFragment.displayMetrics;
-//		int sideSize = displayMetrics.heightPixels / PhotosFragment.SPAN_COUNT;
-
-//		imageView.setMaxWidth(sideSize);
-//		imageView.setMinimumWidth(sideSize);
-//		imageView.setMaxHeight(sideSize);
-//		imageView.setMinimumHeight(sideSize);
 	}
 
 	@Override

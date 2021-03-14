@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 
 import com.hcmus.photovideoviewer.MainActivity;
 import com.hcmus.photovideoviewer.R;
+import com.hcmus.photovideoviewer.adapters.VideoViewAdapter;
 import com.hcmus.photovideoviewer.viewmodels.VideosViewModel;
 
 public class VideosFragment extends Fragment {
@@ -44,7 +45,7 @@ public class VideosFragment extends Fragment {
 
 		videosViewModel = new ViewModelProvider(this).get(VideosViewModel.class);
 
-		videoViewAdapter = new VideoViewAdapter(videosViewModel.getVideoModels());
+		videoViewAdapter = new VideoViewAdapter(recyclerView.getContext(), videosViewModel.getVideoModels());
 		recyclerView.setAdapter(videoViewAdapter);
 
 		layoutManager = new GridLayoutManager(getActivity(), MainActivity.SPAN_COUNT);

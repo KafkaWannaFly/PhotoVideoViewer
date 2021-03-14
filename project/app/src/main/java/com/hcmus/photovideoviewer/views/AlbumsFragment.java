@@ -1,4 +1,4 @@
-package com.hcmus.photovideoviewer;
+package com.hcmus.photovideoviewer.views;
 
 import androidx.lifecycle.ViewModelProvider;
 
@@ -15,12 +15,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.hcmus.photovideoviewer.viewmodels.AlbumsViewModel;
+import com.hcmus.photovideoviewer.R;
 import com.hcmus.photovideoviewer.models.Albums;
-import com.hcmus.photovideoviewer.ui.main.AlbumAdapter;
+import com.hcmus.photovideoviewer.adapters.AlbumAdapter;
 
 import java.util.List;
 
-public class ExploreFragment extends Fragment {
+public class AlbumsFragment extends Fragment {
 	private enum LayoutManagerType {
 		GRID_LAYOUT_MANAGER,
 		LINEAR_LAYOUT_MANAGER
@@ -50,7 +52,7 @@ public class ExploreFragment extends Fragment {
 
 	@Override
 	public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
-							 @Nullable Bundle savedInstanceState) {
+	                         @Nullable Bundle savedInstanceState) {
 		View rootView = inflater.inflate(R.layout.albums_fragment, container, false);
 		rootView.setTag("RecyclerViewFragment");
 		mRecyclerView = (RecyclerView) rootView.findViewById(R.id.glide_image_list_recycle_view);
@@ -77,32 +79,32 @@ public class ExploreFragment extends Fragment {
 		mViewModel = new ViewModelProvider(this).get(AlbumsViewModel.class);
 		// TODO: Use the ViewModel
 	}
-	public void setRecyclerViewLayoutManager(LayoutManagerType layoutManagerType) {
-		int scrollPosition = 0;
+public void setRecyclerViewLayoutManager(LayoutManagerType layoutManagerType) {
+	int scrollPosition = 0;
 
-		// If a layout manager has already been set, get current scroll position.
-		if (mRecyclerView.getLayoutManager() != null) {
-			scrollPosition = ((LinearLayoutManager) mRecyclerView.getLayoutManager())
-					.findFirstCompletelyVisibleItemPosition();
-		}
-
-		switch (layoutManagerType) {
-			case GRID_LAYOUT_MANAGER:
-				mLayoutManager = new GridLayoutManager(getActivity(), 2);
-				mCurrentLayoutManagerType = LayoutManagerType.GRID_LAYOUT_MANAGER;
-				break;
-			case LINEAR_LAYOUT_MANAGER:
-				mLayoutManager = new LinearLayoutManager(getActivity());
-				mCurrentLayoutManagerType = LayoutManagerType.LINEAR_LAYOUT_MANAGER;
-				break;
-			default:
-				mLayoutManager = new LinearLayoutManager(getActivity());
-				mCurrentLayoutManagerType = LayoutManagerType.LINEAR_LAYOUT_MANAGER;
-		}
-
-		mRecyclerView.setLayoutManager(mLayoutManager);
-		mRecyclerView.scrollToPosition(scrollPosition);
+	// If a layout manager has already been set, get current scroll position.
+	if (mRecyclerView.getLayoutManager() != null) {
+		scrollPosition = ((LinearLayoutManager) mRecyclerView.getLayoutManager())
+				.findFirstCompletelyVisibleItemPosition();
 	}
+
+	switch (layoutManagerType) {
+		case GRID_LAYOUT_MANAGER:
+			mLayoutManager = new GridLayoutManager(getActivity(), 2);
+			mCurrentLayoutManagerType = LayoutManagerType.GRID_LAYOUT_MANAGER;
+			break;
+		case LINEAR_LAYOUT_MANAGER:
+			mLayoutManager = new LinearLayoutManager(getActivity());
+			mCurrentLayoutManagerType = LayoutManagerType.LINEAR_LAYOUT_MANAGER;
+			break;
+		default:
+			mLayoutManager = new LinearLayoutManager(getActivity());
+			mCurrentLayoutManagerType = LayoutManagerType.LINEAR_LAYOUT_MANAGER;
+	}
+
+	mRecyclerView.setLayoutManager(mLayoutManager);
+	mRecyclerView.scrollToPosition(scrollPosition);
+}
 	@Override
 	public void onSaveInstanceState(Bundle savedInstanceState) {
 		// Save currently selected layout manager.

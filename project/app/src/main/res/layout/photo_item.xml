@@ -12,5 +12,6 @@
             tools:ignore="ContentDescription"
             android:adjustViewBounds="true"
             android:scaleType="centerCrop"
+            android:layout_margin="2dp"
             />
 </FrameLayout>
