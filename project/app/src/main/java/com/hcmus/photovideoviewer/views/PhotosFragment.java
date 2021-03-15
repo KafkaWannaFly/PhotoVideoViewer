@@ -21,10 +21,10 @@ import com.hcmus.photovideoviewer.R;
 
 public class PhotosFragment extends Fragment {
 	private RecyclerView recyclerView;
-	private RecyclerView.LayoutManager layoutManager;
+	private RecyclerView.LayoutManager layoutManager = null;
 
-	private PhotosViewModel photosViewModel;
-	private PhotoViewAdapter photoViewAdapter;
+	private PhotosViewModel photosViewModel = null;
+	private PhotoViewAdapter photoViewAdapter = null;
 
 
 	public static PhotosFragment newInstance() {

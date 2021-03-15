@@ -1,99 +1,83 @@
 package com.hcmus.photovideoviewer;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 
-import com.CodeBoy.MediaFacer.MediaFacer;
-import com.CodeBoy.MediaFacer.PictureGet;
-import com.CodeBoy.MediaFacer.VideoGet;
-import com.CodeBoy.MediaFacer.mediaHolders.pictureContent;
-import com.CodeBoy.MediaFacer.mediaHolders.pictureFolderContent;
-import com.CodeBoy.MediaFacer.mediaHolders.videoFolderContent;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
-import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
-import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.viewpager2.adapter.FragmentStateAdapter;
+import androidx.viewpager2.widget.ViewPager2;
 
-import android.util.DisplayMetrics;
-import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 
-import com.hcmus.photovideoviewer.models.PhotoModel;
-import com.hcmus.photovideoviewer.models.VideoModel;
-import com.hcmus.photovideoviewer.services.MediaDataRepository;
-import com.hcmus.photovideoviewer.ui.main.SectionsPagerAdapter;
+import com.hcmus.photovideoviewer.adapters.ViewPagerAdapter;
 
-import java.util.ArrayList;
-import java.util.Objects;
-
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity
+		implements BottomNavigationView.OnNavigationItemSelectedListener {
+	public static final int SPAN_COUNT = 4; // Number of displayed columns in view
 	static final int READ_EXTERNAL_CODE = 1;
 	static public boolean EXTERNAL_PERMISSION = false;
 
-	public static final int SPAN_COUNT = 4; // Number of displayed columns in view
-
-	public static DisplayMetrics displayMetrics = new DisplayMetrics();
+	private ViewPager2 pager = null;
+	private BottomNavigationView bottomNavigationView = null;
+	private FragmentStateAdapter fragmentStateAdapter = null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
-		SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(this, getSupportFragmentManager());
-		ViewPager viewPager = findViewById(R.id.view_pager);
-		viewPager.setAdapter(sectionsPagerAdapter);
-		TabLayout tabs = findViewById(R.id.tabs);
-		tabs.setupWithViewPager(viewPager);
+		setContentView(R.layout.main_activity);
 
-		this.getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+		pager = findViewById(R.id.pager);
+		fragmentStateAdapter = new ViewPagerAdapter(this);
+		pager.setAdapter(fragmentStateAdapter);
+
+		bottomNavigationView = findViewById(R.id.bottomNavigationView);
+		bottomNavigationView.setOnNavigationItemSelectedListener(this);
+
+		pager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+			@Override
+			public void onPageSelected(int position) {
+				super.onPageSelected(position);
+				switch (position) {
+					case 0: {
+						bottomNavigationView.setSelectedItemId(R.id.photoTab);
+						break;
+					}
+					case 1: {
+						bottomNavigationView.setSelectedItemId(R.id.videoTab);
+						break;
+					}
+					case 2: {
+						bottomNavigationView.setSelectedItemId(R.id.albumTab);
+						break;
+					}
+					case 3: {
+						bottomNavigationView.setSelectedItemId(R.id.exploreTab);
+						break;
+					}
+				}
+			}
+		});
+
+//		SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(this, getSupportFragmentManager());
+//		ViewPager viewPager = findViewById(R.id.view_pager);
+//		viewPager.setAdapter(sectionsPagerAdapter);
+//		TabLayout tabs = findViewById(R.id.tabs);
+//		tabs.setupWithViewPager(viewPager);
 
 		checkPermission();
-
-//		ArrayList<PhotoModel> photoModels = MediaDataRepository.getInstance().getPhotoModels();
-//		Log.d("Photos", photoModels.toString());
-//		ArrayList<VideoModel> videoModels = MediaDataRepository.getInstance().getVideoModels();
-//		Log.d("Videos", videoModels.toString());
-
-//		FloatingActionButton fab = findViewById(R.id.fab);
-//		fab.setOnClickListener(new View.OnClickListener() {
-//			@Override
-//			public void onClick(View view) {
-//				Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//						.setAction("Action", null).show();
-//			}
-//		});
-
-		//get all images in the MediaStore.
-//		ArrayList<pictureContent> allPhotos;
-//
-//		allPhotos = MediaFacer
-//				.withPictureContex(MainActivity.this)
-//				.getAllPictureContents(PictureGet.externalContentUri);
-//		System.out.println("All IMGs: " + allPhotos.size());
-//
-//		//get all folders containing pictures
-//		ArrayList<pictureFolderContent> pictureFolders = new ArrayList<>();
-//		pictureFolders.addAll(MediaFacer.withPictureContex(MainActivity.this).getPictureFolders());
-//
-//		//now load images for the first pictureFolderContent object
-//		pictureFolders.get(0)
-//				.setPhotos(MediaFacer
-//						.withPictureContex(MainActivity.this)
-//						.getAllPictureContentByBucket_id(pictureFolders.get(0).getBucket_id()));
-//		System.out.println("All Folders Contains IMG: " + pictureFolders.size());
 	}
 
 	private void checkPermission() {
 		if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
-			!= PackageManager.PERMISSION_GRANTED) {
-			requestPermissions(new String[] {
-				Manifest.permission.READ_EXTERNAL_STORAGE
+				    != PackageManager.PERMISSION_GRANTED) {
+			requestPermissions(new String[]{
+					Manifest.permission.READ_EXTERNAL_STORAGE
 			}, READ_EXTERNAL_CODE);
 		}
 	}
@@ -104,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
 
 		switch (requestCode) {
 			case READ_EXTERNAL_CODE: {
-				for (int result: grantResults) {
+				for (int result : grantResults) {
 					if (result != PackageManager.PERMISSION_GRANTED) {
 						EXTERNAL_PERMISSION = false;
 						return;
@@ -114,5 +98,37 @@ public class MainActivity extends AppCompatActivity {
 				EXTERNAL_PERMISSION = true;
 			}
 		}
+	}
+
+	@SuppressLint("NonConstantResourceId")
+	@Override
+	public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+		boolean returnLater = false;
+
+		int itemId = item.getItemId();
+		switch (itemId) {
+			case R.id.photoTab: {
+				pager.setCurrentItem(0);
+				returnLater = true;
+				break;
+			}
+			case R.id.videoTab: {
+				pager.setCurrentItem(1);
+				returnLater = true;
+				break;
+			}
+			case R.id.albumTab: {
+				pager.setCurrentItem(2);
+				returnLater = true;
+				break;
+			}
+			case R.id.exploreTab: {
+				pager.setCurrentItem(3);
+				returnLater = true;
+				break;
+			}
+		}
+
+		return returnLater;
 	}
 }
