@@ -39,7 +39,7 @@ public class PhotoViewAdapter extends RecyclerView.Adapter<PhotoViewAdapter.View
 		ImageView imageView = holder.getImageView();
 		Glide.with(context)
 				.load(photoModels.get(position).uri)
-				.placeholder(R.mipmap.ic_launcher_round)
+				.placeholder(R.drawable.pussy_cat)
 				.into(imageView);
 
 	}

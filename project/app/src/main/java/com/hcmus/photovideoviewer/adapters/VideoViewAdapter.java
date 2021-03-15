@@ -41,7 +41,7 @@ public class VideoViewAdapter extends RecyclerView.Adapter<VideoViewAdapter.View
 		Glide.with(context)
 				.load(videoModel.uri)
 				.thumbnail(0.1f)
-				.placeholder(R.mipmap.ic_launcher_round)
+				.placeholder(R.drawable.pussy_cat)
 				.into(videoView);
 
 		Log.d("Videos", videoModels.get(position).toString());
