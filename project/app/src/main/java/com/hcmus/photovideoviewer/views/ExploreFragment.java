@@ -15,10 +15,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.hcmus.photovideoviewer.adapters.AlbumAdapter;
 import com.hcmus.photovideoviewer.viewmodels.AlbumsViewModel;
 import com.hcmus.photovideoviewer.R;
-import com.hcmus.photovideoviewer.models.Albums;
-import com.hcmus.photovideoviewer.adapters.AlbumAdapter;
+import com.hcmus.photovideoviewer.models.AlbumModel;
 
 import java.util.List;
 
@@ -30,7 +30,7 @@ public class ExploreFragment extends Fragment {
 	private AlbumsViewModel mViewModel;
 	private RecyclerView mRecyclerView;
 	private GridLayoutManager gridLayoutManager;
-	private List<Albums> albumsList;
+	private List<AlbumModel> albumsList;
 	protected RecyclerView.LayoutManager mLayoutManager;
 	protected LayoutManagerType mCurrentLayoutManagerType;
 	protected AlbumAdapter mAdapter;
@@ -67,7 +67,7 @@ public class ExploreFragment extends Fragment {
 		}
 		setRecyclerViewLayoutManager(mCurrentLayoutManagerType);
 
-		mAdapter = new AlbumAdapter(mDataset);
+//		mAdapter = new AlbumAdapter(mDataset);
 		// Set CustomAdapter as the adapter for RecyclerView.
 		mRecyclerView.setAdapter(mAdapter);
 		return rootView;

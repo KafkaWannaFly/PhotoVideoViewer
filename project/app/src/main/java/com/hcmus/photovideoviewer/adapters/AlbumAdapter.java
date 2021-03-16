@@ -9,6 +9,10 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.hcmus.photovideoviewer.R;
+import com.hcmus.photovideoviewer.models.AlbumModel;
+import com.squareup.picasso.Picasso;
+import com.google.android.material.*;
+import java.util.ArrayList;
 
 /**
  * Provide views to RecyclerView with data from mDataSet.
@@ -16,7 +20,8 @@ import com.hcmus.photovideoviewer.R;
 public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ViewHolder> {
     private static final String TAG = "CustomAdapter";
 
-    private String[] mDataSet;
+    //    private String[] mDataSet;
+    ArrayList<AlbumModel> albumData;
 
     // BEGIN_INCLUDE(recyclerViewSampleViewHolder)
     /**
@@ -25,7 +30,7 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ViewHolder> 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         private final TextView title_of_album;
         private final ImageView imgTitle_of_album;
-
+        private final TextView quantity_of_album;
 
         public ViewHolder(View v) {
             super(v);
@@ -38,7 +43,7 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ViewHolder> 
             });
             title_of_album = (TextView) v.findViewById(R.id.title_of_album);
             imgTitle_of_album = (ImageView) v.findViewById(R.id.my_image_glide);
-
+            quantity_of_album = (TextView) v.findViewById(R.id.quantity_of_album);
         }
 
         public TextView getTextView() {
@@ -47,16 +52,18 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ViewHolder> 
         public ImageView getImageView(){
             return imgTitle_of_album;
         }
+        public TextView getQuantityAlbums(){
+            return quantity_of_album;
+        }
     }
     // END_INCLUDE(recyclerViewSampleViewHolder)
 
     /**
      * Initialize the dataset of the Adapter.
      *
-     * @param dataSet String[] containing the data to populate views to be used by RecyclerView.
      */
-    public AlbumAdapter(String[] dataSet) {
-        mDataSet = dataSet;
+    public AlbumAdapter(ArrayList<AlbumModel> albumModels) {
+        this.albumData = albumModels;
     }
 
     // BEGIN_INCLUDE(recyclerViewOnCreateViewHolder)
@@ -79,16 +86,20 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ViewHolder> 
 
         // Get element from your dataset at this position and replace the contents of the view
         // with that element
-        viewHolder.getTextView().setText(mDataSet[position]);
-        //        viewHolder.getImageView().setImageBitmap(getBitmapFromURL("/storage/emulated/0/Download/1.jpg"));
-//        viewHolder.getImageView().setImageResource(R.drawable.ic_launcher_background);
-
+        Log.d("Test data album", "" + albumData.get(position));
+        viewHolder.getTextView().setText(albumData.get(position).getAlbumName());
+        viewHolder.getQuantityAlbums().setText(albumData.get(position).getQuantity()+"");
+        Picasso.get()
+                .load(albumData.get(position).getImageUrl().uri)
+                .resize(700,650)
+                .centerCrop()
+                .into( viewHolder.getImageView());
     }
     // END_INCLUDE(recyclerViewOnBindViewHolder)
 
     // Return the size of your dataset (invoked by the layout manager)
     @Override
     public int getItemCount() {
-        return mDataSet.length;
+        return albumData.size();
     }
 }

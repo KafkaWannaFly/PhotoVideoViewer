@@ -11,16 +11,19 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.hcmus.photovideoviewer.adapters.AlbumAdapter;
+import com.hcmus.photovideoviewer.models.PhotoModel;
 import com.hcmus.photovideoviewer.viewmodels.AlbumsViewModel;
 import com.hcmus.photovideoviewer.R;
-import com.hcmus.photovideoviewer.models.Albums;
-import com.hcmus.photovideoviewer.adapters.AlbumAdapter;
+import com.hcmus.photovideoviewer.models.AlbumModel;
+import com.hcmus.photovideoviewer.viewmodels.PhotosViewModel;
 
-import java.util.List;
+import java.util.ArrayList;
 
 public class AlbumsFragment extends Fragment {
 	private enum LayoutManagerType {
@@ -30,12 +33,12 @@ public class AlbumsFragment extends Fragment {
 	private AlbumsViewModel mViewModel;
 	private RecyclerView mRecyclerView;
 	private GridLayoutManager gridLayoutManager;
-	private List<Albums> albumsList;
 	protected RecyclerView.LayoutManager mLayoutManager;
 	protected LayoutManagerType mCurrentLayoutManagerType;
 	protected AlbumAdapter mAdapter;
-	protected String[] mDataset;
-
+	//	protected String[] mDataset;
+	private AlbumAdapter albumAdapter;
+	private AlbumsViewModel albumsViewModel;
 
 
 	public static AlbumsFragment newInstance() {
@@ -47,12 +50,12 @@ public class AlbumsFragment extends Fragment {
 
 		// Initialize dataset, this data would usually come from a local content provider or
 		// remote server.
-		initDataset();
+
 	}
 
 	@Override
 	public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
-	                         @Nullable Bundle savedInstanceState) {
+							 @Nullable Bundle savedInstanceState) {
 		View rootView = inflater.inflate(R.layout.albums_fragment, container, false);
 		rootView.setTag("RecyclerViewFragment");
 		mRecyclerView = (RecyclerView) rootView.findViewById(R.id.glide_image_list_recycle_view);
@@ -66,10 +69,9 @@ public class AlbumsFragment extends Fragment {
 					.getSerializable("layoutManager");
 		}
 		setRecyclerViewLayoutManager(mCurrentLayoutManagerType);
-
-		mAdapter = new AlbumAdapter(mDataset);
-		// Set CustomAdapter as the adapter for RecyclerView.
-		mRecyclerView.setAdapter(mAdapter);
+		albumsViewModel = new ViewModelProvider(this).get(AlbumsViewModel.class);
+		albumAdapter = new AlbumAdapter(albumsViewModel.getAlbumModels());
+		mRecyclerView.setAdapter(albumAdapter);
 		return rootView;
 	}
 
@@ -77,44 +79,38 @@ public class AlbumsFragment extends Fragment {
 	public void onActivityCreated(@Nullable Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 		mViewModel = new ViewModelProvider(this).get(AlbumsViewModel.class);
-		// TODO: Use the ViewModel
 	}
-public void setRecyclerViewLayoutManager(LayoutManagerType layoutManagerType) {
-	int scrollPosition = 0;
+	public void setRecyclerViewLayoutManager(LayoutManagerType layoutManagerType) {
+		int scrollPosition = 0;
 
-	// If a layout manager has already been set, get current scroll position.
-	if (mRecyclerView.getLayoutManager() != null) {
-		scrollPosition = ((LinearLayoutManager) mRecyclerView.getLayoutManager())
-				.findFirstCompletelyVisibleItemPosition();
+		// If a layout manager has already been set, get current scroll position.
+		if (mRecyclerView.getLayoutManager() != null) {
+			scrollPosition = ((LinearLayoutManager) mRecyclerView.getLayoutManager())
+					.findFirstCompletelyVisibleItemPosition();
+		}
+
+		switch (layoutManagerType) {
+			case GRID_LAYOUT_MANAGER:
+				mLayoutManager = new GridLayoutManager(getActivity(), 2);
+				mCurrentLayoutManagerType = LayoutManagerType.GRID_LAYOUT_MANAGER;
+				break;
+			case LINEAR_LAYOUT_MANAGER:
+				mLayoutManager = new LinearLayoutManager(getActivity());
+				mCurrentLayoutManagerType = LayoutManagerType.LINEAR_LAYOUT_MANAGER;
+				break;
+			default:
+				mLayoutManager = new LinearLayoutManager(getActivity());
+				mCurrentLayoutManagerType = LayoutManagerType.LINEAR_LAYOUT_MANAGER;
+		}
+
+		mRecyclerView.setLayoutManager(mLayoutManager);
+		mRecyclerView.scrollToPosition(scrollPosition);
 	}
-
-	switch (layoutManagerType) {
-		case GRID_LAYOUT_MANAGER:
-			mLayoutManager = new GridLayoutManager(getActivity(), 2);
-			mCurrentLayoutManagerType = LayoutManagerType.GRID_LAYOUT_MANAGER;
-			break;
-		case LINEAR_LAYOUT_MANAGER:
-			mLayoutManager = new LinearLayoutManager(getActivity());
-			mCurrentLayoutManagerType = LayoutManagerType.LINEAR_LAYOUT_MANAGER;
-			break;
-		default:
-			mLayoutManager = new LinearLayoutManager(getActivity());
-			mCurrentLayoutManagerType = LayoutManagerType.LINEAR_LAYOUT_MANAGER;
-	}
-
-	mRecyclerView.setLayoutManager(mLayoutManager);
-	mRecyclerView.scrollToPosition(scrollPosition);
-}
 	@Override
 	public void onSaveInstanceState(Bundle savedInstanceState) {
 		// Save currently selected layout manager.
 		savedInstanceState.putSerializable("layoutManager", mCurrentLayoutManagerType);
 		super.onSaveInstanceState(savedInstanceState);
 	}
-	private void initDataset() {
-		mDataset = new String[60];
-		for (int i = 0; i < 60; i++) {
-			mDataset[i] = "This is element #" + i;
-		}
-	}
+
 }

@@ -6,13 +6,16 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Build;
 import android.provider.MediaStore;
 import android.util.Log;
 
-import androidx.annotation.RequiresApi;
-
+import com.CodeBoy.MediaFacer.MediaFacer;
+import com.CodeBoy.MediaFacer.VideoGet;
+import com.CodeBoy.MediaFacer.mediaHolders.pictureContent;
+import com.CodeBoy.MediaFacer.mediaHolders.pictureFolderContent;
+import com.CodeBoy.MediaFacer.mediaHolders.videoContent;
 import com.hcmus.photovideoviewer.MainApplication;
+import com.hcmus.photovideoviewer.models.AlbumModel;
 import com.hcmus.photovideoviewer.models.PhotoModel;
 import com.hcmus.photovideoviewer.models.VideoModel;
 
@@ -25,11 +28,12 @@ public class MediaDataRepository {
 	private final Context context;
 	private ArrayList<PhotoModel> photoModels = new ArrayList<>();
 	private ArrayList<VideoModel> videoModels = new ArrayList<>();
-
+	private ArrayList<AlbumModel> albumModels = new ArrayList<>();
 	private MediaDataRepository() {
 		context = MainApplication.getContext();
 		this.fetchPhotos();
 		this.fetchVideos();
+		this.fetchAlbums();
 	}
 
 	public static MediaDataRepository getInstance() {
@@ -42,10 +46,10 @@ public class MediaDataRepository {
 	public ArrayList<PhotoModel> getPhotoModels() {
 		return photoModels;
 	}
-
 	public ArrayList<VideoModel> getVideoModels() {
 		return videoModels;
 	}
+	public ArrayList<AlbumModel> getAlbumModels(){return albumModels;}
 
 	private void fetchPhotos() {
 		Uri _uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
@@ -90,9 +94,8 @@ public class MediaDataRepository {
 		Log.d("Images", "Found " + photoModels.size() + " photos");
 	}
 
-	@RequiresApi(api = Build.VERSION_CODES.Q)
 	private void fetchVideos() {
-		Uri _uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
+		Uri uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
 		String[] projection = new String[]{
 				MediaStore.Video.Media._ID,
 				MediaStore.Video.Media.DISPLAY_NAME,
@@ -102,7 +105,7 @@ public class MediaDataRepository {
 		};
 
 		ContentResolver contentResolver = context.getContentResolver();
-		try (Cursor cursor = contentResolver.query(_uri,
+		try (Cursor cursor = contentResolver.query(uri,
 				projection,
 				null,
 				null,
@@ -127,7 +130,6 @@ public class MediaDataRepository {
 						size = _size;
 						dateModified = new Date(date * 1000);
 						duration = _duration/1000;
-						uri = ContentUris.withAppendedId(_uri, id);
 					}
 				};
 
@@ -136,5 +138,43 @@ public class MediaDataRepository {
 		}
 
 		Log.d("Videos", "Found " + videoModels.size() + " Videos");
+	}
+	private void fetchAlbums()
+	{
+		Uri _uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+		ArrayList<pictureContent> allPhotosAlbum;
+		ArrayList<videoContent> allVideos;
+
+		ArrayList<pictureFolderContent> pictureFolders = new ArrayList<>();
+		pictureFolders.addAll(MediaFacer.withPictureContex(context).getPictureFolders());
+		for(int i = 0; i < pictureFolders.size(); i++)
+		{
+			int index = i;
+			allPhotosAlbum = MediaFacer.withPictureContex(context).getAllPictureContentByBucket_id(pictureFolders.get(index).getBucket_id());
+			allVideos = MediaFacer
+					.withVideoContex(context)
+					.getAllVideoContent(VideoGet.externalContentUri);
+			ArrayList<pictureContent> finalAllPhotos = allPhotosAlbum;
+			ArrayList<videoContent> finalAllVideos = allVideos;
+
+			PhotoModel photoModel = new PhotoModel() {
+				{
+					id = (long)finalAllPhotos.get(0).getPictureId();
+					displayName = finalAllPhotos.get(0).getPicturName();
+					size = finalAllPhotos.get(0).getPictureSize();
+					dateModified = new Date(finalAllPhotos.get(0).getDate_modified() * 1000);
+					uri = ContentUris.withAppendedId(_uri, id);
+				}
+			};
+			AlbumModel albumModel = new AlbumModel(){
+				{
+					albumName = pictureFolders.get(index).getFolderName();
+					quantity = finalAllPhotos.size() + finalAllVideos.size();
+					imageUrl = photoModel;
+				}
+			};
+			albumModels.add(albumModel);
+		}
+		Log.d("Size of Album: ", "" + albumModels.get(0));
 	}
 }
