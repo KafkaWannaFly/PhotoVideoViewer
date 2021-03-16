@@ -1,6 +1,8 @@
 package com.hcmus.photovideoviewer.adapters;
 
 import android.content.Context;
+import android.content.Intent;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -54,6 +56,8 @@ public class VideoViewAdapter extends RecyclerView.Adapter<VideoViewAdapter.View
 					.load(R.drawable.film_cam_icon)
 					.placeholder(R.drawable.pussy_cat)
 					.into(videoView);
+
+			videoView.setOnClickListener(this.onCameraOpen());
 		}
 		else {
 			VideoModel videoModel = videoModels.get(position-1);
@@ -102,5 +106,13 @@ public class VideoViewAdapter extends RecyclerView.Adapter<VideoViewAdapter.View
 		}
 	}
 
-
+	private View.OnClickListener onCameraOpen() {
+		return new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(MediaStore.INTENT_ACTION_VIDEO_CAMERA);
+				context.startActivity(intent);
+			}
+		};
+	}
 }

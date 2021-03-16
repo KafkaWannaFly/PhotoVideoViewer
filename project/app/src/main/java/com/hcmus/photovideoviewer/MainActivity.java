@@ -20,7 +20,7 @@ import com.hcmus.photovideoviewer.adapters.ViewPagerAdapter;
 public class MainActivity extends AppCompatActivity
 		implements BottomNavigationView.OnNavigationItemSelectedListener {
 	static final int READ_EXTERNAL_CODE = 1;
-	static public boolean EXTERNAL_PERMISSION = false;
+	public static final int CAMERA_PERMISSION_CODE = 2;
 
 	private ViewPager2 pager = null;
 	private BottomNavigationView bottomNavigationView = null;
@@ -30,6 +30,8 @@ public class MainActivity extends AppCompatActivity
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main_activity);
+
+		checkPermission();
 
 		pager = findViewById(R.id.pager);
 		fragmentStateAdapter = new ViewPagerAdapter(this);
@@ -69,7 +71,6 @@ public class MainActivity extends AppCompatActivity
 //		TabLayout tabs = findViewById(R.id.tabs);
 //		tabs.setupWithViewPager(viewPager);
 
-		checkPermission();
 	}
 
 	private void checkPermission() {
@@ -78,6 +79,13 @@ public class MainActivity extends AppCompatActivity
 			requestPermissions(new String[]{
 					Manifest.permission.READ_EXTERNAL_STORAGE
 			}, READ_EXTERNAL_CODE);
+		}
+
+		if(ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+				   != PackageManager.PERMISSION_GRANTED) {
+			requestPermissions(new String[] {
+					Manifest.permission.CAMERA
+			}, CAMERA_PERMISSION_CODE);
 		}
 	}
 
@@ -89,13 +97,20 @@ public class MainActivity extends AppCompatActivity
 			case READ_EXTERNAL_CODE: {
 				for (int result : grantResults) {
 					if (result != PackageManager.PERMISSION_GRANTED) {
-						EXTERNAL_PERMISSION = false;
 						return;
 					}
 				}
-
-				EXTERNAL_PERMISSION = true;
 			}
+			case CAMERA_PERMISSION_CODE: {
+				for(int result: grantResults) {
+					if (result != PackageManager.PERMISSION_GRANTED) {
+						return;
+					}
+				}
+				break;
+			}
+			default:
+				throw new IllegalStateException("Unexpected value: " + requestCode);
 		}
 	}
 

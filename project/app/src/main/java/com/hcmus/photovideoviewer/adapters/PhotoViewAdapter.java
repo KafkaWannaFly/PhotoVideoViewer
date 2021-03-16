@@ -1,6 +1,8 @@
 package com.hcmus.photovideoviewer.adapters;
 
 import android.content.Context;
+import android.content.Intent;
+import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,7 +20,6 @@ import java.util.ArrayList;
 
 public class PhotoViewAdapter extends RecyclerView.Adapter<PhotoViewAdapter.ViewHolder> {
 	private ArrayList<PhotoModel> photoModels = null;
-	private Fragment fragment = null;
 	Context context = null;
 
 	public PhotoViewAdapter(Context context, ArrayList<PhotoModel> photoModels) {
@@ -42,6 +43,8 @@ public class PhotoViewAdapter extends RecyclerView.Adapter<PhotoViewAdapter.View
 					.load(R.drawable.photo_cam_icon)
 					.placeholder(R.drawable.pussy_cat)
 					.into(imageView);
+
+			imageView.setOnClickListener(this.onCameraOpen());
 		}
 		else {
 			Glide.with(context)
@@ -67,5 +70,15 @@ public class PhotoViewAdapter extends RecyclerView.Adapter<PhotoViewAdapter.View
 		public ImageView getImageView() {
 			return imageView;
 		}
+	}
+
+	private View.OnClickListener onCameraOpen() {
+		return new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+				context.startActivity(intent);
+			}
+		};
 	}
 }

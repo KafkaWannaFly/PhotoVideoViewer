@@ -1,7 +1,10 @@
 package com.hcmus.photovideoviewer.views;
 
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -33,6 +36,12 @@ public class PhotosFragment extends Fragment {
 	}
 
 	@Override
+	public void onCreate(@Nullable Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+//		this.checkCameraPermission();
+	}
+
+	@Override
 	public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
 	                         @Nullable Bundle savedInstanceState) {
 		View rootView = inflater.inflate(R.layout.photos_fragment, container, false);
@@ -57,4 +66,34 @@ public class PhotosFragment extends Fragment {
 	public void onSaveInstanceState(@NonNull Bundle outState) {
 		super.onSaveInstanceState(outState);
 	}
+
+//	private void checkCameraPermission() {
+//		if(ContextCompat.checkSelfPermission(this.getContext(), Manifest.permission.CAMERA)
+//			!= PackageManager.PERMISSION_GRANTED) {
+//			requestPermissions(new String[] {
+//					Manifest.permission.CAMERA
+//			}, CAMERA_PERMISSION_CODE);
+//		}
+//	}
+
+//	@Override
+//	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+//		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+//
+//		switch (requestCode) {
+//			case CAMERA_PERMISSION_CODE: {
+//				for(int result: grantResults) {
+//					if (result != PackageManager.PERMISSION_GRANTED) {
+//						CAMERA_PERMISSION_GRANTED = false;
+//						return;
+//					}
+//				}
+//				CAMERA_PERMISSION_GRANTED = true;
+//
+//				break;
+//			}
+//			default:
+//				throw new IllegalStateException("Unexpected value: " + requestCode);
+//		}
+//	}
 }
