@@ -37,16 +37,23 @@ public class PhotoViewAdapter extends RecyclerView.Adapter<PhotoViewAdapter.View
 	@Override
 	public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
 		ImageView imageView = holder.getImageView();
-		Glide.with(context)
-				.load(photoModels.get(position).uri)
-				.placeholder(R.drawable.pussy_cat)
-				.into(imageView);
-
+		if (position == 0) {
+			Glide.with(context)
+					.load(R.drawable.photo_cam_icon)
+					.placeholder(R.drawable.pussy_cat)
+					.into(imageView);
+		}
+		else {
+			Glide.with(context)
+					.load(photoModels.get(position-1).uri)
+					.placeholder(R.drawable.pussy_cat)
+					.into(imageView);
+		}
 	}
 
 	@Override
 	public int getItemCount() {
-		return photoModels.size();
+		return photoModels.size() + 1; // Photos and 1 camera icon
 	}
 
 	public static class ViewHolder extends RecyclerView.ViewHolder {

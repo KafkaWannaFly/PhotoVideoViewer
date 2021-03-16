@@ -19,7 +19,6 @@ import com.hcmus.photovideoviewer.adapters.ViewPagerAdapter;
 
 public class MainActivity extends AppCompatActivity
 		implements BottomNavigationView.OnNavigationItemSelectedListener {
-	public static final int SPAN_COUNT = 4; // Number of displayed columns in view
 	static final int READ_EXTERNAL_CODE = 1;
 	static public boolean EXTERNAL_PERMISSION = false;
 

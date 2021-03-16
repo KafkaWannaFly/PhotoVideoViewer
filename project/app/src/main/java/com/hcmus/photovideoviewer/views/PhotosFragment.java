@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.hcmus.photovideoviewer.MainActivity;
+import com.hcmus.photovideoviewer.MainApplication;
 import com.hcmus.photovideoviewer.adapters.PhotoViewAdapter;
 import com.hcmus.photovideoviewer.viewmodels.PhotosViewModel;
 import com.hcmus.photovideoviewer.R;
@@ -48,7 +49,7 @@ public class PhotosFragment extends Fragment {
 		photoViewAdapter = new PhotoViewAdapter(recyclerView.getContext(), photosViewModel.getPhotoModels());
 		recyclerView.setAdapter(photoViewAdapter);
 
-		layoutManager = new GridLayoutManager(getActivity(), MainActivity.SPAN_COUNT);
+		layoutManager = new GridLayoutManager(getActivity(), MainApplication.SPAN_COUNT);
 		recyclerView.setLayoutManager(layoutManager);
 	}
 

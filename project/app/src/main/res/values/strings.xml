@@ -5,5 +5,6 @@
     <string name="videos_tab">Videos</string>
     <string name="albums_tab">Albums</string>
     <string name="explore_tab">Explore</string>
+    <string name="play_video">Play video</string>
 
 </resources>
