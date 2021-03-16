@@ -143,7 +143,7 @@ public class MediaDataRepository {
 	{
 		Uri _uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
 		ArrayList<pictureContent> allPhotosAlbum;
-		ArrayList<videoContent> allVideos;
+		ArrayList<videoContent> allVideosAlbum;
 
 		ArrayList<pictureFolderContent> pictureFolders = new ArrayList<>();
 		pictureFolders.addAll(MediaFacer.withPictureContex(context).getPictureFolders());
@@ -151,18 +151,16 @@ public class MediaDataRepository {
 		{
 			int index = i;
 			allPhotosAlbum = MediaFacer.withPictureContex(context).getAllPictureContentByBucket_id(pictureFolders.get(index).getBucket_id());
-			allVideos = MediaFacer
-					.withVideoContex(context)
-					.getAllVideoContent(VideoGet.externalContentUri);
+			allVideosAlbum = MediaFacer.withVideoContex(context).getAllVideoContentByBucket_id(pictureFolders.get(index).getBucket_id());
 			ArrayList<pictureContent> finalAllPhotos = allPhotosAlbum;
-			ArrayList<videoContent> finalAllVideos = allVideos;
+			ArrayList<videoContent> finalAllVideos = allVideosAlbum;
 
 			PhotoModel photoModel = new PhotoModel() {
 				{
-					id = (long)finalAllPhotos.get(0).getPictureId();
-					displayName = finalAllPhotos.get(0).getPicturName();
-					size = finalAllPhotos.get(0).getPictureSize();
-					dateModified = new Date(finalAllPhotos.get(0).getDate_modified() * 1000);
+					id = (long)finalAllPhotos.get(finalAllPhotos.size()-1).getPictureId();
+					displayName = finalAllPhotos.get(finalAllPhotos.size()-1).getPicturName();
+					size = finalAllPhotos.get(finalAllPhotos.size()-1).getPictureSize();
+					dateModified = new Date(finalAllPhotos.get(finalAllPhotos.size()-1).getDate_modified() * 1000);
 					uri = ContentUris.withAppendedId(_uri, id);
 				}
 			};
