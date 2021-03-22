@@ -6,5 +6,6 @@
     <string name="albums_tab">Albums</string>
     <string name="explore_tab">Explore</string>
     <string name="play_video">Play video</string>
+    <string name="more_option_fab">More option</string>
 
 </resources>

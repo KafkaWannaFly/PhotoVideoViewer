@@ -46,38 +46,22 @@ public class VideoViewAdapter extends RecyclerView.Adapter<VideoViewAdapter.View
 		ImageButton playButton = holder.getPlayButton();
 		TextView durationText = holder.getDurationText();
 
-		if (position == 0) {
-			playButton.setVisibility(View.INVISIBLE);
-			playButton.setEnabled(false);
+		VideoModel videoModel = videoModels.get(position);
 
-			durationText.setVisibility(View.INVISIBLE);
+		LocalTime localTime = LocalTime.ofSecondOfDay(videoModel.duration);
+		durationText.setText(localTime.format(DateTimeFormatter.ISO_LOCAL_TIME));
 
-			Glide.with(context)
-					.load(R.drawable.film_cam_icon)
-					.placeholder(R.drawable.pussy_cat)
-					.into(videoView);
-
-			videoView.setOnClickListener(this.onCameraOpen());
-		}
-		else {
-			VideoModel videoModel = videoModels.get(position-1);
-
-			LocalTime localTime = LocalTime.ofSecondOfDay(videoModel.duration);
-			durationText.setText(localTime.format(DateTimeFormatter.ISO_LOCAL_TIME));
-
-			Glide.with(context)
-					.load(videoModel.uri)
-					.thumbnail(0.1f)
-					.placeholder(R.drawable.pussy_cat)
-					.into(videoView);
-		}
-
+		Glide.with(context)
+				.load(videoModel.uri)
+				.thumbnail(0.1f)
+				.placeholder(R.drawable.pussy_cat)
+				.into(videoView);
 
 	}
 
 	@Override
 	public int getItemCount() {
-		return videoModels.size() + 1;
+		return videoModels.size();
 	}
 
 	public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -104,15 +88,5 @@ public class VideoViewAdapter extends RecyclerView.Adapter<VideoViewAdapter.View
 		public TextView getDurationText() {
 			return durationText;
 		}
-	}
-
-	private View.OnClickListener onCameraOpen() {
-		return new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				Intent intent = new Intent(MediaStore.INTENT_ACTION_VIDEO_CAMERA);
-				context.startActivity(intent);
-			}
-		};
 	}
 }

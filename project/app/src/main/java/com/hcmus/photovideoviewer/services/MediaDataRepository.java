@@ -29,11 +29,10 @@ public class MediaDataRepository {
 	private ArrayList<PhotoModel> photoModels = new ArrayList<>();
 	private ArrayList<VideoModel> videoModels = new ArrayList<>();
 	private ArrayList<AlbumModel> albumModels = new ArrayList<>();
+
 	private MediaDataRepository() {
 		context = MainApplication.getContext();
-		this.fetchPhotos();
-		this.fetchVideos();
-		this.fetchAlbums();
+
 	}
 
 	public static MediaDataRepository getInstance() {
@@ -43,13 +42,23 @@ public class MediaDataRepository {
 		return instance;
 	}
 
+	public void fetchData() {
+		this.fetchPhotos();
+		this.fetchVideos();
+		this.fetchAlbums();
+	}
+
 	public ArrayList<PhotoModel> getPhotoModels() {
 		return photoModels;
 	}
+
 	public ArrayList<VideoModel> getVideoModels() {
 		return videoModels;
 	}
-	public ArrayList<AlbumModel> getAlbumModels(){return albumModels;}
+
+	public ArrayList<AlbumModel> getAlbumModels() {
+		return albumModels;
+	}
 
 	private void fetchPhotos() {
 		Uri _uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
@@ -129,7 +138,7 @@ public class MediaDataRepository {
 						displayName = name;
 						size = _size;
 						dateModified = new Date(date * 1000);
-						duration = _duration/1000;
+						duration = _duration / 1000;
 						uri = ContentUris.withAppendedId(_uri, id);
 					}
 				};
@@ -140,16 +149,15 @@ public class MediaDataRepository {
 
 		Log.d("Videos", "Found " + videoModels.size() + " Videos");
 	}
-	private void fetchAlbums()
-	{
+
+	private void fetchAlbums() {
 		Uri _uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
 		ArrayList<pictureContent> allPhotosAlbum;
 		ArrayList<videoContent> allVideosAlbum;
 
 		ArrayList<pictureFolderContent> pictureFolders = new ArrayList<>();
 		pictureFolders.addAll(MediaFacer.withPictureContex(context).getPictureFolders());
-		for(int i = 0; i < pictureFolders.size(); i++)
-		{
+		for (int i = 0; i < pictureFolders.size(); i++) {
 			int index = i;
 			allPhotosAlbum = MediaFacer.withPictureContex(context).getAllPictureContentByBucket_id(pictureFolders.get(index).getBucket_id());
 			allVideosAlbum = MediaFacer.withVideoContex(context).getAllVideoContentByBucket_id(pictureFolders.get(index).getBucket_id());
@@ -158,14 +166,14 @@ public class MediaDataRepository {
 
 			PhotoModel photoModel = new PhotoModel() {
 				{
-					id = (long)finalAllPhotos.get(finalAllPhotos.size()-1).getPictureId();
-					displayName = finalAllPhotos.get(finalAllPhotos.size()-1).getPicturName();
-					size = finalAllPhotos.get(finalAllPhotos.size()-1).getPictureSize();
-					dateModified = new Date(finalAllPhotos.get(finalAllPhotos.size()-1).getDate_modified() * 1000);
+					id = (long) finalAllPhotos.get(finalAllPhotos.size() - 1).getPictureId();
+					displayName = finalAllPhotos.get(finalAllPhotos.size() - 1).getPicturName();
+					size = finalAllPhotos.get(finalAllPhotos.size() - 1).getPictureSize();
+					dateModified = new Date(finalAllPhotos.get(finalAllPhotos.size() - 1).getDate_modified() * 1000);
 					uri = ContentUris.withAppendedId(_uri, id);
 				}
 			};
-			AlbumModel albumModel = new AlbumModel(){
+			AlbumModel albumModel = new AlbumModel() {
 				{
 					albumName = pictureFolders.get(index).getFolderName();
 					quantity = finalAllPhotos.size() + finalAllVideos.size();

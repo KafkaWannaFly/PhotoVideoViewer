@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         tools:context=".MainActivity">
 
     <androidx.viewpager2.widget.ViewPager2
@@ -11,14 +11,61 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:layout_constraintBottom_toTopOf="@id/bottomNavigationView"
-            android:layout_marginBottom="56dp"
-            />
+            android:layout_marginBottom="56dp" />
+
+    <View
+            android:id="@+id/backgroundForFabButton"
+            android:visibility="invisible"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/halfTransparentGray"
+            android:onClick="unFocusFabMenu"
+            android:clickable="true" />
+
+    <com.getbase.floatingactionbutton.FloatingActionsMenu
+            android:id="@+id/fabMenuButton"
+
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="@id/pager"
+            app:layout_constraintRight_toRightOf="@id/pager"
+
+            app:fab_expandDirection="up"
+            app:fab_labelsPosition="left"
+            app:fab_addButtonSize="normal"
+            app:fab_addButtonColorNormal="#FA2F4D"
+
+            android:onClick="setFabMenu"
+            android:clickable="true">
+
+        <com.getbase.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fabVideoCamButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:fabSize="normal"
+                app:fab_title="Take Video"
+                app:fab_icon="@drawable/ic_baseline_videocam_24"
+                android:onClick="setFabTakeVideoButton" />
+
+        <com.getbase.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fabPhotoCamButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:fabSize="normal"
+                app:fab_title="Take photo"
+                app:fab_icon="@drawable/ic_baseline_photo_camera_24"
+                android:onClick="setFabTakePhotoButton" />
+
+    </com.getbase.floatingactionbutton.FloatingActionsMenu>
+
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/bottomNavigationView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:menu="@menu/bottom_tab_menu"
-            />
+            app:menu="@menu/bottom_tab_menu" />
+
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

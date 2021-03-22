@@ -67,33 +67,4 @@ public class PhotosFragment extends Fragment {
 		super.onSaveInstanceState(outState);
 	}
 
-//	private void checkCameraPermission() {
-//		if(ContextCompat.checkSelfPermission(this.getContext(), Manifest.permission.CAMERA)
-//			!= PackageManager.PERMISSION_GRANTED) {
-//			requestPermissions(new String[] {
-//					Manifest.permission.CAMERA
-//			}, CAMERA_PERMISSION_CODE);
-//		}
-//	}
-
-//	@Override
-//	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-//		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-//
-//		switch (requestCode) {
-//			case CAMERA_PERMISSION_CODE: {
-//				for(int result: grantResults) {
-//					if (result != PackageManager.PERMISSION_GRANTED) {
-//						CAMERA_PERMISSION_GRANTED = false;
-//						return;
-//					}
-//				}
-//				CAMERA_PERMISSION_GRANTED = true;
-//
-//				break;
-//			}
-//			default:
-//				throw new IllegalStateException("Unexpected value: " + requestCode);
-//		}
-//	}
 }

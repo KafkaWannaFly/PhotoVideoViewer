@@ -2,9 +2,12 @@ package com.hcmus.photovideoviewer;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 
+import com.getbase.floatingactionbutton.FloatingActionButton;
+import com.getbase.floatingactionbutton.FloatingActionsMenu;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import androidx.annotation.NonNull;
@@ -13,26 +16,38 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
+import android.provider.MediaStore;
+import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.hcmus.photovideoviewer.adapters.ViewPagerAdapter;
+import com.hcmus.photovideoviewer.services.MediaDataRepository;
 
 public class MainActivity extends AppCompatActivity
 		implements BottomNavigationView.OnNavigationItemSelectedListener {
-	static final int READ_EXTERNAL_CODE = 1;
+
+	public static final int READ_EXTERNAL_CODE = 1;
 	public static final int CAMERA_PERMISSION_CODE = 2;
 
 	private ViewPager2 pager = null;
 	private BottomNavigationView bottomNavigationView = null;
 	private FragmentStateAdapter fragmentStateAdapter = null;
 
+	private FloatingActionsMenu fabMenu = null;
+	private FloatingActionButton fabTakePhotoButton = null;
+	private FloatingActionButton fabTakeVideoButton = null;
+	private View backgroundForFabButton = null;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main_activity);
 
-		checkPermission();
+		// Permissions
+		checkReadExternalPermission();
 
+		// Bottom tabs
 		pager = findViewById(R.id.pager);
 		fragmentStateAdapter = new ViewPagerAdapter(this);
 		pager.setAdapter(fragmentStateAdapter);
@@ -65,28 +80,53 @@ public class MainActivity extends AppCompatActivity
 			}
 		});
 
-//		SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(this, getSupportFragmentManager());
-//		ViewPager viewPager = findViewById(R.id.view_pager);
-//		viewPager.setAdapter(sectionsPagerAdapter);
-//		TabLayout tabs = findViewById(R.id.tabs);
-//		tabs.setupWithViewPager(viewPager);
-
+		fabMenu = findViewById(R.id.fabMenuButton);
+		fabTakePhotoButton = findViewById(R.id.fabPhotoCamButton);
+		fabTakeVideoButton = findViewById(R.id.fabVideoCamButton);
+		backgroundForFabButton = findViewById(R.id.backgroundForFabButton);
 	}
 
-	private void checkPermission() {
+	private void checkReadExternalPermission() {
 		if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
 				    != PackageManager.PERMISSION_GRANTED) {
 			requestPermissions(new String[]{
 					Manifest.permission.READ_EXTERNAL_STORAGE
 			}, READ_EXTERNAL_CODE);
 		}
+		else {
+			MediaDataRepository.getInstance().fetchData();
+		}
+	}
 
-		if(ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-				   != PackageManager.PERMISSION_GRANTED) {
-			requestPermissions(new String[] {
+	private void checkCameraPermission() {
+		if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+				    != PackageManager.PERMISSION_GRANTED) {
+			requestPermissions(new String[]{
 					Manifest.permission.CAMERA
 			}, CAMERA_PERMISSION_CODE);
 		}
+	}
+
+	public void setFabTakePhotoButton(View v) {
+		this.checkCameraPermission();
+		Intent intent = new Intent(MediaStore.INTENT_ACTION_STILL_IMAGE_CAMERA);
+		startActivity(intent);
+	}
+
+	public void setFabTakeVideoButton(View v) {
+		this.checkCameraPermission();
+		Intent intent = new Intent(MediaStore.INTENT_ACTION_VIDEO_CAMERA);
+		startActivity(intent);
+	}
+
+	public void setFabMenu(View v) {
+		Log.d("Fab", "Fab menu click");
+		int visibilityValue = Math.abs(backgroundForFabButton.getVisibility() + 4 - 8);
+		backgroundForFabButton.setVisibility(visibilityValue);
+	}
+
+	public void unFocusFabMenu(View v) {
+		backgroundForFabButton.setVisibility(View.INVISIBLE);
 	}
 
 	@Override
@@ -100,13 +140,17 @@ public class MainActivity extends AppCompatActivity
 						return;
 					}
 				}
+
+				MediaDataRepository.getInstance().fetchData();
 			}
+
 			case CAMERA_PERMISSION_CODE: {
-				for(int result: grantResults) {
+				for (int result : grantResults) {
 					if (result != PackageManager.PERMISSION_GRANTED) {
 						return;
 					}
 				}
+
 				break;
 			}
 			default:

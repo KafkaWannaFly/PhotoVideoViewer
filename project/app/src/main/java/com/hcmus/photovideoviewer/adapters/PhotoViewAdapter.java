@@ -38,25 +38,16 @@ public class PhotoViewAdapter extends RecyclerView.Adapter<PhotoViewAdapter.View
 	@Override
 	public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
 		ImageView imageView = holder.getImageView();
-		if (position == 0) {
-			Glide.with(context)
-					.load(R.drawable.photo_cam_icon)
-					.placeholder(R.drawable.pussy_cat)
-					.into(imageView);
 
-			imageView.setOnClickListener(this.onCameraOpen());
-		}
-		else {
-			Glide.with(context)
-					.load(photoModels.get(position-1).uri)
-					.placeholder(R.drawable.pussy_cat)
-					.into(imageView);
-		}
+		Glide.with(context)
+				.load(photoModels.get(position).uri)
+				.placeholder(R.drawable.pussy_cat)
+				.into(imageView);
 	}
 
 	@Override
 	public int getItemCount() {
-		return photoModels.size() + 1; // Photos and 1 camera icon
+		return photoModels.size();
 	}
 
 	public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -70,15 +61,5 @@ public class PhotoViewAdapter extends RecyclerView.Adapter<PhotoViewAdapter.View
 		public ImageView getImageView() {
 			return imageView;
 		}
-	}
-
-	private View.OnClickListener onCameraOpen() {
-		return new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-				context.startActivity(intent);
-			}
-		};
 	}
 }
