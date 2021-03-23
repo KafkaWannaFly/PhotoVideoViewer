@@ -13,14 +13,14 @@
             app:layout_constraintBottom_toTopOf="@id/bottomNavigationView"
             android:layout_marginBottom="56dp" />
 
-    <View
-            android:id="@+id/backgroundForFabButton"
-            android:visibility="invisible"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@color/halfTransparentGray"
-            android:onClick="unFocusFabMenu"
-            android:clickable="true" />
+    <!--    <View-->
+    <!--            android:id="@+id/backgroundForFabButton"-->
+    <!--            android:visibility="invisible"-->
+    <!--            android:layout_width="match_parent"-->
+    <!--            android:layout_height="match_parent"-->
+    <!--            android:background="@color/halfTransparentGray"-->
+    <!--            android:onClick="unFocusFabMenu"-->
+    <!--            android:clickable="true" />-->
 
     <com.getbase.floatingactionbutton.FloatingActionsMenu
             android:id="@+id/fabMenuButton"
@@ -35,8 +35,7 @@
             app:fab_addButtonSize="normal"
             app:fab_addButtonColorNormal="#FA2F4D"
 
-            android:onClick="setFabMenu"
-            android:clickable="true">
+            >
 
         <com.getbase.floatingactionbutton.FloatingActionButton
                 android:id="@+id/fabVideoCamButton"
@@ -65,7 +64,6 @@
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="parent"
             app:menu="@menu/bottom_tab_menu" />
-
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

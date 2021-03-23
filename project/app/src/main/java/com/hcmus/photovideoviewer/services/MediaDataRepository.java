@@ -60,7 +60,9 @@ public class MediaDataRepository {
 		return albumModels;
 	}
 
-	private void fetchPhotos() {
+	public ArrayList<PhotoModel> fetchPhotos() {
+		photoModels.clear();
+
 		Uri _uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
 		String[] projection = new String[]{
 				MediaStore.Images.Media._ID,
@@ -101,9 +103,12 @@ public class MediaDataRepository {
 		}
 
 		Log.d("Images", "Found " + photoModels.size() + " photos");
+		return this.photoModels;
 	}
 
-	private void fetchVideos() {
+	public ArrayList<VideoModel> fetchVideos() {
+		videoModels.clear();
+
 		Uri _uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
 		String[] projection = new String[]{
 				MediaStore.Video.Media._ID,
@@ -148,9 +153,11 @@ public class MediaDataRepository {
 		}
 
 		Log.d("Videos", "Found " + videoModels.size() + " Videos");
+
+		return this.videoModels;
 	}
 
-	private void fetchAlbums() {
+	public void fetchAlbums() {
 		Uri _uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
 		ArrayList<pictureContent> allPhotosAlbum;
 		ArrayList<videoContent> allVideosAlbum;

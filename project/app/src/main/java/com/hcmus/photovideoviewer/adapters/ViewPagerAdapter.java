@@ -10,6 +10,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter;
 
 import com.hcmus.photovideoviewer.R;
 import com.hcmus.photovideoviewer.services.MediaDataRepository;
+import com.hcmus.photovideoviewer.viewmodels.PhotosViewModel;
 import com.hcmus.photovideoviewer.views.AlbumsFragment;
 import com.hcmus.photovideoviewer.views.ExploreFragment;
 import com.hcmus.photovideoviewer.views.PhotosFragment;
@@ -24,6 +25,8 @@ public class ViewPagerAdapter extends FragmentStateAdapter {
 			R.string.explore_tab
 	};
 
+	MediaDataRepository mediaDataRepository;
+
 	public ViewPagerAdapter(@NonNull FragmentActivity fragmentActivity) {
 		super(fragmentActivity);
 	}
@@ -34,6 +37,11 @@ public class ViewPagerAdapter extends FragmentStateAdapter {
 
 	public ViewPagerAdapter(@NonNull FragmentManager fragmentManager, @NonNull Lifecycle lifecycle) {
 		super(fragmentManager, lifecycle);
+	}
+
+	public ViewPagerAdapter(@NonNull FragmentActivity fragmentActivity, MediaDataRepository mediaDataRepository) {
+		super(fragmentActivity);
+		this.mediaDataRepository = mediaDataRepository;
 	}
 
 	@NonNull

@@ -34,10 +34,12 @@ public class MainActivity extends AppCompatActivity
 	private BottomNavigationView bottomNavigationView = null;
 	private FragmentStateAdapter fragmentStateAdapter = null;
 
-	private FloatingActionsMenu fabMenu = null;
-	private FloatingActionButton fabTakePhotoButton = null;
-	private FloatingActionButton fabTakeVideoButton = null;
-	private View backgroundForFabButton = null;
+	public MediaDataRepository mediaDataRepository = null;
+
+//	private FloatingActionsMenu fabMenu = null;
+//	private FloatingActionButton fabTakePhotoButton = null;
+//	private FloatingActionButton fabTakeVideoButton = null;
+//	private View backgroundForFabButton = null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -49,12 +51,11 @@ public class MainActivity extends AppCompatActivity
 
 		// Bottom tabs
 		pager = findViewById(R.id.pager);
-		fragmentStateAdapter = new ViewPagerAdapter(this);
+		fragmentStateAdapter = new ViewPagerAdapter(this, mediaDataRepository);
 		pager.setAdapter(fragmentStateAdapter);
 
 		bottomNavigationView = findViewById(R.id.bottomNavigationView);
 		bottomNavigationView.setOnNavigationItemSelectedListener(this);
-
 		pager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
 			@Override
 			public void onPageSelected(int position) {
@@ -80,10 +81,17 @@ public class MainActivity extends AppCompatActivity
 			}
 		});
 
-		fabMenu = findViewById(R.id.fabMenuButton);
-		fabTakePhotoButton = findViewById(R.id.fabPhotoCamButton);
-		fabTakeVideoButton = findViewById(R.id.fabVideoCamButton);
-		backgroundForFabButton = findViewById(R.id.backgroundForFabButton);
+//		fabMenu = findViewById(R.id.fabMenuButton);
+//		fabTakePhotoButton = findViewById(R.id.fabPhotoCamButton);
+//		fabTakeVideoButton = findViewById(R.id.fabVideoCamButton);
+//		backgroundForFabButton = findViewById(R.id.backgroundForFabButton);
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		mediaDataRepository.fetchData();
+		Log.d("ActivityLife", "MainActivity resume");
 	}
 
 	private void checkReadExternalPermission() {
@@ -94,7 +102,8 @@ public class MainActivity extends AppCompatActivity
 			}, READ_EXTERNAL_CODE);
 		}
 		else {
-			MediaDataRepository.getInstance().fetchData();
+			mediaDataRepository = MediaDataRepository.getInstance();
+			mediaDataRepository.fetchData();
 		}
 	}
 
@@ -108,26 +117,26 @@ public class MainActivity extends AppCompatActivity
 	}
 
 	public void setFabTakePhotoButton(View v) {
-		this.checkCameraPermission();
+//		this.checkCameraPermission();
 		Intent intent = new Intent(MediaStore.INTENT_ACTION_STILL_IMAGE_CAMERA);
 		startActivity(intent);
 	}
 
 	public void setFabTakeVideoButton(View v) {
-		this.checkCameraPermission();
+//		this.checkCameraPermission();
 		Intent intent = new Intent(MediaStore.INTENT_ACTION_VIDEO_CAMERA);
 		startActivity(intent);
 	}
 
-	public void setFabMenu(View v) {
-		Log.d("Fab", "Fab menu click");
-		int visibilityValue = Math.abs(backgroundForFabButton.getVisibility() + 4 - 8);
-		backgroundForFabButton.setVisibility(visibilityValue);
-	}
-
-	public void unFocusFabMenu(View v) {
-		backgroundForFabButton.setVisibility(View.INVISIBLE);
-	}
+//	public void setFabMenu(View v) {
+//		Log.d("Fab", "Fab menu click");
+//		int visibilityValue = Math.abs(backgroundForFabButton.getVisibility() + 4 - 8);
+//		backgroundForFabButton.setVisibility(visibilityValue);
+//	}
+//
+//	public void unFocusFabMenu(View v) {
+//		backgroundForFabButton.setVisibility(View.INVISIBLE);
+//	}
 
 	@Override
 	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -141,7 +150,8 @@ public class MainActivity extends AppCompatActivity
 					}
 				}
 
-				MediaDataRepository.getInstance().fetchData();
+				mediaDataRepository = MediaDataRepository.getInstance();
+				mediaDataRepository.fetchData();
 			}
 
 			case CAMERA_PERMISSION_CODE: {

@@ -1,5 +1,6 @@
 package com.hcmus.photovideoviewer.views;
 
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.os.Bundle;
@@ -18,7 +19,11 @@ import com.hcmus.photovideoviewer.MainActivity;
 import com.hcmus.photovideoviewer.MainApplication;
 import com.hcmus.photovideoviewer.R;
 import com.hcmus.photovideoviewer.adapters.VideoViewAdapter;
+import com.hcmus.photovideoviewer.models.VideoModel;
+import com.hcmus.photovideoviewer.services.MediaDataRepository;
 import com.hcmus.photovideoviewer.viewmodels.VideosViewModel;
+
+import java.util.ArrayList;
 
 public class VideosFragment extends Fragment {
 	private VideosViewModel videosViewModel = null;
@@ -29,6 +34,20 @@ public class VideosFragment extends Fragment {
 
 	public static VideosFragment newInstance() {
 		return new VideosFragment();
+	}
+
+	@Override
+	public void onCreate(@Nullable Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+
+		videosViewModel = new VideosViewModel(MediaDataRepository.getInstance().getVideoModels());
+	}
+
+	@Override
+	public void onStart() {
+		super.onStart();
+
+		videosViewModel.getLiveVideoModels().setValue(MediaDataRepository.getInstance().fetchVideos());
 	}
 
 	@Override
@@ -44,13 +63,16 @@ public class VideosFragment extends Fragment {
 	public void onActivityCreated(@Nullable Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 
-		videosViewModel = new ViewModelProvider(this).get(VideosViewModel.class);
+		videosViewModel.getLiveVideoModels().observe(getViewLifecycleOwner(), new Observer<ArrayList<VideoModel>>() {
+			@Override
+			public void onChanged(ArrayList<VideoModel> videoModels) {
+				videoViewAdapter = new VideoViewAdapter(recyclerView.getContext(), videoModels);
+				recyclerView.setAdapter(videoViewAdapter);
 
-		videoViewAdapter = new VideoViewAdapter(recyclerView.getContext(), videosViewModel.getVideoModels());
-		recyclerView.setAdapter(videoViewAdapter);
-
-		layoutManager = new GridLayoutManager(getActivity(), MainApplication.SPAN_COUNT);
-		recyclerView.setLayoutManager(layoutManager);
+				layoutManager = new GridLayoutManager(getActivity(), MainApplication.SPAN_COUNT);
+				recyclerView.setLayoutManager(layoutManager);
+			}
+		});
 	}
 
 }
