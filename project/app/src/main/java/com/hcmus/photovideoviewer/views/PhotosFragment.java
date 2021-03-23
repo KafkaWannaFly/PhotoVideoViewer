@@ -35,6 +35,7 @@ public class PhotosFragment extends Fragment {
 
 	private Function<PhotoModel, Boolean> filterFunc;
 
+
 	public static PhotosFragment newInstance() {
 		return new PhotosFragment();
 	}

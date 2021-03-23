@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+            android:id="@+id/layoutButton"
+            android:title="@string/switch_layout"
+            android:icon="@drawable/ic_baseline_view_column_24"
+            android:contentDescription="@string/switch_layout_des"
+            app:showAsAction="ifRoom"
+            />
+    <item
+            android:id="@+id/sortButton"
+            android:title="@string/sort_order"
+            android:icon="@drawable/ic_baseline_arrow_downward_24"
+            android:contentDescription="@string/sort_order_des"
+            app:showAsAction="ifRoom"
+        />
+
+    <item
+            android:id="@+id/moreOptionsButton"
+            android:title="@string/slide_show"
+            android:icon="@drawable/ic_baseline_more_vert_24"
+            android:contentDescription="@string/more"
+            app:showAsAction="never"
+        />
+
+    <item
+            android:id="@+id/slideShowButton"
+            android:title="@string/setting"
+            android:icon="@drawable/ic_baseline_slideshow_24"
+        />
+
+
+</menu>

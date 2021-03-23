@@ -7,5 +7,12 @@
     <string name="explore_tab">Explore</string>
     <string name="play_video">Play video</string>
     <string name="more_option_fab">More option</string>
+    <string name="switch_layout">Switch Layout</string>
+    <string name="sort_order">Sort Order</string>
+    <string name="switch_layout_des">Change layout of items</string>
+    <string name="sort_order_des">Sort by newest or oldest first</string>
+    <string name="more">More</string>
+    <string name="slide_show">Slide Show</string>
+    <string name="setting">Setting</string>
 
 </resources>

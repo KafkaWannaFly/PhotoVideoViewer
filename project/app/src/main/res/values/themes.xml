@@ -14,9 +14,9 @@
         <!-- Customize your theme here. -->
     </style>
 
-    <style name="Theme.PhotoVideoViewer.NoActionBar">
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
+    <style name="Theme.PhotoVideoViewer.NoActionBar" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+
     </style>
+
 
 </resources>
