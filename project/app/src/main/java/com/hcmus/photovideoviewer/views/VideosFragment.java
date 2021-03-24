@@ -1,5 +1,6 @@
 package com.hcmus.photovideoviewer.views;
 
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -21,6 +22,7 @@ import com.hcmus.photovideoviewer.R;
 import com.hcmus.photovideoviewer.adapters.VideoViewAdapter;
 import com.hcmus.photovideoviewer.models.VideoModel;
 import com.hcmus.photovideoviewer.services.MediaDataRepository;
+import com.hcmus.photovideoviewer.viewmodels.AppBarViewModel;
 import com.hcmus.photovideoviewer.viewmodels.VideosViewModel;
 
 import java.util.ArrayList;
@@ -31,10 +33,25 @@ public class VideosFragment extends Fragment {
 	private RecyclerView recyclerView = null;
 	private RecyclerView.LayoutManager layoutManager = null;
 	private VideoViewAdapter videoViewAdapter = null;
+//	private MutableLiveData<Integer> liveColumnSpan = null;
+	private AppBarViewModel appBarViewModel = null;
 
 	public static VideosFragment newInstance() {
 		return new VideosFragment();
 	}
+
+	public VideosFragment() {
+
+	}
+
+//	public VideosFragment(MutableLiveData<Integer> liveColumnSpan) {
+//		this.liveColumnSpan = liveColumnSpan;
+//	}
+
+	public VideosFragment(AppBarViewModel appBarViewModel) {
+		this.appBarViewModel = appBarViewModel;
+	}
+
 
 	@Override
 	public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -66,12 +83,28 @@ public class VideosFragment extends Fragment {
 		videosViewModel.getLiveVideoModels().observe(getViewLifecycleOwner(), new Observer<ArrayList<VideoModel>>() {
 			@Override
 			public void onChanged(ArrayList<VideoModel> videoModels) {
+
+				appBarViewModel.liveSortOrder.observe(getViewLifecycleOwner(), order -> {
+					if (order == 0) {
+						videoModels.sort((o1, o2) -> o2.dateModified.compareTo(o1.dateModified));
+					}
+					else if (order == 1) {
+						videoModels.sort((o1, o2) -> o1.dateModified.compareTo(o2.dateModified));
+					}
+
+					if (videoViewAdapter != null) {
+						videoViewAdapter.notifyDataSetChanged();
+					}
+				});
+
 				videoViewAdapter = new VideoViewAdapter(recyclerView.getContext(), videoModels);
 				recyclerView.setAdapter(videoViewAdapter);
-
-				layoutManager = new GridLayoutManager(getActivity(), MainApplication.SPAN_COUNT);
-				recyclerView.setLayoutManager(layoutManager);
 			}
+		});
+
+		appBarViewModel.liveColumnSpan.observe(getViewLifecycleOwner(), columnSpan -> {
+			layoutManager = new GridLayoutManager(getActivity(), columnSpan);
+			recyclerView.setLayoutManager(layoutManager);
 		});
 	}
 

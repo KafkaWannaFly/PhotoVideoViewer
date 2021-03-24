@@ -8,6 +8,7 @@ import android.os.Bundle;
 
 import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
+import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import androidx.annotation.NonNull;
@@ -23,23 +24,18 @@ import android.view.View;
 
 import com.hcmus.photovideoviewer.adapters.ViewPagerAdapter;
 import com.hcmus.photovideoviewer.services.MediaDataRepository;
+import com.hcmus.photovideoviewer.viewmodels.AppBarViewModel;
 
 public class MainActivity extends AppCompatActivity
 		implements BottomNavigationView.OnNavigationItemSelectedListener {
 
 	public static final int READ_EXTERNAL_CODE = 1;
 	public static final int CAMERA_PERMISSION_CODE = 2;
-
+	public MediaDataRepository mediaDataRepository = MediaDataRepository.getInstance();
 	private ViewPager2 pager = null;
 	private BottomNavigationView bottomNavigationView = null;
+	private AppBarViewModel appBarViewModel = new AppBarViewModel();
 	private FragmentStateAdapter fragmentStateAdapter = null;
-
-	public MediaDataRepository mediaDataRepository = null;
-
-//	private FloatingActionsMenu fabMenu = null;
-//	private FloatingActionButton fabTakePhotoButton = null;
-//	private FloatingActionButton fabTakeVideoButton = null;
-//	private View backgroundForFabButton = null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +47,7 @@ public class MainActivity extends AppCompatActivity
 
 		// Bottom tabs
 		pager = findViewById(R.id.pager);
-		fragmentStateAdapter = new ViewPagerAdapter(this, mediaDataRepository);
+		fragmentStateAdapter = new ViewPagerAdapter(this, appBarViewModel);
 		pager.setAdapter(fragmentStateAdapter);
 
 		bottomNavigationView = findViewById(R.id.bottomNavigationView);
@@ -81,10 +77,40 @@ public class MainActivity extends AppCompatActivity
 			}
 		});
 
-//		fabMenu = findViewById(R.id.fabMenuButton);
-//		fabTakePhotoButton = findViewById(R.id.fabPhotoCamButton);
-//		fabTakeVideoButton = findViewById(R.id.fabVideoCamButton);
-//		backgroundForFabButton = findViewById(R.id.backgroundForFabButton);
+		MaterialToolbar materialToolbar = findViewById(R.id.topToolBar);
+		materialToolbar.setOnMenuItemClickListener(item -> {
+			if (item.getItemId() == R.id.layoutButton) {
+				Integer currentCol = appBarViewModel.liveColumnSpan.getValue();
+				if(currentCol == null) {
+					return false;
+				}
+
+				currentCol = currentCol + 1 > 3? 1 : currentCol + 1;
+				appBarViewModel.liveColumnSpan.setValue(currentCol);
+
+				if(currentCol == 1) {
+					item.setIcon(R.drawable.ic_baseline_view_1_column_24);
+				} else if(currentCol == 2) {
+					item.setIcon(R.drawable.ic_baseline_view_2_column_24);
+				} else {
+					item.setIcon(R.drawable.ic_baseline_view_3_column_24);
+				}
+
+				return true;
+			}
+			else if (item.getItemId() == R.id.sortButton) {
+				Integer currentOrder = appBarViewModel.liveSortOrder.getValue();
+				currentOrder = currentOrder ^ 1;
+
+				item.setIcon(currentOrder == 1 ?
+						             R.drawable.ic_baseline_arrow_upward_24 : R.drawable.ic_baseline_arrow_downward_24);
+
+				appBarViewModel.liveSortOrder.setValue(currentOrder);
+				return true;
+			}
+
+			return false;
+		});
 	}
 
 	@Override
@@ -102,7 +128,6 @@ public class MainActivity extends AppCompatActivity
 			}, READ_EXTERNAL_CODE);
 		}
 		else {
-			mediaDataRepository = MediaDataRepository.getInstance();
 			mediaDataRepository.fetchData();
 		}
 	}
@@ -128,6 +153,11 @@ public class MainActivity extends AppCompatActivity
 		startActivity(intent);
 	}
 
+	public void onLayoutChanged(View v) {
+
+	}
+
+
 //	public void setFabMenu(View v) {
 //		Log.d("Fab", "Fab menu click");
 //		int visibilityValue = Math.abs(backgroundForFabButton.getVisibility() + 4 - 8);
@@ -150,7 +180,6 @@ public class MainActivity extends AppCompatActivity
 					}
 				}
 
-				mediaDataRepository = MediaDataRepository.getInstance();
 				mediaDataRepository.fetchData();
 			}
 

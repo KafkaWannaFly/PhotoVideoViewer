@@ -4,7 +4,7 @@
     <item
             android:id="@+id/layoutButton"
             android:title="@string/switch_layout"
-            android:icon="@drawable/ic_baseline_view_column_24"
+            android:icon="@drawable/ic_baseline_view_3_column_24"
             android:contentDescription="@string/switch_layout_des"
             app:showAsAction="ifRoom"
             />

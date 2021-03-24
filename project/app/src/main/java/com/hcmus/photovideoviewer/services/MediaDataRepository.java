@@ -43,9 +43,14 @@ public class MediaDataRepository {
 	}
 
 	public void fetchData() {
-		this.fetchPhotos();
-		this.fetchVideos();
-		this.fetchAlbums();
+		try {
+			this.fetchPhotos();
+			this.fetchVideos();
+			this.fetchAlbums();
+		} catch (Exception exception) {
+			Log.d("Exception", exception.getMessage());
+		}
+
 	}
 
 	public ArrayList<PhotoModel> getPhotoModels() {

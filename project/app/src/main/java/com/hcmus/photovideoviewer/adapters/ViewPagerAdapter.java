@@ -6,10 +6,12 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.MutableLiveData;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
 import com.hcmus.photovideoviewer.R;
 import com.hcmus.photovideoviewer.services.MediaDataRepository;
+import com.hcmus.photovideoviewer.viewmodels.AppBarViewModel;
 import com.hcmus.photovideoviewer.viewmodels.PhotosViewModel;
 import com.hcmus.photovideoviewer.views.AlbumsFragment;
 import com.hcmus.photovideoviewer.views.ExploreFragment;
@@ -25,7 +27,9 @@ public class ViewPagerAdapter extends FragmentStateAdapter {
 			R.string.explore_tab
 	};
 
-	MediaDataRepository mediaDataRepository;
+//	MediaDataRepository mediaDataRepository;
+//	MutableLiveData<Integer> liveColumnSpan;
+	AppBarViewModel appBarViewModel;
 
 	public ViewPagerAdapter(@NonNull FragmentActivity fragmentActivity) {
 		super(fragmentActivity);
@@ -39,9 +43,21 @@ public class ViewPagerAdapter extends FragmentStateAdapter {
 		super(fragmentManager, lifecycle);
 	}
 
-	public ViewPagerAdapter(@NonNull FragmentActivity fragmentActivity, MediaDataRepository mediaDataRepository) {
+//	public ViewPagerAdapter(@NonNull FragmentActivity fragmentActivity, MediaDataRepository mediaDataRepository) {
+//		super(fragmentActivity);
+////		this.mediaDataRepository = mediaDataRepository;
+//	}
+
+//	public ViewPagerAdapter(@NonNull FragmentActivity fragmentActivity, MutableLiveData<Integer> liveColumnSpan) {
+//		super(fragmentActivity);
+//
+//		this.liveColumnSpan = liveColumnSpan;
+//	}
+
+	public ViewPagerAdapter(@NonNull FragmentActivity fragmentActivity, AppBarViewModel appBarViewModel) {
 		super(fragmentActivity);
-		this.mediaDataRepository = mediaDataRepository;
+
+		this.appBarViewModel = appBarViewModel;
 	}
 
 	@NonNull
@@ -49,10 +65,10 @@ public class ViewPagerAdapter extends FragmentStateAdapter {
 	public Fragment createFragment(int position) {
 		Fragment fragment;
 		if(TAB_TITLES[position] == R.string.photos_tab) {
-			fragment = PhotosFragment.newInstance();
+			fragment = new PhotosFragment(appBarViewModel);
 		}
 		else if (TAB_TITLES[position] == R.string.videos_tab) {
-			fragment = VideosFragment.newInstance();
+			fragment = new VideosFragment(appBarViewModel);
 		}
 		else if (TAB_TITLES[position] == R.string.albums_tab) {
 			fragment = AlbumsFragment.newInstance();
@@ -61,7 +77,7 @@ public class ViewPagerAdapter extends FragmentStateAdapter {
 			fragment = ExploreFragment.newInstance();
 		}
 		else {
-			fragment = PhotosFragment.newInstance();
+			fragment = new PhotosFragment(appBarViewModel);
 		}
 
 		return fragment;

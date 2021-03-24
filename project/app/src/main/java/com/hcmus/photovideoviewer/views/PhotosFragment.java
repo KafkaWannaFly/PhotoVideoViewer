@@ -20,6 +20,7 @@ import com.hcmus.photovideoviewer.R;
 import com.hcmus.photovideoviewer.adapters.PhotoViewAdapter;
 import com.hcmus.photovideoviewer.models.PhotoModel;
 import com.hcmus.photovideoviewer.services.MediaDataRepository;
+import com.hcmus.photovideoviewer.viewmodels.AppBarViewModel;
 import com.hcmus.photovideoviewer.viewmodels.PhotosViewModel;
 
 import java.util.ArrayList;
@@ -29,19 +30,25 @@ import java.util.function.Function;
 public class PhotosFragment extends Fragment {
 	private RecyclerView recyclerView;
 	private RecyclerView.LayoutManager layoutManager = null;
+//	private MutableLiveData<Integer> liveColumnSpan = null;
 
 	private PhotosViewModel photosViewModel = null;
 	private PhotoViewAdapter photoViewAdapter = null;
 
+	private AppBarViewModel appBarViewModel = null;
+
 	private Function<PhotoModel, Boolean> filterFunc;
-
-
-	public static PhotosFragment newInstance() {
-		return new PhotosFragment();
-	}
 
 	public PhotosFragment() {
 
+	}
+
+//	public PhotosFragment(MutableLiveData<Integer> liveColumnSpan) {
+//		this.liveColumnSpan = liveColumnSpan;
+//	}
+
+	public PhotosFragment(AppBarViewModel appBarViewModel) {
+		this.appBarViewModel = appBarViewModel;
 	}
 
 	@Override
@@ -80,16 +87,32 @@ public class PhotosFragment extends Fragment {
 			public void onChanged(ArrayList<PhotoModel> photoModels) {
 				Log.d("ActivityLife", "PhotoFragment data changed");
 
-				if(filterFunc != null) {
+				if (filterFunc != null) {
 					photoModels.removeIf(photoModel -> filterFunc.apply(photoModel));
 				}
 
-				photoViewAdapter = new PhotoViewAdapter(recyclerView.getContext(), photoModels);
-				recyclerView.setAdapter(photoViewAdapter);
+				appBarViewModel.liveSortOrder.observe(getViewLifecycleOwner(), order -> {
+					if (order == 0) {
+						photoModels.sort((o1, o2) -> o2.dateModified.compareTo(o1.dateModified));
+					}
+					else if (order == 1) {
+						photoModels.sort((o1, o2) -> o1.dateModified.compareTo(o2.dateModified));
+					}
 
-				layoutManager = new GridLayoutManager(getActivity(), MainApplication.SPAN_COUNT);
-				recyclerView.setLayoutManager(layoutManager);
+					if (photoViewAdapter != null) {
+						photoViewAdapter.notifyDataSetChanged();
+					}
+				});
+
+				photoViewAdapter = new PhotoViewAdapter(recyclerView.getContext(), photoModels);
+
+				recyclerView.setAdapter(photoViewAdapter);
 			}
+		});
+
+		appBarViewModel.liveColumnSpan.observe(getViewLifecycleOwner(), columnSpan -> {
+			layoutManager = new GridLayoutManager(getActivity(), columnSpan);
+			recyclerView.setLayoutManager(layoutManager);
 		});
 
 	}
@@ -101,6 +124,7 @@ public class PhotosFragment extends Fragment {
 
 	/**
 	 * Define what photo to be displayed. If not set, PhotoFragment will show all photos in device
+	 *
 	 * @param filterFunc A function that tells how to filter photo and will be applied to all photos in the list. Return true if photo is taken, false other wise
 	 */
 	public void setFilterFunc(Function<PhotoModel, Boolean> filterFunc) {
