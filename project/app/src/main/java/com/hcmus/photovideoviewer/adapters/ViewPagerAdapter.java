@@ -27,8 +27,6 @@ public class ViewPagerAdapter extends FragmentStateAdapter {
 			R.string.explore_tab
 	};
 
-//	MediaDataRepository mediaDataRepository;
-//	MutableLiveData<Integer> liveColumnSpan;
 	AppBarViewModel appBarViewModel;
 
 	public ViewPagerAdapter(@NonNull FragmentActivity fragmentActivity) {
@@ -43,16 +41,6 @@ public class ViewPagerAdapter extends FragmentStateAdapter {
 		super(fragmentManager, lifecycle);
 	}
 
-//	public ViewPagerAdapter(@NonNull FragmentActivity fragmentActivity, MediaDataRepository mediaDataRepository) {
-//		super(fragmentActivity);
-////		this.mediaDataRepository = mediaDataRepository;
-//	}
-
-//	public ViewPagerAdapter(@NonNull FragmentActivity fragmentActivity, MutableLiveData<Integer> liveColumnSpan) {
-//		super(fragmentActivity);
-//
-//		this.liveColumnSpan = liveColumnSpan;
-//	}
 
 	public ViewPagerAdapter(@NonNull FragmentActivity fragmentActivity, AppBarViewModel appBarViewModel) {
 		super(fragmentActivity);

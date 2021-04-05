@@ -14,5 +14,23 @@
     <string name="more">More</string>
     <string name="slide_show">Slide Show</string>
     <string name="setting">Setting</string>
-
+    <string name="title_activity_photo_view">FullscreenActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="your_image">Your image</string>
+    <string name="favorite">Favorite</string>
+    <string name="edit">Edit</string>
+    <string name="set_as_background">Set as background</string>
+    <string name="set_private">Set private</string>
+    <string name="set_location">Set location</string>
+    <string name="share">Share</string>
+    <string name="copy">Copy</string>
+    <string name="delete">Delete</string>
+    <string name="name">Name:</string>
+    <string name="size">Size:</string>
+    <string name="time">Time:</string>
+    <string name="dimensions">Dimensions:</string>
+    <string name="path">Path:</string>
+    <string name="lorem">Lorem ipsum dolor sit amet, consectetur adipisicing elit.</string>
+    <string name="location">Location:</string>
 </resources>

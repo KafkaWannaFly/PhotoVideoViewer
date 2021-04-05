@@ -9,22 +9,18 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.hcmus.photovideoviewer.MainApplication;
 import com.hcmus.photovideoviewer.R;
-import com.hcmus.photovideoviewer.adapters.PhotoViewAdapter;
+import com.hcmus.photovideoviewer.adapters.PhotosViewAdapter;
 import com.hcmus.photovideoviewer.models.PhotoModel;
 import com.hcmus.photovideoviewer.services.MediaDataRepository;
 import com.hcmus.photovideoviewer.viewmodels.AppBarViewModel;
 import com.hcmus.photovideoviewer.viewmodels.PhotosViewModel;
 
 import java.util.ArrayList;
-import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
 public class PhotosFragment extends Fragment {
@@ -33,7 +29,7 @@ public class PhotosFragment extends Fragment {
 //	private MutableLiveData<Integer> liveColumnSpan = null;
 
 	private PhotosViewModel photosViewModel = null;
-	private PhotoViewAdapter photoViewAdapter = null;
+	private PhotosViewAdapter photosViewAdapter = null;
 
 	private AppBarViewModel appBarViewModel = null;
 
@@ -99,14 +95,14 @@ public class PhotosFragment extends Fragment {
 						photoModels.sort((o1, o2) -> o1.dateModified.compareTo(o2.dateModified));
 					}
 
-					if (photoViewAdapter != null) {
-						photoViewAdapter.notifyDataSetChanged();
+					if (photosViewAdapter != null) {
+						photosViewAdapter.notifyDataSetChanged();
 					}
 				});
 
-				photoViewAdapter = new PhotoViewAdapter(recyclerView.getContext(), photoModels);
+				photosViewAdapter = new PhotosViewAdapter(recyclerView.getContext(), photoModels);
 
-				recyclerView.setAdapter(photoViewAdapter);
+				recyclerView.setAdapter(photosViewAdapter);
 			}
 		});
 
