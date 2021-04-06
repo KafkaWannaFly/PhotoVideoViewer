@@ -6,8 +6,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 
-import com.getbase.floatingactionbutton.FloatingActionButton;
-import com.getbase.floatingactionbutton.FloatingActionsMenu;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -22,7 +20,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.hcmus.photovideoviewer.adapters.ViewPagerAdapter;
+import com.hcmus.photovideoviewer.adapters.MainPagerAdapter;
 import com.hcmus.photovideoviewer.services.MediaDataRepository;
 import com.hcmus.photovideoviewer.viewmodels.AppBarViewModel;
 
@@ -34,7 +32,7 @@ public class MainActivity extends AppCompatActivity
 	public MediaDataRepository mediaDataRepository = MediaDataRepository.getInstance();
 	private ViewPager2 pager = null;
 	private BottomNavigationView bottomNavigationView = null;
-	private AppBarViewModel appBarViewModel = new AppBarViewModel();
+	private final AppBarViewModel appBarViewModel = new AppBarViewModel();
 	private FragmentStateAdapter fragmentStateAdapter = null;
 
 	@Override
@@ -47,7 +45,7 @@ public class MainActivity extends AppCompatActivity
 
 		// Bottom tabs
 		pager = findViewById(R.id.pager);
-		fragmentStateAdapter = new ViewPagerAdapter(this, appBarViewModel);
+		fragmentStateAdapter = new MainPagerAdapter(this, appBarViewModel);
 		pager.setAdapter(fragmentStateAdapter);
 
 		bottomNavigationView = findViewById(R.id.bottomNavigationView);

@@ -18,7 +18,7 @@ import com.hcmus.photovideoviewer.views.ExploreFragment;
 import com.hcmus.photovideoviewer.views.PhotosFragment;
 import com.hcmus.photovideoviewer.views.VideosFragment;
 
-public class ViewPagerAdapter extends FragmentStateAdapter {
+public class MainPagerAdapter extends FragmentStateAdapter {
 	@StringRes
 	public static final int[] TAB_TITLES = new int[] {
 			R.string.photos_tab,
@@ -29,20 +29,20 @@ public class ViewPagerAdapter extends FragmentStateAdapter {
 
 	AppBarViewModel appBarViewModel;
 
-	public ViewPagerAdapter(@NonNull FragmentActivity fragmentActivity) {
+	public MainPagerAdapter(@NonNull FragmentActivity fragmentActivity) {
 		super(fragmentActivity);
 	}
 
-	public ViewPagerAdapter(@NonNull Fragment fragment) {
+	public MainPagerAdapter(@NonNull Fragment fragment) {
 		super(fragment);
 	}
 
-	public ViewPagerAdapter(@NonNull FragmentManager fragmentManager, @NonNull Lifecycle lifecycle) {
+	public MainPagerAdapter(@NonNull FragmentManager fragmentManager, @NonNull Lifecycle lifecycle) {
 		super(fragmentManager, lifecycle);
 	}
 
 
-	public ViewPagerAdapter(@NonNull FragmentActivity fragmentActivity, AppBarViewModel appBarViewModel) {
+	public MainPagerAdapter(@NonNull FragmentActivity fragmentActivity, AppBarViewModel appBarViewModel) {
 		super(fragmentActivity);
 
 		this.appBarViewModel = appBarViewModel;

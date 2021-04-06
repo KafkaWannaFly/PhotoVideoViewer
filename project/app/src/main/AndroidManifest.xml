@@ -14,7 +14,8 @@
             android:label="@string/app_name"
             android:roundIcon="@drawable/pussy_cat"
             android:supportsRtl="true"
-            android:theme="@style/Theme.PhotoVideoViewer">
+            android:theme="@style/Theme.PhotoVideoViewer"
+            >
         <activity
                 android:name=".views.PhotoViewActivity"
                 android:configChanges="orientation|keyboardHidden|screenSize"
@@ -23,7 +24,9 @@
         <activity
                 android:name=".MainActivity"
                 android:label="@string/app_name"
-                android:theme="@style/Theme.PhotoVideoViewer.NoActionBar">
+                android:theme="@style/Theme.PhotoVideoViewer.NoActionBar"
+                android:screenOrientation="portrait"
+                >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
