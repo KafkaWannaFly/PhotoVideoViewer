@@ -14,6 +14,7 @@ import com.hcmus.photovideoviewer.services.MediaDataRepository;
 import com.hcmus.photovideoviewer.viewmodels.AppBarViewModel;
 import com.hcmus.photovideoviewer.viewmodels.PhotosViewModel;
 import com.hcmus.photovideoviewer.views.AlbumsFragment;
+//import com.hcmus.photovideoviewer.views.ExploreFragment;
 import com.hcmus.photovideoviewer.views.ExploreFragment;
 import com.hcmus.photovideoviewer.views.PhotosFragment;
 import com.hcmus.photovideoviewer.views.VideosFragment;
@@ -59,10 +60,11 @@ public class MainPagerAdapter extends FragmentStateAdapter {
 			fragment = new VideosFragment(appBarViewModel);
 		}
 		else if (TAB_TITLES[position] == R.string.albums_tab) {
-			fragment = AlbumsFragment.newInstance();
+//			fragment = AlbumsFragment.newInstance();
+			fragment = new AlbumsFragment(appBarViewModel);
 		}
 		else if (TAB_TITLES[position] == R.string.explore_tab) {
-			fragment = ExploreFragment.newInstance();
+			fragment = new ExploreFragment(appBarViewModel);
 		}
 		else {
 			fragment = new PhotosFragment(appBarViewModel);

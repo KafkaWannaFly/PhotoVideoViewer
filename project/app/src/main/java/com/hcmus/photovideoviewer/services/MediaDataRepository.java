@@ -32,7 +32,6 @@ public class MediaDataRepository {
 
 	private MediaDataRepository() {
 		context = MainApplication.getContext();
-
 	}
 
 	public static MediaDataRepository getInstance() {
@@ -162,7 +161,8 @@ public class MediaDataRepository {
 		return this.videoModels;
 	}
 
-	public void fetchAlbums() {
+	public ArrayList<AlbumModel> fetchAlbums() {
+		albumModels.clear();
 		Uri _uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
 		ArrayList<pictureContent> allPhotosAlbum;
 		ArrayList<videoContent> allVideosAlbum;
@@ -195,5 +195,6 @@ public class MediaDataRepository {
 			albumModels.add(albumModel);
 		}
 		Log.d("Size of Album: ", "" + albumModels.get(0));
+		return albumModels;
 	}
 }

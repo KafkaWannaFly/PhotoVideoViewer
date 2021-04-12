@@ -22,7 +22,7 @@ public class PhotosViewAdapter extends RecyclerView.Adapter<PhotosViewAdapter.Vi
 	Context context = null;
 
 	public PhotosViewAdapter(Context context, ArrayList<PhotoModel> photoModels) {
-		this.context = context;
+			this.context = context;
 		this.photoModels = photoModels;
 	}
 

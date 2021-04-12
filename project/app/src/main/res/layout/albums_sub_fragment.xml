@@ -24,6 +24,7 @@
     app:cardUseCompatPadding="true">
 
     <LinearLayout
+        android:id="@+id/albumView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_margin="7dp"
@@ -53,7 +54,7 @@
             android:gravity="left"
             android:text="aaaaaaa"
             android:textColor="@color/black"
-            android:textSize="18dp"></TextView>
+            android:textSize="20dp"></TextView>
         <TextView
             android:id="@+id/quantity_of_album"
             android:layout_width="match_parent"

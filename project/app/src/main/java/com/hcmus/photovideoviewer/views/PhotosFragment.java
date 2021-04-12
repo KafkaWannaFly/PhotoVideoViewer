@@ -88,7 +88,6 @@ public class PhotosFragment extends Fragment {
 					if (filterFunc != null) {
 						photoModels.removeIf(photoModel -> filterFunc.apply(photoModel));
 					}
-
 					appBarViewModel.liveSortOrder.observe(getViewLifecycleOwner(), order -> {
 						if (order == 0) {
 							photoModels.sort((o1, o2) -> o2.dateModified.compareTo(o1.dateModified));
