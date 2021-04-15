@@ -15,15 +15,26 @@ public class PhotoModel implements Parcelable {
 	public Date dateModified;
 	public Uri uri;
 
+	public boolean isFavorite = false;
+	public boolean isSecret = false;
+	public Uri formerUri = null;
+
+	public String location = null;
+
 	public PhotoModel() {
 
 	}
+
 
 	protected PhotoModel(Parcel in) {
 		id = in.readLong();
 		displayName = in.readString();
 		size = in.readDouble();
 		uri = in.readParcelable(Uri.class.getClassLoader());
+		isFavorite = in.readByte() != 0;
+		isSecret = in.readByte() != 0;
+		formerUri = in.readParcelable(Uri.class.getClassLoader());
+		location = in.readString();
 		dateModified = new Date(in.readLong());
 	}
 
@@ -39,17 +50,6 @@ public class PhotoModel implements Parcelable {
 		}
 	};
 
-	@NotNull
-	@Override
-	public String toString() {
-		return "PhotoModel{" +
-				       "id=" + id +
-				       ", displayName='" + displayName + '\'' +
-				       ", size='" + size + '\'' +
-				       ", dateModified='" + dateModified + '\'' +
-				       '}';
-	}
-
 	@Override
 	public int describeContents() {
 		return 0;
@@ -61,6 +61,10 @@ public class PhotoModel implements Parcelable {
 		dest.writeString(displayName);
 		dest.writeDouble(size);
 		dest.writeParcelable(uri, flags);
-		dest.writeDouble(dateModified.getTime());
+		dest.writeByte((byte) (isFavorite ? 1 : 0));
+		dest.writeByte((byte) (isSecret ? 1 : 0));
+		dest.writeParcelable(formerUri, flags);
+		dest.writeString(location);
+		dest.writeLong(dateModified.getTime());
 	}
 }

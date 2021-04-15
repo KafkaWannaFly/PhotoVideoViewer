@@ -9,10 +9,10 @@ import com.hcmus.photovideoviewer.services.MediaDataRepository;
 
 import java.util.ArrayList;
 
-public class PhotosViewModel extends ViewModel {
+public class PhotosFragmentViewModel extends ViewModel {
 	private final MutableLiveData<ArrayList<PhotoModel>> livePhotoModels;
 
-	public PhotosViewModel(ArrayList<PhotoModel> photoModels) {
+	public PhotosFragmentViewModel(ArrayList<PhotoModel> photoModels) {
 		this.livePhotoModels = new MutableLiveData<>(photoModels);
 	}
 

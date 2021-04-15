@@ -18,7 +18,7 @@ import com.hcmus.photovideoviewer.adapters.PhotosViewAdapter;
 import com.hcmus.photovideoviewer.models.PhotoModel;
 import com.hcmus.photovideoviewer.services.MediaDataRepository;
 import com.hcmus.photovideoviewer.viewmodels.AppBarViewModel;
-import com.hcmus.photovideoviewer.viewmodels.PhotosViewModel;
+import com.hcmus.photovideoviewer.viewmodels.PhotosFragmentViewModel;
 
 import java.util.ArrayList;
 import java.util.function.Function;
@@ -28,7 +28,7 @@ public class PhotosFragment extends Fragment {
 	private RecyclerView.LayoutManager layoutManager = null;
 //	private MutableLiveData<Integer> liveColumnSpan = null;
 
-	private PhotosViewModel photosViewModel = null;
+	private PhotosFragmentViewModel photosViewModel = null;
 	private PhotosViewAdapter photosViewAdapter = null;
 
 	private AppBarViewModel appBarViewModel = null;
@@ -51,7 +51,7 @@ public class PhotosFragment extends Fragment {
 	public void onCreate(@Nullable Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		photosViewModel = new PhotosViewModel(MediaDataRepository.getInstance().getPhotoModels());
+		photosViewModel = new PhotosFragmentViewModel(MediaDataRepository.getInstance().getPhotoModels());
 
 		Log.d("ActivityLife", "PhotoFragment created");
 	}
@@ -80,7 +80,7 @@ public class PhotosFragment extends Fragment {
 		super.onActivityCreated(savedInstanceState);
 
 		try {
-			photosViewModel.getLivePhotoModels().observe(getViewLifecycleOwner(), new Observer<ArrayList<PhotoModel>>() {
+			photosViewModel.getLivePhotoModels().observe(PhotosFragment.this, new Observer<ArrayList<PhotoModel>>() {
 				@Override
 				public void onChanged(ArrayList<PhotoModel> photoModels) {
 					Log.d("ActivityLife", "PhotoFragment data changed");
@@ -88,7 +88,7 @@ public class PhotosFragment extends Fragment {
 					if (filterFunc != null) {
 						photoModels.removeIf(photoModel -> filterFunc.apply(photoModel));
 					}
-					appBarViewModel.liveSortOrder.observe(getViewLifecycleOwner(), order -> {
+					appBarViewModel.liveSortOrder.observe(PhotosFragment.this, order -> {
 						if (order == 0) {
 							photoModels.sort((o1, o2) -> o2.dateModified.compareTo(o1.dateModified));
 						}

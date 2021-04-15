@@ -6,13 +6,10 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.MutableLiveData;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
 import com.hcmus.photovideoviewer.R;
-import com.hcmus.photovideoviewer.services.MediaDataRepository;
 import com.hcmus.photovideoviewer.viewmodels.AppBarViewModel;
-import com.hcmus.photovideoviewer.viewmodels.PhotosViewModel;
 import com.hcmus.photovideoviewer.views.AlbumsFragment;
 //import com.hcmus.photovideoviewer.views.ExploreFragment;
 import com.hcmus.photovideoviewer.views.ExploreFragment;

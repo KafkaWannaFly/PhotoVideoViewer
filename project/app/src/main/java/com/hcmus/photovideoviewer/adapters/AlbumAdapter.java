@@ -1,11 +1,9 @@
 package com.hcmus.photovideoviewer.adapters;
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,34 +12,20 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.viewpager2.widget.ViewPager2;
 
 import com.CodeBoy.MediaFacer.MediaFacer;
 import com.CodeBoy.MediaFacer.mediaHolders.pictureContent;
 import com.CodeBoy.MediaFacer.mediaHolders.pictureFolderContent;
 import com.CodeBoy.MediaFacer.mediaHolders.videoContent;
-import com.hcmus.photovideoviewer.MainActivity;
 import com.hcmus.photovideoviewer.R;
 import com.hcmus.photovideoviewer.models.AlbumModel;
 import com.hcmus.photovideoviewer.models.PhotoModel;
-import com.hcmus.photovideoviewer.services.MediaDataRepository;
-import com.hcmus.photovideoviewer.viewmodels.PhotosViewModel;
 import com.hcmus.photovideoviewer.views.AlbumsViewActivity;
-import com.hcmus.photovideoviewer.views.PhotoViewActivity;
-import com.hcmus.photovideoviewer.views.PhotosFragment;
 import com.squareup.picasso.Picasso;
-import com.google.android.material.*;
+
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
-import java.util.zip.Inflater;
 
 import static android.app.PendingIntent.getActivity;
 
@@ -134,6 +118,7 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ViewHolder> 
 //            });
 //            Intent viewDetailAlbum = new Intent(this.context, frag.getClass());
 //            frag.getContext().startActivity(viewDetailAlbum);
+//            AlbumsViewActivity albumsViewActivity = new AlbumsViewActivity();
             Intent viewAlbumIntent = new Intent(this.context , AlbumsViewActivity.class);
             ArrayList<PhotoModel> photoModels = new ArrayList<>();
 //            photoModels.add(albumData.get(position).getImageUrl());
