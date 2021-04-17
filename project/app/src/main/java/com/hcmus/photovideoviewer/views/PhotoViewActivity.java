@@ -220,15 +220,10 @@ public class PhotoViewActivity extends AppCompatActivity {
 	private final View.OnClickListener favoriteTextClickListener = v -> {
 		try {
 			PhotoModel photoModel = photoModels.get(currentPosition);
-			photoModel.isFavorite = !photoModel.isFavorite;
+//			photoModel.isFavorite = !photoModel.isFavorite;
 
-//			int color = defaultTextColor.getDefaultColor();
-//			if (photoModel.isFavorite) {
-//				color = getColor(R.color.favorite_red);
-//			}
-//			this.setTextViewDrawableTint(favoriteText, color);
-
-			photoViewViewModel.getLivePhotoModel().setValue(photoModel);
+//			photoViewViewModel.getLivePhotoModel().setValue(photoModel);
+			photoViewViewModel.setFavorite(!photoModel.isFavorite);
 
 			Log.d("PhotoViewTextClick", "favoriteText click!");
 		} catch (Exception exception) {

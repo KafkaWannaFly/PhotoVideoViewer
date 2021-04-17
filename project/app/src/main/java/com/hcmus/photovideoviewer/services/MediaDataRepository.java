@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.MediaStore;
@@ -99,6 +100,8 @@ public class MediaDataRepository {
 						size = _size;
 						dateModified = new Date(date * 1000);
 						uri = ContentUris.withAppendedId(_uri, id);
+
+						isFavorite = getIsFavorite(this);
 					}
 				};
 
@@ -108,6 +111,15 @@ public class MediaDataRepository {
 
 		Log.d("Images", "Found " + photoModels.size() + " photos");
 		return this.photoModels;
+	}
+
+	/**
+	 * Check if this photo is in Favorite list
+	 */
+	private boolean getIsFavorite(PhotoModel photoModel) {
+		SharedPreferences sharedPreferences = context.getSharedPreferences("Photos", Context.MODE_PRIVATE);
+
+		return sharedPreferences.getBoolean(photoModel.uri + "isFavorite", false);
 	}
 
 	public ArrayList<VideoModel> fetchVideos() {
