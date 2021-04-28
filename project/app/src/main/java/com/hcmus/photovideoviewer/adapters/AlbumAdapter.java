@@ -132,8 +132,8 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ViewHolder> 
             photoModels = fitPhotoLibrary(allPhotosAlbum);
             viewAlbumIntent.putParcelableArrayListExtra("photoModels", photoModels);
             viewAlbumIntent.putExtra("currentPosition", position);
-            context.startActivity(viewAlbumIntent);
             Log.d("onClickCardAlbum", "clicked " + position);
+            context.startActivity(viewAlbumIntent);
         });
     }
     @Override

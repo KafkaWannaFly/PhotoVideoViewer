@@ -1,5 +1,7 @@
 package com.hcmus.photovideoviewer.viewmodels;
 
+import android.app.Application;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -15,7 +17,6 @@ public class PhotosFragmentViewModel extends ViewModel {
 	public PhotosFragmentViewModel(ArrayList<PhotoModel> photoModels) {
 		this.livePhotoModels = new MutableLiveData<>(photoModels);
 	}
-
 	public MutableLiveData<ArrayList<PhotoModel>> getLivePhotoModels() {
 		return this.livePhotoModels;
 	}

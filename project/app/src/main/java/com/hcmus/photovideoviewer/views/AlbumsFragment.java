@@ -62,7 +62,7 @@ public class AlbumsFragment extends Fragment {
 							 @Nullable Bundle savedInstanceState) {
 		View rootView = inflater.inflate(R.layout.albums_fragment, container, false);
 		rootView.setTag("RecyclerViewFragment");
-		mRecyclerView = (RecyclerView) rootView.findViewById(R.id.album_recycle_view);
+		mRecyclerView = rootView.findViewById(R.id.album_recycle_view);
 //		mLayoutManager = new LinearLayoutManager(getActivity());
 		appBarViewModel.liveColumnSpan.observe(getViewLifecycleOwner(), columnSpan -> {
 			mLayoutManager = new GridLayoutManager(getActivity(), columnSpan);
