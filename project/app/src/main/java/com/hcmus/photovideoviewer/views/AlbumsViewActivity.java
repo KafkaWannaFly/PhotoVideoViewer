@@ -41,6 +41,8 @@ AlbumsViewActivity extends AppCompatActivity{
 
     private Function<PhotoModel, Boolean> filterFunc;
     private ArrayList<PhotoModel> photoModels = new ArrayList<>();
+    private ArrayList<PhotoModel> photoModelsFavourites = new ArrayList<>();
+
     Integer currentPosition = null;
     private ViewPager2 pager = null;
     private View itemLayoutButton = null;
@@ -53,6 +55,7 @@ AlbumsViewActivity extends AppCompatActivity{
     private Integer currentCol = 1;
     private int spanCount = 1;
     private PhotosFragmentViewModel model;
+    private String albumName = "";
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -63,9 +66,13 @@ AlbumsViewActivity extends AppCompatActivity{
 //        appBarViewModel.liveColumnSpan.observe(this, columnSpan -> {
 //            recyclerView.setLayoutManager(new GridLayoutManager(this, columnSpan));
 //        });
-
+        Intent intent = getIntent();
+        photoModels = intent.getParcelableArrayListExtra("photoModels");
+        albumName = intent.getStringExtra("albumName");
+        photoModelsFavourites = intent.getParcelableArrayListExtra("photoFavoriteData");
         appBarViewModel = new AppBarViewModel();
         MaterialToolbar materialToolbar = findViewById(R.id.topToolBarAlbum);
+        materialToolbar.setTitle(albumName);
         materialToolbar.setOnMenuItemClickListener(item -> {
             if (item.getItemId() == R.id.layoutButton) {
                 currentCol = appBarViewModel.liveColumnSpan.getValue();
@@ -106,8 +113,8 @@ AlbumsViewActivity extends AppCompatActivity{
 
         //currentPosition = intent.getIntExtra("currentPosition", 0);
 //        photosViewAdapter = new PhotosViewAdapter(this, photoModels);
-        Intent intent = getIntent();
-        photoModels = intent.getParcelableArrayListExtra("photoModels");
+
+        //photoModels.addAll(photoModelsFavourites);
         photosViewModel = new PhotosFragmentViewModel(photoModels);
         photosViewModel.getLivePhotoModels().setValue(photoModels);
         try {

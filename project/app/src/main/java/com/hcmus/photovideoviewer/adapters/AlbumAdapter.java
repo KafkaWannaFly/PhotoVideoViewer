@@ -1,5 +1,6 @@
 package com.hcmus.photovideoviewer.adapters;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
@@ -21,6 +22,7 @@ import com.CodeBoy.MediaFacer.mediaHolders.videoContent;
 import com.hcmus.photovideoviewer.R;
 import com.hcmus.photovideoviewer.models.AlbumModel;
 import com.hcmus.photovideoviewer.models.PhotoModel;
+import com.hcmus.photovideoviewer.views.AlbumsFragment;
 import com.hcmus.photovideoviewer.views.AlbumsViewActivity;
 import com.squareup.picasso.Picasso;
 
@@ -40,7 +42,7 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ViewHolder> 
     static int flag = 0;
     //    private String[] mDataSet;
     ArrayList<AlbumModel> albumData;
-
+    ArrayList<PhotoModel> dataPhotoFavourite;
     // BEGIN_INCLUDE(recyclerViewSampleViewHolder)
     /**
      * Provide a reference to the type of views that you are using (custom ViewHolder)
@@ -50,6 +52,7 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ViewHolder> 
         private final ImageView imgTitle_of_album;
         private final TextView quantity_of_album;
         private final View album_view;
+
 
         public ViewHolder(View v) {
             super(v);
@@ -81,9 +84,10 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ViewHolder> 
 //    public AlbumAdapter(ArrayList<AlbumModel> albumModels) {
 //        this.albumData = albumModels;
 //    }
-    public AlbumAdapter(Context context, ArrayList<AlbumModel> albumModels) {
+    public AlbumAdapter(Context context, ArrayList<AlbumModel> albumModels, ArrayList<PhotoModel> dataPhotoFavourite) {
         this.context = context;
         this.albumData = albumModels;
+        this.dataPhotoFavourite = dataPhotoFavourite;
         Log.d("Abc", this.albumData.size() + "");
     }
     @Override
@@ -112,25 +116,29 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ViewHolder> 
                     .into(viewHolder.getImageView());
             flag++;
         viewHolder.getAlbumView().setOnClickListener(v->{
-//            PhotosFragment frag = new PhotosFragment();
-//            frag.setFilterFunc(photoModel -> {
-//                return albumData.get(position).getImageUrl().uri == photoModel.uri;
-//            });
-//            Intent viewDetailAlbum = new Intent(this.context, frag.getClass());
-//            frag.getContext().startActivity(viewDetailAlbum);
-//            AlbumsViewActivity albumsViewActivity = new AlbumsViewActivity();
-            Intent viewAlbumIntent = new Intent(this.context , AlbumsViewActivity.class);
             ArrayList<PhotoModel> photoModels = new ArrayList<>();
-//            photoModels.add(albumData.get(position).getImageUrl());
-//            photoModels.add(albumData.get(position).getImageUrl());
-            ArrayList<pictureContent> allPhotosAlbum;
-            ArrayList<videoContent> allVideosAlbum;
-            ArrayList<pictureFolderContent> pictureFolders = new ArrayList<>();
-            pictureFolders.addAll(MediaFacer.withPictureContex(context).getPictureFolders());
-            allPhotosAlbum = MediaFacer.withPictureContex(this.context).getAllPictureContentByBucket_id(pictureFolders.get(position).getBucket_id());
-            //Viet Ham convert data.
-            photoModels = fitPhotoLibrary(allPhotosAlbum);
+            TextView titleText = v.findViewById(R.id.title_of_album);
+            if(titleText.getText().toString().compareTo("Favourites") == 0){
+//                Intent intentFavourites = new Intent();
+//                photoModels = intentFavourites.getParcelableArrayListExtra("photoFavoriteData");
+                photoModels = this.dataPhotoFavourite;
+                System.out.println("aa");
+            }
+            else if(titleText.getText().toString().compareTo("Privacies") == 0)
+            {
+
+            }
+            else{
+                ArrayList<pictureContent> allPhotosAlbum;
+                ArrayList<videoContent> allVideosAlbum;
+                ArrayList<pictureFolderContent> pictureFolders = new ArrayList<>();
+                pictureFolders.addAll(MediaFacer.withPictureContex(context).getPictureFolders());
+                allPhotosAlbum = MediaFacer.withPictureContex(this.context).getAllPictureContentByBucket_id(pictureFolders.get(position).getBucket_id());
+                photoModels = fitPhotoLibrary(allPhotosAlbum);
+            }
+            Intent viewAlbumIntent = new Intent(this.context , AlbumsViewActivity.class);
             viewAlbumIntent.putParcelableArrayListExtra("photoModels", photoModels);
+            viewAlbumIntent.putExtra("albumName", albumData.get(position).getAlbumName());
             viewAlbumIntent.putExtra("currentPosition", position);
             Log.d("onClickCardAlbum", "clicked " + position);
             context.startActivity(viewAlbumIntent);

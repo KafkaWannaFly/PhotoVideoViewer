@@ -9,6 +9,8 @@ import androidx.lifecycle.MutableLiveData;
 import com.hcmus.photovideoviewer.models.PhotoModel;
 import com.hcmus.photovideoviewer.views.PhotosFragment;
 
+import java.util.Map;
+
 public class PhotoViewViewModel {
 	private final MutableLiveData<PhotoModel> livePhotoModel = new MutableLiveData<>();
 	private Context context = null;
