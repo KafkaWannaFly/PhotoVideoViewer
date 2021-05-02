@@ -2,6 +2,7 @@ package com.hcmus.photovideoviewer;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -17,6 +18,7 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -24,6 +26,8 @@ import android.view.View;
 import com.hcmus.photovideoviewer.adapters.MainPagerAdapter;
 import com.hcmus.photovideoviewer.services.MediaDataRepository;
 import com.hcmus.photovideoviewer.viewmodels.AppBarViewModel;
+
+import static android.provider.Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION;
 
 public class MainActivity extends AppCompatActivity
 		implements BottomNavigationView.OnNavigationItemSelectedListener {
@@ -136,19 +140,28 @@ public class MainActivity extends AppCompatActivity
 					Manifest.permission.ACCESS_MEDIA_LOCATION,
 					Manifest.permission.MANAGE_EXTERNAL_STORAGE,
 			}, EXTERNAL_PERMISSION_CODE);
+
+			if (!Environment.isExternalStorageManager()) {
+				this.promptMessageForFileManagePermission();
+			}
 		}
 		else {
 			mediaDataRepository.fetchData();
 		}
 	}
 
-	private void checkCameraPermission() {
-		if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-				    != PackageManager.PERMISSION_GRANTED) {
-			requestPermissions(new String[]{
-					Manifest.permission.CAMERA
-			}, CAMERA_PERMISSION_CODE);
-		}
+	private void promptMessageForFileManagePermission() {
+		String title = "Request for Files access permission";
+		String content = "We need All Files access permission to work properly. Please turn it on in your settings";
+		new AlertDialog.Builder(this)
+				.setTitle(title)
+				.setMessage(content)
+				.setPositiveButton("OK", (dialog, which) -> {
+					Intent intent = new Intent(ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
+					this.startActivity(intent);
+				})
+				.setNegativeButton("NO", null)
+				.show();
 	}
 
 	public void setFabTakePhotoButton(View v) {
