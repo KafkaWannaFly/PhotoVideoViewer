@@ -160,7 +160,7 @@ public class AlbumsFragment extends Fragment {
 				size = _size;
 				dateModified = new Date(date * 1000);
 				//uri = ContentUris.withAppendedId(_uri, id);
-				uri = _uri;
+				uri = _uri.toString();
 				isFavorite = true;
 			}
 		};

@@ -45,8 +45,11 @@ public class PhotosViewAdapter extends RecyclerView.Adapter<PhotosViewAdapter.Vi
 			context.startActivity(viewPhotoIntent);
 		});
 
+		PhotoModel photoModel = photoModels.get(position);
 		Glide.with(context)
-				.load(photoModels.get(position).uri)
+				.load(photoModel.isSecret?
+						      R.drawable.ic_baseline_lock_24 :
+						      photoModel.uri)
 				.placeholder(R.drawable.pussy_cat)
 				.into(imageView);
 	}

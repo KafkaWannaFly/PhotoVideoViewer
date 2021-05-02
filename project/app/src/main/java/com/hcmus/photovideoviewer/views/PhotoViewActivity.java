@@ -1,21 +1,17 @@
 package com.hcmus.photovideoviewer.views;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.Intent;
 import android.content.res.ColorStateList;
-import android.graphics.Color;
-import android.graphics.ColorFilter;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -30,12 +26,15 @@ import com.hcmus.photovideoviewer.viewmodels.PhotoViewViewModel;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
  */
 public class PhotoViewActivity extends AppCompatActivity {
+	final int DELETE_REQUEST_CODE = 0;
 
 	ArrayList<PhotoModel> photoModels = null;
 	Integer currentPosition = null;
@@ -77,8 +76,10 @@ public class PhotoViewActivity extends AppCompatActivity {
 
 		defaultTextColor = photoNameText.getTextColors();
 
-		favoriteText.setOnClickListener(favoriteTextClickListener);
-		setPrivateText.setOnClickListener(setPrivateTextClickListener);
+		// LISTENERS
+		favoriteText.setOnClickListener(this.favoriteTextClickListener);
+		setPrivateText.setOnClickListener(this.setPrivateTextClickListener);
+		deleteText.setOnClickListener(this.deleteTextClickListener);
 
 		// Get data pass from PhotosFragment
 		Intent intent = getIntent();
@@ -220,9 +221,7 @@ public class PhotoViewActivity extends AppCompatActivity {
 	private final View.OnClickListener favoriteTextClickListener = v -> {
 		try {
 			PhotoModel photoModel = photoModels.get(currentPosition);
-//			photoModel.isFavorite = !photoModel.isFavorite;
 
-//			photoViewViewModel.getLivePhotoModel().setValue(photoModel);
 			photoViewViewModel.setFavorite(!photoModel.isFavorite);
 
 			Log.d("PhotoViewTextClick", "favoriteText click!");
@@ -235,21 +234,43 @@ public class PhotoViewActivity extends AppCompatActivity {
 	private final View.OnClickListener setPrivateTextClickListener = v -> {
 		try {
 			PhotoModel photoModel = photoModels.get(currentPosition);
-			photoModel.isSecret = !photoModel.isSecret;
 
-//			int color = defaultTextColor.getDefaultColor();
-//			if (photoModel.isSecret) {
-//				TypedValue typedValue = new TypedValue();
-//				getTheme().resolveAttribute(R.attr.colorOnPrimary, typedValue, true);
-//				color = getColor(typedValue.data);
-//			}
-//			this.setTextViewDrawableTint(setPrivateText, color);
-
-			photoViewViewModel.getLivePhotoModel().setValue(photoModel);
+			photoViewViewModel.setPrivate(!photoModel.isSecret);
 
 			Log.d("PhotoViewTextClick", "setPrivateText click!");
 		} catch (Exception exception) {
 			Log.e("PhotoViewTextClick", exception.getMessage());
 		}
 	};
+
+	private final View.OnClickListener deleteTextClickListener = v -> {
+		Log.d("PhotoViewTextClick", "deleteText click!");
+
+		try {
+			PhotoModel photoModel = photoModels.get(currentPosition);
+
+//			boolean isDeleted = photoViewViewModel.deleteImage(photoModel);
+//			Log.d("PhotoViewTextClick", "Delete result: " + isDeleted);
+
+			photoViewViewModel.deleteImage(photoModel, DELETE_REQUEST_CODE);
+
+//			PhotoViewViewModel.delete(this,
+//					new Uri[] {Uri.parse(photoModel.uri)},
+//					DELETE_REQUEST_CODE);
+		} catch (Exception exception) {
+			Log.e("PhotoViewTextClick", exception.getMessage());
+		}
+	};
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+
+		if (requestCode == DELETE_REQUEST_CODE) {
+			Log.d("PhotoViewTextClick", "Result code: " + resultCode);
+			if (resultCode == RESULT_OK) {
+				this.finish();
+			}
+		}
+	}
 }

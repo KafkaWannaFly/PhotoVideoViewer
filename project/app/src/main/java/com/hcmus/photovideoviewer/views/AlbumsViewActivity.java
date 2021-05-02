@@ -1,6 +1,5 @@
 package com.hcmus.photovideoviewer.views;
 
-import android.content.ClipData;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -8,10 +7,7 @@ import android.view.View;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.LifecycleOwner;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
@@ -21,12 +17,10 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.hcmus.photovideoviewer.R;
 import com.hcmus.photovideoviewer.adapters.PhotosViewAdapter;
 import com.hcmus.photovideoviewer.models.PhotoModel;
-import com.hcmus.photovideoviewer.services.MediaDataRepository;
-import com.hcmus.photovideoviewer.viewmodels.PhotosFragmentViewModel;
 import com.hcmus.photovideoviewer.viewmodels.AppBarViewModel;
+import com.hcmus.photovideoviewer.viewmodels.PhotosFragmentViewModel;
+
 import java.util.ArrayList;
-import java.util.Observable;
-import java.util.Observer;
 import java.util.function.Function;
 
 public class

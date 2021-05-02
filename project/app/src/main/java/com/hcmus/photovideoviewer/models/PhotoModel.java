@@ -13,11 +13,11 @@ public class PhotoModel implements Parcelable {
 	public String displayName;
 	public double size; //byte
 	public Date dateModified;
-	public Uri uri;
+	public String uri;
 
 	public boolean isFavorite = false;
-	public boolean isSecret = false;
-	public Uri formerUri = null;
+	public boolean isSecret;
+	public String formerUri = null;
 
 	public String location = null;
 
@@ -30,10 +30,10 @@ public class PhotoModel implements Parcelable {
 		id = in.readLong();
 		displayName = in.readString();
 		size = in.readDouble();
-		uri = in.readParcelable(Uri.class.getClassLoader());
+		uri = in.readString();
 		isFavorite = in.readByte() != 0;
 		isSecret = in.readByte() != 0;
-		formerUri = in.readParcelable(Uri.class.getClassLoader());
+		formerUri = in.readString();
 		location = in.readString();
 		dateModified = new Date(in.readLong());
 	}
@@ -60,10 +60,10 @@ public class PhotoModel implements Parcelable {
 		dest.writeLong(id);
 		dest.writeString(displayName);
 		dest.writeDouble(size);
-		dest.writeParcelable(uri, flags);
+		dest.writeString(uri);
 		dest.writeByte((byte) (isFavorite ? 1 : 0));
 		dest.writeByte((byte) (isSecret ? 1 : 0));
-		dest.writeParcelable(formerUri, flags);
+		dest.writeString(formerUri);
 		dest.writeString(location);
 		dest.writeLong(dateModified.getTime());
 	}

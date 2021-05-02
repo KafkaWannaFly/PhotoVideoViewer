@@ -158,7 +158,7 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ViewHolder> 
             photoModel.dateModified = new Date(allPhotosAlbum.get(i).getDate_modified() * 1000);
             photoModel.displayName = allPhotosAlbum.get(i).getPicturName();
             photoModel.size = allPhotosAlbum.get(i).getPictureSize();
-            photoModel.uri = ContentUris.withAppendedId(_uri, photoModel.id);
+            photoModel.uri = ContentUris.withAppendedId(_uri, photoModel.id).toString();
             photoModels.add(photoModel);
         }
         return photoModels;

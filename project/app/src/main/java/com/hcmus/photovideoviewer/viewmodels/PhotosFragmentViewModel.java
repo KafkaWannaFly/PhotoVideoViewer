@@ -15,6 +15,10 @@ public class PhotosFragmentViewModel extends ViewModel {
 	private final MutableLiveData<ArrayList<PhotoModel>> livePhotoModels;
 
 	public PhotosFragmentViewModel(ArrayList<PhotoModel> photoModels) {
+//		photoModels.removeIf(photoModel -> {
+//			return !photoModel.isSecret;
+//		});
+
 		this.livePhotoModels = new MutableLiveData<>(photoModels);
 	}
 	public MutableLiveData<ArrayList<PhotoModel>> getLivePhotoModels() {

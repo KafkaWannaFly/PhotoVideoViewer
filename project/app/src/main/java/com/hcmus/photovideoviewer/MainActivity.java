@@ -15,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.MenuItem;
@@ -27,12 +28,12 @@ import com.hcmus.photovideoviewer.viewmodels.AppBarViewModel;
 public class MainActivity extends AppCompatActivity
 		implements BottomNavigationView.OnNavigationItemSelectedListener {
 
-	public static final int READ_EXTERNAL_CODE = 1;
+	public static final int EXTERNAL_PERMISSION_CODE = 1;
 	public static final int CAMERA_PERMISSION_CODE = 2;
+	private final AppBarViewModel appBarViewModel = new AppBarViewModel();
 	public MediaDataRepository mediaDataRepository = MediaDataRepository.getInstance();
 	private ViewPager2 pager = null;
 	private BottomNavigationView bottomNavigationView = null;
-	private final AppBarViewModel appBarViewModel = new AppBarViewModel();
 	private FragmentStateAdapter fragmentStateAdapter = null;
 
 	@Override
@@ -41,7 +42,7 @@ public class MainActivity extends AppCompatActivity
 		setContentView(R.layout.main_activity);
 
 		// Permissions
-		checkReadExternalPermission();
+		checkManageExternalStoragePermission();
 
 		// Bottom tabs
 		pager = findViewById(R.id.pager);
@@ -79,18 +80,20 @@ public class MainActivity extends AppCompatActivity
 		materialToolbar.setOnMenuItemClickListener(item -> {
 			if (item.getItemId() == R.id.layoutButton) {
 				Integer currentCol = appBarViewModel.liveColumnSpan.getValue();
-				if(currentCol == null) {
+				if (currentCol == null) {
 					return false;
 				}
 
-				currentCol = currentCol + 1 > 3? 1 : currentCol + 1;
+				currentCol = currentCol + 1 > 3 ? 1 : currentCol + 1;
 				appBarViewModel.liveColumnSpan.setValue(currentCol);
 
-				if(currentCol == 1) {
+				if (currentCol == 1) {
 					item.setIcon(R.drawable.ic_baseline_view_1_column_24);
-				} else if(currentCol == 2) {
+				}
+				else if (currentCol == 2) {
 					item.setIcon(R.drawable.ic_baseline_view_2_column_24);
-				} else {
+				}
+				else {
 					item.setIcon(R.drawable.ic_baseline_view_3_column_24);
 				}
 
@@ -118,12 +121,21 @@ public class MainActivity extends AppCompatActivity
 		Log.d("ActivityLife", "MainActivity resume");
 	}
 
-	private void checkReadExternalPermission() {
-		if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
-				    != PackageManager.PERMISSION_GRANTED) {
+	private void checkManageExternalStoragePermission() {
+		boolean needPermission =
+				ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+						!= PackageManager.PERMISSION_GRANTED &&
+						ContextCompat.checkSelfPermission(this, Manifest.permission.MANAGE_EXTERNAL_STORAGE)
+								   != PackageManager.PERMISSION_GRANTED &&
+						ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_MEDIA_LOCATION)
+								   != PackageManager.PERMISSION_GRANTED;
+		if (needPermission) {
 			requestPermissions(new String[]{
-					Manifest.permission.READ_EXTERNAL_STORAGE
-			}, READ_EXTERNAL_CODE);
+					Manifest.permission.READ_EXTERNAL_STORAGE,
+					Manifest.permission.WRITE_EXTERNAL_STORAGE,
+					Manifest.permission.ACCESS_MEDIA_LOCATION,
+					Manifest.permission.MANAGE_EXTERNAL_STORAGE,
+			}, EXTERNAL_PERMISSION_CODE);
 		}
 		else {
 			mediaDataRepository.fetchData();
@@ -171,7 +183,7 @@ public class MainActivity extends AppCompatActivity
 		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
 		switch (requestCode) {
-			case READ_EXTERNAL_CODE: {
+			case EXTERNAL_PERMISSION_CODE: {
 				for (int result : grantResults) {
 					if (result != PackageManager.PERMISSION_GRANTED) {
 						return;
