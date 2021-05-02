@@ -5,6 +5,7 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.PorterDuff;
@@ -25,6 +26,7 @@ import com.hcmus.photovideoviewer.viewmodels.PhotoViewViewModel;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -232,12 +234,31 @@ public class PhotoViewActivity extends AppCompatActivity {
 	};
 
 	private final View.OnClickListener setPrivateTextClickListener = v -> {
+		Log.d("PhotoViewTextClick", "setPrivateText click!");
 		try {
 			PhotoModel photoModel = photoModels.get(currentPosition);
 
-			photoViewViewModel.setPrivate(!photoModel.isSecret);
+			String msg;
+			if (photoModel.isSecret) {
+				msg = "Bring this image back to public?";
+			}
+			else {
+				msg = "Are you sure to move this image to secret place?";
+			}
 
-			Log.d("PhotoViewTextClick", "setPrivateText click!");
+			new AlertDialog.Builder(this)
+					.setTitle("Gallery secret")
+					.setMessage(msg)
+					.setPositiveButton("Yes, I'm sure", (dialog, which) -> {
+						try {
+							photoViewViewModel.setPrivate(!photoModel.isSecret);
+							this.finish();
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					})
+					.setNegativeButton("Cancel", null)
+					.show();
 		} catch (Exception exception) {
 			Log.e("PhotoViewTextClick", exception.getMessage());
 		}
@@ -249,14 +270,9 @@ public class PhotoViewActivity extends AppCompatActivity {
 		try {
 			PhotoModel photoModel = photoModels.get(currentPosition);
 
-//			boolean isDeleted = photoViewViewModel.deleteImage(photoModel);
-//			Log.d("PhotoViewTextClick", "Delete result: " + isDeleted);
 
 			photoViewViewModel.deleteImage(photoModel, DELETE_REQUEST_CODE);
 
-//			PhotoViewViewModel.delete(this,
-//					new Uri[] {Uri.parse(photoModel.uri)},
-//					DELETE_REQUEST_CODE);
 		} catch (Exception exception) {
 			Log.e("PhotoViewTextClick", exception.getMessage());
 		}

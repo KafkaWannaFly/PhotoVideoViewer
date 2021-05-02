@@ -91,7 +91,7 @@ public class MediaDataRepository {
 				MediaStore.Images.Media.DISPLAY_NAME,
 				MediaStore.Images.Media.DATE_MODIFIED,
 				MediaStore.Images.Media.SIZE,
-//				MediaStore.Images.Media.DATA
+				MediaStore.Images.Media.DATA
 		};
 
 		ContentResolver contentResolver = context.getContentResolver();
@@ -104,14 +104,14 @@ public class MediaDataRepository {
 			int nameColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME);
 			int sizeColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.SIZE);
 			int dateColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATE_MODIFIED);
-//			int pathColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+			int pathColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
 
 			while (cursor.moveToNext()) {
 				long _id = cursor.getLong(idColumn);
 				String name = cursor.getString(nameColumn);
 				Long _size = cursor.getLong(sizeColumn);
 				Long date = cursor.getLong(dateColumn);
-//				String filePath = cursor.getString(pathColumn);
+				String filePath = cursor.getString(pathColumn);
 
 //				String
 				PhotoModel photoModel = new PhotoModel() {
@@ -120,8 +120,8 @@ public class MediaDataRepository {
 						displayName = name;
 						size = _size;
 						dateModified = new Date(date * 1000);
-						uri = ContentUris.withAppendedId(whereToLook, id).toString();
-//						uri = filePath;
+//						uri = ContentUris.withAppendedId(whereToLook, id).toString();
+						uri = filePath;
 						isFavorite = getIsFavorite(this);
 						isSecret = MediaStore.Images.Media.INTERNAL_CONTENT_URI == whereToLook;
 					}

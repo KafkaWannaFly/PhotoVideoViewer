@@ -12,6 +12,6 @@ public class AppBarViewModel {
 
 	public AppBarViewModel() {
 		liveColumnSpan.setValue(MainApplication.SPAN_COUNT);
-		liveSortOrder.setValue(0);
+		liveSortOrder.setValue(1);
 	}
 }

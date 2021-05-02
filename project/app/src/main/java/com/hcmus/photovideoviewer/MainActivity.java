@@ -5,6 +5,8 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.media.MediaScannerConnection;
+import android.net.Uri;
 import android.os.Bundle;
 
 import com.google.android.material.appbar.MaterialToolbar;
@@ -47,6 +49,8 @@ public class MainActivity extends AppCompatActivity
 
 		// Permissions
 		checkManageExternalStoragePermission();
+
+		this.refreshMediaStore();
 
 		// Bottom tabs
 		pager = findViewById(R.id.pager);
@@ -130,9 +134,9 @@ public class MainActivity extends AppCompatActivity
 				ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
 						!= PackageManager.PERMISSION_GRANTED &&
 						ContextCompat.checkSelfPermission(this, Manifest.permission.MANAGE_EXTERNAL_STORAGE)
-								   != PackageManager.PERMISSION_GRANTED &&
+								!= PackageManager.PERMISSION_GRANTED &&
 						ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_MEDIA_LOCATION)
-								   != PackageManager.PERMISSION_GRANTED;
+								!= PackageManager.PERMISSION_GRANTED;
 		if (needPermission) {
 			requestPermissions(new String[]{
 					Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -181,15 +185,17 @@ public class MainActivity extends AppCompatActivity
 	}
 
 
-//	public void setFabMenu(View v) {
-//		Log.d("Fab", "Fab menu click");
-//		int visibilityValue = Math.abs(backgroundForFabButton.getVisibility() + 4 - 8);
-//		backgroundForFabButton.setVisibility(visibilityValue);
-//	}
-//
-//	public void unFocusFabMenu(View v) {
-//		backgroundForFabButton.setVisibility(View.INVISIBLE);
-//	}
+	private void refreshMediaStore() {
+		MediaScannerConnection.scanFile(this,
+				new String[]{Environment.getExternalStorageDirectory().toString()},
+				null,
+				new MediaScannerConnection.OnScanCompletedListener() {
+					public void onScanCompleted(String path, Uri uri) {
+						Log.d("ExternalStorage", "Scanned " + path + ":");
+						Log.d("ExternalStorage", "-> uri=" + uri);
+					}
+				});
+	}
 
 	@Override
 	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
