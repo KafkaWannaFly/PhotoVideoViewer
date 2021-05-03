@@ -3,12 +3,14 @@ package com.hcmus.photovideoviewer.viewmodels;
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.app.RecoverableSecurityException;
+import android.app.WallpaperManager;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.Picture;
 import android.graphics.drawable.Drawable;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
@@ -35,6 +37,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -338,5 +341,12 @@ public class PhotoViewViewModel {
 		}
 
 		return null;
+	}
+
+	public void setImageAsBackground(PhotoModel photoModel) throws IOException {
+		WallpaperManager wallpaperManager = WallpaperManager.getInstance(context);
+		InputStream inputStream = new FileInputStream(photoModel.uri);
+
+		wallpaperManager.setStream(inputStream);
 	}
 }

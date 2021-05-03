@@ -22,6 +22,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ShareActionProvider;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
@@ -88,6 +89,7 @@ public class PhotoViewActivity extends AppCompatActivity {
 		setPrivateText.setOnClickListener(this.setPrivateTextClickListener);
 		deleteText.setOnClickListener(this.deleteTextClickListener);
 		shareText.setOnClickListener(this.shareTextClickListener);
+		setBackgroundText.setOnClickListener(this.setBackgroundTextClickListener);
 
 		// Get data pass from PhotosFragment
 		Intent intent = getIntent();
@@ -111,9 +113,6 @@ public class PhotoViewActivity extends AppCompatActivity {
 		} catch (Exception e) {
 			Log.d("BottomSheet", e.getMessage());
 		}
-
-		StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
-		StrictMode.setVmPolicy(builder.build());
 	}
 
 	@Override
@@ -141,35 +140,6 @@ public class PhotoViewActivity extends AppCompatActivity {
 				bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
 			}
 		});
-	}
-
-	void setPhotoInfo(@NotNull PhotoModel photoModel) {
-		this.photoNameText.setText(photoModel.displayName);
-		this.locationText.setText(R.string.unknown);
-		this.pathText.setText(photoModel.uri.toString());
-		this.timeText.setText(photoModel.dateModified.toString());
-
-		double size = photoModel.size;
-		String postfix = "B";
-
-		if (size > 1024) {
-			postfix = "KB";
-			size = size / 1024;
-		}
-		if (size > 1024) {
-			postfix = "MB";
-			size = size / 1024;
-		}
-		if (size > 1024) {
-			postfix = "GB";
-			size = size / 1024;
-		}
-		size = Math.round(size * 100) / 100;
-		String sizeStr = size + " " + postfix;
-		this.sizeText.setText(sizeStr);
-
-		String dimenStr = this.myPhotoImageView.getHeight() + "x" + this.myPhotoImageView.getWidth();
-		this.dimensionText.setText(dimenStr);
 	}
 
 	@SuppressLint("UseCompatTextViewDrawableApis")
@@ -302,7 +272,7 @@ public class PhotoViewActivity extends AppCompatActivity {
 
 			Intent shareIntent = new Intent();
 			shareIntent.setAction(Intent.ACTION_SEND);
-			shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+			shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
 			shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse(photoModel.uri));
 			shareIntent.setType("image/*");
@@ -312,6 +282,19 @@ public class PhotoViewActivity extends AppCompatActivity {
 
 		} catch (Exception exception) {
 			Log.e("PhotoViewTextClick", exception.getMessage());
+		}
+	};
+
+	private final View.OnClickListener setBackgroundTextClickListener = v -> {
+		Log.d("PhotoViewTextClick", "setBackgroundText click!");
+		try {
+			PhotoModel photoModel = photoModels.get(currentPosition);
+
+			photoViewViewModel.setImageAsBackground(photoModel);
+
+			Toast.makeText(this, "Background changed", Toast.LENGTH_SHORT).show();
+		} catch (Exception exception) {
+			exception.printStackTrace();
 		}
 	};
 
