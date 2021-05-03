@@ -5,8 +5,11 @@ import android.app.PendingIntent;
 import android.app.RecoverableSecurityException;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
@@ -16,15 +19,20 @@ import android.util.Log;
 
 import androidx.lifecycle.MutableLiveData;
 
+import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
+import com.hcmus.photovideoviewer.R;
 import com.hcmus.photovideoviewer.constants.FolderConstants;
 import com.hcmus.photovideoviewer.constants.PhotoPreferences;
 import com.hcmus.photovideoviewer.models.PhotoModel;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import org.apache.commons.io.IOUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -170,7 +178,7 @@ public class PhotoViewViewModel {
 		});
 	}
 
-	private boolean deletePhotoWithoutAsking(String uriStr) {
+	public boolean deletePhotoWithoutAsking(String uriStr) {
 		ContentResolver contentResolver = context.getContentResolver();
 
 		boolean result;
@@ -184,12 +192,13 @@ public class PhotoViewViewModel {
 			result = new File(uriStr).delete();
 		}
 
+		this.refreshMediaStore();
+
 		return result;
 	}
 
 	/**
 	 * Move file to new location
-	 *
 	 * @param from will be delete after done
 	 * @param to   destination
 	 */
@@ -199,10 +208,6 @@ public class PhotoViewViewModel {
 
 		boolean isDeleted = deletePhotoWithoutAsking(from.getPath());
 		Log.d("PhotoViewTextClick", "Is image deleted? " + isDeleted);
-
-		if (isDeleted) {
-			refreshMediaStore();
-		}
 	}
 
 	private void saveIsFavorite(PhotoModel photoModel, boolean isFavorite) {
@@ -293,5 +298,45 @@ public class PhotoViewViewModel {
 				resolver.delete(uri, null, null);
 			}
 		}
+	}
+
+	public void sharePhoto(PhotoModel photoModel) {
+		Picasso.get().load(photoModel.uri).into(new Target() {
+			@Override
+			public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+				Intent intent = new Intent(Intent.ACTION_SEND);
+				intent.setType("image/*");
+				intent.putExtra(Intent.EXTRA_STREAM, getBitmapFromView(bitmap));
+				intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+				activity.startActivity(Intent.createChooser(intent, activity.getString(R.string.send_image)));
+			}
+
+			@Override
+			public void onBitmapFailed(Exception e, Drawable errorDrawable) {
+
+			}
+
+			@Override
+			public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+			}
+		});
+	}
+
+	private Uri getBitmapFromView(Bitmap bitmap) {
+		try {
+			File file = new File(context.getExternalCacheDir(), System.currentTimeMillis() + ".jpg");
+			FileOutputStream fileOutputStream = new FileOutputStream(file);
+
+			bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream);
+			fileOutputStream.close();
+
+			return Uri.fromFile(file);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return null;
 	}
 }

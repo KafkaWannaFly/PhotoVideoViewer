@@ -3,19 +3,24 @@ package com.hcmus.photovideoviewer.views;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.MimeTypeFilter;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ShareActionProvider;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -82,6 +87,7 @@ public class PhotoViewActivity extends AppCompatActivity {
 		favoriteText.setOnClickListener(this.favoriteTextClickListener);
 		setPrivateText.setOnClickListener(this.setPrivateTextClickListener);
 		deleteText.setOnClickListener(this.deleteTextClickListener);
+		shareText.setOnClickListener(this.shareTextClickListener);
 
 		// Get data pass from PhotosFragment
 		Intent intent = getIntent();
@@ -105,6 +111,9 @@ public class PhotoViewActivity extends AppCompatActivity {
 		} catch (Exception e) {
 			Log.d("BottomSheet", e.getMessage());
 		}
+
+		StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
+		StrictMode.setVmPolicy(builder.build());
 	}
 
 	@Override
@@ -240,16 +249,15 @@ public class PhotoViewActivity extends AppCompatActivity {
 
 			String msg;
 			if (photoModel.isSecret) {
-				msg = "Bring this image back to public?";
+				msg = getString(R.string.set_private_to_public);
 			}
 			else {
-				msg = "Are you sure to move this image to secret place?";
+				msg = getString(R.string.set_public_to_private);
 			}
 
 			new AlertDialog.Builder(this)
-					.setTitle("Gallery secret")
 					.setMessage(msg)
-					.setPositiveButton("Yes, I'm sure", (dialog, which) -> {
+					.setPositiveButton(R.string.yes_im_sure, (dialog, which) -> {
 						try {
 							photoViewViewModel.setPrivate(!photoModel.isSecret);
 							this.finish();
@@ -257,7 +265,7 @@ public class PhotoViewActivity extends AppCompatActivity {
 							e.printStackTrace();
 						}
 					})
-					.setNegativeButton("Cancel", null)
+					.setNegativeButton(R.string.cancel, null)
 					.show();
 		} catch (Exception exception) {
 			Log.e("PhotoViewTextClick", exception.getMessage());
@@ -270,8 +278,37 @@ public class PhotoViewActivity extends AppCompatActivity {
 		try {
 			PhotoModel photoModel = photoModels.get(currentPosition);
 
+//			photoViewViewModel.deleteImage(photoModel, DELETE_REQUEST_CODE);
 
-			photoViewViewModel.deleteImage(photoModel, DELETE_REQUEST_CODE);
+			new AlertDialog.Builder(this)
+					.setMessage(R.string.ask_sure_delete)
+					.setPositiveButton(R.string.yes_im_sure, (dialog, which) -> {
+						photoViewViewModel.deletePhotoWithoutAsking(photoModel.uri);
+						this.finish();
+					})
+					.setNegativeButton(R.string.cancel, null)
+					.show();
+
+		} catch (Exception exception) {
+			Log.e("PhotoViewTextClick", exception.getMessage());
+		}
+	};
+
+	private final View.OnClickListener shareTextClickListener = v -> {
+		Log.d("PhotoViewTextClick", "shareText click!");
+
+		try {
+			PhotoModel photoModel = photoModels.get(currentPosition);
+
+			Intent shareIntent = new Intent();
+			shareIntent.setAction(Intent.ACTION_SEND);
+			shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+			shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse(photoModel.uri));
+			shareIntent.setType("image/*");
+			startActivity(Intent.createChooser(shareIntent, getString(R.string.send_image)));
+
+//			photoViewViewModel.sharePhoto(photoModel);
 
 		} catch (Exception exception) {
 			Log.e("PhotoViewTextClick", exception.getMessage());
