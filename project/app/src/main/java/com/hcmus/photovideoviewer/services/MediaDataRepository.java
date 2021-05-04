@@ -91,7 +91,7 @@ public class MediaDataRepository {
 				MediaStore.Images.Media.DISPLAY_NAME,
 				MediaStore.Images.Media.DATE_MODIFIED,
 				MediaStore.Images.Media.SIZE,
-				MediaStore.Images.Media.DATA
+				MediaStore.Images.Media.DATA,
 		};
 
 		ContentResolver contentResolver = context.getContentResolver();

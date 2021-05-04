@@ -40,4 +40,5 @@
     <string name="cancel">Cancel</string>
     <string name="send_image">Send image</string>
     <string name="ask_sure_delete">Are you sure want to delete?</string>
+    <string name="set_background_success">Set background successfully</string>
 </resources>
