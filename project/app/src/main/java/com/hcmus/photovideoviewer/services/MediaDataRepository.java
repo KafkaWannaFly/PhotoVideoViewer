@@ -115,7 +115,7 @@ public class MediaDataRepository {
 				MediaStore.Images.Media.DISPLAY_NAME,
 				MediaStore.Images.Media.DATE_MODIFIED,
 				MediaStore.Images.Media.SIZE,
-				MediaStore.Images.Media.DATA
+				MediaStore.Images.Media.DATA,
 		};
 
 		ContentResolver contentResolver = context.getContentResolver();
@@ -146,10 +146,11 @@ public class MediaDataRepository {
 						dateModified = new Date(date * 1000);
 //						uri = ContentUris.withAppendedId(whereToLook, id).toString();
 						uri = filePath;
-						isFavorite = getIsFavorite(this);
-						isSecret = MediaStore.Images.Media.INTERNAL_CONTENT_URI == whereToLook;
 					}
 				};
+
+				photoModel.isFavorite = getIsFavorite(photoModel);
+				photoModel.location = getImageLocation(photoModel);
 
 				models.add(photoModel);
 			}
@@ -158,11 +159,17 @@ public class MediaDataRepository {
 		return models;
 	}
 
+	private String getImageLocation(PhotoModel photoModel) {
+		SharedPreferences sharedPreferences =
+				context.getSharedPreferences(PhotoPreferences.PHOTOS, Context.MODE_PRIVATE);
+		return sharedPreferences.getString(PhotoPreferences.locationPreferenceOf(photoModel.displayName), "");
+	}
 	/**
 	 * Check if this photo is in Favorite list
 	 */
 	private boolean getIsFavorite(PhotoModel photoModel) {
-		SharedPreferences sharedPreferences = context.getSharedPreferences(PhotoPreferences.PHOTOS, Context.MODE_PRIVATE);
+		SharedPreferences sharedPreferences =
+				context.getSharedPreferences(PhotoPreferences.PHOTOS, Context.MODE_PRIVATE);
 
 		return sharedPreferences.getBoolean(
 				PhotoPreferences.favoritePreferenceOf(photoModel.displayName),

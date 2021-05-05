@@ -1,16 +1,19 @@
 package com.hcmus.photovideoviewer.viewmodels;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.PendingIntent;
-import android.app.RecoverableSecurityException;
+import android.app.WallpaperManager;
 import android.content.ContentResolver;
+import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.Context;
-import android.content.IntentSender;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.util.Log;
 
@@ -27,9 +30,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.io.InputStream;
 
 public class PhotoViewViewModel {
 	private final MutableLiveData<PhotoModel> livePhotoModel = new MutableLiveData<>();
@@ -43,61 +44,59 @@ public class PhotoViewViewModel {
 		livePhotoModel.setValue(photoModel);
 	}
 
-	public static void delete(final Activity activity, final Uri[] uriList, final int requestCode)
-			throws SecurityException, IntentSender.SendIntentException, IllegalArgumentException {
-		final ContentResolver resolver = activity.getContentResolver();
+	public static String getDataColumn(Context context, Uri uri, String selection,
+	                                   String[] selectionArgs) {
 
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-			// WARNING: if the URI isn't a MediaStore Uri and specifically
-			// only for media files (images, videos, audio), the request
-			// will throw an IllegalArgumentException, with the message:
-			// 'All requested items must be referenced by specific ID'
+		Cursor cursor = null;
+		final String column = "_data";
+		final String[] projection = {
+				column
+		};
 
-			// No need to handle 'onActivityResult' callback, when the system returns
-			// from the user permission prompt the files will be already deleted.
-			// Multiple 'owned' and 'not-owned' files can be combined in the
-			// same batch request. The system will automatically delete them using the
-			// using the same prompt dialog, making the experience homogeneous.
-
-			final List<Uri> list = new ArrayList<>();
-			Collections.addAll(list, uriList);
-
-			final PendingIntent pendingIntent = MediaStore.createDeleteRequest(resolver, list);
-			activity.startIntentSenderForResult(pendingIntent.getIntentSender(), requestCode, null, 0, 0, 0, null);
-		}
-		else if (Build.VERSION.SDK_INT == Build.VERSION_CODES.Q) {
-			try {
-				// In Android == Q a RecoverableSecurityException is thrown if not-owned.
-				// For a batch request the deletion will stop at the failed not-owned
-				// file, so you may want to restrict deletion in Android Q to only
-				// 1 file at a time, to make the experience less ugly.
-				// Fortunately this gets solved in Android R.
-
-				for (final Uri uri : uriList) {
-					resolver.delete(uri, null, null);
-				}
-			} catch (RecoverableSecurityException ex) {
-				final IntentSender intent = ex.getUserAction()
-						                            .getActionIntent()
-						                            .getIntentSender();
-
-				// IMPORTANT: still need to perform the actual deletion
-				// as usual, so again getContentResolver().delete(...),
-				// in your 'onActivityResult' callback, as in Android Q
-				// all this extra code is necessary 'only' to get the permission,
-				// as the system doesn't perform any actual deletion at all.
-				// The onActivityResult doesn't have the target Uri, so you
-				// need to catch it somewhere.
-				activity.startIntentSenderForResult(intent, requestCode, null, 0, 0, 0, null);
+		try {
+			cursor = context.getContentResolver().query(uri, projection, selection, selectionArgs,
+					null);
+			if (cursor != null && cursor.moveToFirst()) {
+				final int index = cursor.getColumnIndexOrThrow(column);
+				return cursor.getString(index);
 			}
+		} finally {
+			if (cursor != null)
+				cursor.close();
 		}
-		else {
-			// As usual for older APIs
+		return null;
+	}
 
-			for (final Uri uri : uriList) {
-				resolver.delete(uri, null, null);
-			}
-		}
+	/**
+	 * @param uri The Uri to check.
+	 * @return Whether the Uri authority is ExternalStorageProvider.
+	 */
+	public static boolean isExternalStorageDocument(Uri uri) {
+		return "com.android.externalstorage.documents".equals(uri.getAuthority());
+	}
+
+	/**
+	 * @param uri The Uri to check.
+	 * @return Whether the Uri authority is DownloadsProvider.
+	 */
+	public static boolean isDownloadsDocument(Uri uri) {
+		return "com.android.providers.downloads.documents".equals(uri.getAuthority());
+	}
+
+	/**
+	 * @param uri The Uri to check.
+	 * @return Whether the Uri authority is MediaProvider.
+	 */
+	public static boolean isMediaDocument(Uri uri) {
+		return "com.android.providers.media.documents".equals(uri.getAuthority());
+	}
+
+	/**
+	 * @param uri The Uri to check.
+	 * @return Whether the Uri authority is Google Photos.
+	 */
+	public static boolean isGooglePhotosUri(Uri uri) {
+		return "com.google.android.apps.photos.content".equals(uri.getAuthority());
 	}
 
 	public MutableLiveData<PhotoModel> getLivePhotoModel() {
@@ -146,7 +145,7 @@ public class PhotoViewViewModel {
 		}
 	}
 
-	private int copyPhoto(String src, String dest) throws IOException {
+	public int copyPhoto(String src, String dest) throws IOException {
 		ContentResolver contentResolver = context.getContentResolver();
 		try (FileInputStream from = src.contains("content:/") ?
 				                            (FileInputStream) contentResolver.openInputStream(Uri.parse(src)) :
@@ -163,14 +162,14 @@ public class PhotoViewViewModel {
 				new String[]{Environment.getExternalStorageDirectory().toString()},
 				null,
 				new MediaScannerConnection.OnScanCompletedListener() {
-			public void onScanCompleted(String path, Uri uri) {
-				Log.d("ExternalStorage", "Scanned " + path + ":");
-				Log.d("ExternalStorage", "-> uri=" + uri);
-			}
-		});
+					public void onScanCompleted(String path, Uri uri) {
+						Log.d("ExternalStorage", "Scanned " + path + ":");
+						Log.d("ExternalStorage", "-> uri=" + uri);
+					}
+				});
 	}
 
-	private boolean deletePhotoWithoutAsking(String uriStr) {
+	public boolean deletePhotoWithoutAsking(String uriStr) {
 		ContentResolver contentResolver = context.getContentResolver();
 
 		boolean result;
@@ -183,6 +182,8 @@ public class PhotoViewViewModel {
 		else {
 			result = new File(uriStr).delete();
 		}
+
+		this.refreshMediaStore();
 
 		return result;
 	}
@@ -199,10 +200,6 @@ public class PhotoViewViewModel {
 
 		boolean isDeleted = deletePhotoWithoutAsking(from.getPath());
 		Log.d("PhotoViewTextClick", "Is image deleted? " + isDeleted);
-
-		if (isDeleted) {
-			refreshMediaStore();
-		}
 	}
 
 	private void saveIsFavorite(PhotoModel photoModel, boolean isFavorite) {
@@ -238,60 +235,104 @@ public class PhotoViewViewModel {
 		editor.apply();
 	}
 
-	public void deleteImage(PhotoModel photoModel, int requestCode) throws PendingIntent.CanceledException, IntentSender.SendIntentException {
-		final ContentResolver resolver = activity.getContentResolver();
+	public void setImageAsBackground(PhotoModel photoModel) throws IOException {
+		WallpaperManager wallpaperManager = WallpaperManager.getInstance(context);
+		InputStream inputStream = new FileInputStream(photoModel.uri);
 
-		final List<Uri> uriList = new ArrayList<>();
-		uriList.add(Uri.parse(photoModel.uri));
+		wallpaperManager.setStream(inputStream);
 
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-			// WARNING: if the URI isn't a MediaStore Uri and specifically
-			// only for media files (images, videos, audio), the request
-			// will throw an IllegalArgumentException, with the message:
-			// 'All requested items must be referenced by specific ID'
+		inputStream.close();
+	}
 
-			// No need to handle 'onActivityResult' callback, when the system returns
-			// from the user permission prompt the files will be already deleted.
-			// Multiple 'owned' and 'not-owned' files can be combined in the
-			// same batch request. The system will automatically delete them using the
-			// using the same prompt dialog, making the experience homogeneous.
+	public String getPath(final Context context, final Uri uri) {
 
+		@SuppressLint("ObsoleteSdkInt") final boolean isKitKat = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
 
-			final PendingIntent pendingIntent = MediaStore.createDeleteRequest(resolver, uriList);
-			activity.startIntentSenderForResult(pendingIntent.getIntentSender(), requestCode, null, 0, 0, 0, null);
-		}
-		else if (Build.VERSION.SDK_INT == Build.VERSION_CODES.Q) {
-			try {
-				// In Android == Q a RecoverableSecurityException is thrown if not-owned.
-				// For a batch request the deletion will stop at the failed not-owned
-				// file, so you may want to restrict deletion in Android Q to only
-				// 1 file at a time, to make the experience less ugly.
-				// Fortunately this gets solved in Android R.
+		// DocumentProvider
+		if (isKitKat && DocumentsContract.isDocumentUri(context, uri)) {
+			// ExternalStorageProvider
+			if (isExternalStorageDocument(uri)) {
+				final String docId = DocumentsContract.getDocumentId(uri);
+				final String[] split = docId.split(":");
+				final String type = split[0];
 
-				for (final Uri uri : uriList) {
-					resolver.delete(uri, null, null);
+				if ("primary".equalsIgnoreCase(type)) {
+					return Environment.getExternalStorageDirectory() + "/" + split[1];
 				}
-			} catch (RecoverableSecurityException ex) {
-				final IntentSender intent = ex.getUserAction()
-						                            .getActionIntent()
-						                            .getIntentSender();
 
-				// IMPORTANT: still need to perform the actual deletion
-				// as usual, so again getContentResolver().delete(...),
-				// in your 'onActivityResult' callback, as in Android Q
-				// all this extra code is necessary 'only' to get the permission,
-				// as the system doesn't perform any actual deletion at all.
-				// The onActivityResult doesn't have the target Uri, so you
-				// need to catch it somewhere.
-				activity.startIntentSenderForResult(intent, requestCode, null, 0, 0, 0, null);
+				// TODO handle non-primary volumes
+			}
+			// DownloadsProvider
+			else if (isDownloadsDocument(uri)) {
+
+				final String id = DocumentsContract.getDocumentId(uri);
+				final Uri contentUri = ContentUris.withAppendedId(
+						Uri.parse("content://downloads/public_downloads"), Long.parseLong(id));
+
+				return getDataColumn(context, contentUri, null, null);
+			}
+			// MediaProvider
+			else if (isMediaDocument(uri)) {
+				final String docId = DocumentsContract.getDocumentId(uri);
+				final String[] split = docId.split(":");
+				final String type = split[0];
+
+				Uri contentUri = null;
+				if ("image".equals(type)) {
+					contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+				}
+				else if ("video".equals(type)) {
+					contentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
+				}
+				else if ("audio".equals(type)) {
+					contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+				}
+
+				final String selection = "_id=?";
+				final String[] selectionArgs = new String[]{
+						split[1]
+				};
+
+				return getDataColumn(context, contentUri, selection, selectionArgs);
 			}
 		}
-		else {
-			// As usual for older APIs
+		// MediaStore (and general)
+		else if ("content".equalsIgnoreCase(uri.getScheme())) {
 
-			for (final Uri uri : uriList) {
-				resolver.delete(uri, null, null);
-			}
+			// Return the remote address
+			if (isGooglePhotosUri(uri))
+				return uri.getLastPathSegment();
+
+			return getDataColumn(context, uri, null, null);
 		}
+		// File
+		else if ("file".equalsIgnoreCase(uri.getScheme())) {
+			return uri.getPath();
+		}
+
+		return null;
+	}
+
+	public void insertImage(String src, String dest, PhotoModel photoModel) throws IOException {
+		copyPhoto(src, dest);
+
+		ContentValues values = new ContentValues();
+		values.put(MediaStore.Images.Media.DISPLAY_NAME, photoModel.displayName);
+		values.put(MediaStore.Images.Media.MIME_TYPE, "image/*");
+		// Add the date meta data to ensure the image is added at the front of the gallery
+		values.put(MediaStore.Images.Media.DATE_ADDED, System.currentTimeMillis() / 1000);
+		values.put(MediaStore.Images.Media.DATE_MODIFIED, System.currentTimeMillis());
+
+		Uri trashUri = context.getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+		this.deletePhotoWithoutAsking(trashUri.toString());
+	}
+
+	public void saveImageLocationPreference(PhotoModel photoModel, String location) {
+		SharedPreferences sharedPreferences =
+				context.getSharedPreferences(PhotoPreferences.PHOTOS, Context.MODE_PRIVATE);
+		SharedPreferences.Editor editor = sharedPreferences.edit();
+
+		editor.putString(PhotoPreferences.locationPreferenceOf(photoModel.displayName), location);
+		editor.apply();
 	}
 }

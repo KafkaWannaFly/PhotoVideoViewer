@@ -38,4 +38,12 @@
     <string name="Location">Địa điểm</string>
     <string name="peoples">Mọi người</string>
     <string name="todo">TODO</string>
+    <string name="set_private_to_public">Bring this image back to public?</string>
+    <string name="set_public_to_private">Are you sure to move this image to secret place?</string>
+    <string name="yes_im_sure">Yes, I\'m sure</string>
+    <string name="cancel">Cancel</string>
+    <string name="send_image">Send image</string>
+    <string name="ask_sure_delete">Are you sure want to delete?</string>
+    <string name="set_background_success">Set background successfully</string>
+    <string name="copy_image_success">Copy image successfully</string>
 </resources>
