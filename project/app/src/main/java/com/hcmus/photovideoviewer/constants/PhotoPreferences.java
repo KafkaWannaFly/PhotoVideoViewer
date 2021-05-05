@@ -4,6 +4,7 @@ public class PhotoPreferences {
 	public static String PHOTOS = "Photos";
 	public static String PRIVATE = "Private";
 	public static String FAVORITE = "Favorite";
+	public static String LOCATION = "Location";
 
 	public static String privatePreferenceOf(String name) {
 		return PRIVATE + ":" + name;
@@ -11,5 +12,9 @@ public class PhotoPreferences {
 
 	public static String favoritePreferenceOf(String name) {
 		return FAVORITE + ":" + name;
+	}
+
+	public static String locationPreferenceOf(String name) {
+		return LOCATION + ":" + name;
 	}
 }

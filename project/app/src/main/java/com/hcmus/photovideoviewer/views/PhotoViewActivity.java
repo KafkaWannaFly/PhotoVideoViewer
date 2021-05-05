@@ -9,8 +9,10 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.DocumentsContract;
+import android.text.InputType;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -47,7 +49,9 @@ public class PhotoViewActivity extends AppCompatActivity {
 		}
 	};
 	ArrayList<PhotoModel> photoModels = null;
+	PhotoViewViewModel photoViewViewModel = null;
 	Integer currentPosition = null;
+
 	private final View.OnClickListener shareTextClickListener = v -> {
 		Log.d("PhotoViewTextClick", "shareText click!");
 
@@ -62,13 +66,10 @@ public class PhotoViewActivity extends AppCompatActivity {
 			shareIntent.setType("image/*");
 			startActivity(Intent.createChooser(shareIntent, getString(R.string.send_image)));
 
-//			photoViewViewModel.sharePhoto(photoModel);
-
 		} catch (Exception exception) {
 			Log.e("PhotoViewTextClick", exception.getMessage());
 		}
 	};
-	PhotoViewViewModel photoViewViewModel = null;
 	private final View.OnClickListener favoriteTextClickListener = v -> {
 		try {
 			PhotoModel photoModel = photoModels.get(currentPosition);
@@ -143,6 +144,34 @@ public class PhotoViewActivity extends AppCompatActivity {
 			exception.printStackTrace();
 		}
 	};
+	private final View.OnClickListener setLocationTextClickListener = v -> {
+		Log.d("PhotoViewTextClick", "setLocationText click!");
+		try {
+			PhotoModel photoModel = photoModels.get(currentPosition);
+
+			final EditText input = new EditText(this);
+			input.setInputType(InputType.TYPE_CLASS_TEXT);
+
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			builder.setView(input);
+
+			builder.setPositiveButton(R.string.yes_im_sure, (dialog, which) -> {
+				String location = input.getText().toString();
+
+				photoViewViewModel.saveImageLocationPreference(photoModel, location);
+				
+				photoModel.location = location;
+
+				photoViewViewModel.getLivePhotoModel().setValue(photoModel);
+
+			})
+					.setNegativeButton(R.string.cancel, null)
+					.show();
+		} catch (Exception exception) {
+			exception.printStackTrace();
+		}
+	};
+
 	ImageView myPhotoImageView = null;
 	TextView photoNameText, sizeText, timeText, locationText, dimensionText, pathText,
 			favoriteText, editText, slideShowText, setBackgroundText,
@@ -186,6 +215,7 @@ public class PhotoViewActivity extends AppCompatActivity {
 		shareText.setOnClickListener(this.shareTextClickListener);
 		setBackgroundText.setOnClickListener(this.setBackgroundTextClickListener);
 		copyText.setOnClickListener(this.copyTextClickListener);
+		setLocationText.setOnClickListener(this.setLocationTextClickListener);
 
 		// Get data pass from PhotosFragment
 		Intent intent = getIntent();
@@ -315,15 +345,16 @@ public class PhotoViewActivity extends AppCompatActivity {
 
 						DocumentFile chosenFolder = DocumentFile.fromTreeUri(this, uri);
 
+						assert chosenFolder != null;
 						Uri docUri = DocumentsContract.buildDocumentUriUsingTree(chosenFolder.getUri(),
 								DocumentsContract.getTreeDocumentId(chosenFolder.getUri()));
 						String path = photoViewViewModel.getPath(this, docUri);
 
 						// This seem pointless but we're able to immediately updated with newly copied
-						Uri trashUri = photoViewViewModel.insertImage(
+						photoViewViewModel.insertImage(
 								photoModel.uri, path + '/' + photoModel.displayName, photoModel);
-						photoViewViewModel.deletePhotoWithoutAsking(trashUri.toString());
 
+						Toast.makeText(this, getString(R.string.copy_image_success), Toast.LENGTH_SHORT).show();
 					}
 				}
 			}
