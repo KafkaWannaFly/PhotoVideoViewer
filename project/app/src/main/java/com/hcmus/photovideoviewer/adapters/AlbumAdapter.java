@@ -19,9 +19,13 @@ import com.CodeBoy.MediaFacer.MediaFacer;
 import com.CodeBoy.MediaFacer.mediaHolders.pictureContent;
 import com.CodeBoy.MediaFacer.mediaHolders.pictureFolderContent;
 import com.CodeBoy.MediaFacer.mediaHolders.videoContent;
+import com.bumptech.glide.Glide;
 import com.hcmus.photovideoviewer.R;
 import com.hcmus.photovideoviewer.models.AlbumModel;
 import com.hcmus.photovideoviewer.models.PhotoModel;
+import com.hcmus.photovideoviewer.services.MediaDataRepository;
+import com.hcmus.photovideoviewer.viewmodels.PhotoViewViewModel;
+import com.hcmus.photovideoviewer.viewmodels.PhotosFragmentViewModel;
 import com.hcmus.photovideoviewer.views.AlbumsFragment;
 import com.hcmus.photovideoviewer.views.AlbumsViewActivity;
 import com.squareup.picasso.Picasso;
@@ -42,7 +46,6 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ViewHolder> 
     static int flag = 0;
     //    private String[] mDataSet;
     ArrayList<AlbumModel> albumData;
-    ArrayList<PhotoModel> dataPhotoFavourite;
     // BEGIN_INCLUDE(recyclerViewSampleViewHolder)
     /**
      * Provide a reference to the type of views that you are using (custom ViewHolder)
@@ -57,12 +60,7 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ViewHolder> 
         public ViewHolder(View v) {
             super(v);
             // Define click listener for the ViewHolder's View.
-            v.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Log.d(TAG, "Element " + getAdapterPosition() + " clicked.");
-                }
-            });
+            v.setOnClickListener(v1 -> Log.d(TAG, "Element " + getAdapterPosition() + " clicked."));
             title_of_album = (TextView) v.findViewById(R.id.title_of_album);
             imgTitle_of_album = (ImageView) v.findViewById(R.id.my_image_glide);
             quantity_of_album = (TextView) v.findViewById(R.id.quantity_of_album);
@@ -84,10 +82,9 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ViewHolder> 
 //    public AlbumAdapter(ArrayList<AlbumModel> albumModels) {
 //        this.albumData = albumModels;
 //    }
-    public AlbumAdapter(Context context, ArrayList<AlbumModel> albumModels, ArrayList<PhotoModel> dataPhotoFavourite) {
+    public AlbumAdapter(Context context, ArrayList<AlbumModel> albumModels) {
         this.context = context;
         this.albumData = albumModels;
-        this.dataPhotoFavourite = dataPhotoFavourite;
         Log.d("Abc", this.albumData.size() + "");
     }
     @Override
@@ -109,59 +106,82 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ViewHolder> 
             Log.d("Test data album", "" + albumData.get(position));
             viewHolder.getTextView().setText(albumData.get(position).getAlbumName());
             viewHolder.getQuantityAlbums().setText(albumData.get(position).getQuantity() + "");
+            Uri _uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+            String uri = ContentUris.withAppendedId(_uri, albumData.get(position).getImageUrl()).toString();
             Picasso.get()
-                    .load(albumData.get(position).getImageUrl().uri)
+                    .load(uri)
                     .resize(700, 650)
                     .centerCrop()
                     .into(viewHolder.getImageView());
-            flag++;
-        viewHolder.getAlbumView().setOnClickListener(v->{
-            ArrayList<PhotoModel> photoModels = new ArrayList<>();
-            TextView titleText = v.findViewById(R.id.title_of_album);
-            if(titleText.getText().toString().compareTo("Favourites") == 0){
-//                Intent intentFavourites = new Intent();
-//                photoModels = intentFavourites.getParcelableArrayListExtra("photoFavoriteData");
-                photoModels = this.dataPhotoFavourite;
-                System.out.println("aa");
-            }
-            else if(titleText.getText().toString().compareTo("Privacies") == 0)
-            {
+        //Picasso.get().load(albumData.get(position).getImageUrl()).fit().into(viewHolder.getImageView());
 
-            }
-            else{
-                ArrayList<pictureContent> allPhotosAlbum;
-                ArrayList<videoContent> allVideosAlbum;
-                ArrayList<pictureFolderContent> pictureFolders = new ArrayList<>();
-                pictureFolders.addAll(MediaFacer.withPictureContex(context).getPictureFolders());
-                allPhotosAlbum = MediaFacer.withPictureContex(this.context).getAllPictureContentByBucket_id(pictureFolders.get(position).getBucket_id());
-                photoModels = fitPhotoLibrary(allPhotosAlbum);
-            }
-            Intent viewAlbumIntent = new Intent(this.context , AlbumsViewActivity.class);
-            viewAlbumIntent.putParcelableArrayListExtra("photoModels", photoModels);
-            viewAlbumIntent.putExtra("albumName", albumData.get(position).getAlbumName());
-            viewAlbumIntent.putExtra("currentPosition", position);
-            Log.d("onClickCardAlbum", "clicked " + position);
-            context.startActivity(viewAlbumIntent);
-        });
+//        Glide.with(this.context).load(albumData.get(position).getImageUrl()).into(viewHolder.getImageView());
+            flag++;
+            viewHolder.getAlbumView().setOnClickListener(v->{
+                ArrayList<PhotoModel> photoModels = new ArrayList<>();
+                TextView titleText = v.findViewById(R.id.title_of_album);
+                String albumName = "";
+                ArrayList<PhotoModel> dataPhotos = MediaDataRepository.getInstance().getPhotoModels();
+                if(albumData.get(position).getAlbumName().equals("Favourites") == true){
+                    ArrayList<PhotoModel> dataPhotoFavourite = new ArrayList<PhotoModel>();
+                    for(int i = 0; i < dataPhotos.size(); i++){
+                        if(dataPhotos.get(i).isFavorite == true){
+                            dataPhotoFavourite.add(dataPhotos.get(i));
+                        }
+                    }
+                    photoModels = dataPhotoFavourite;
+                    System.out.println("aa");
+                    albumName = "Favourites";
+                }
+                else if(albumData.get(position).getAlbumName().equals("Privacies") == true)
+                {
+                    albumName = "Privacies";
+                }
+                else{
+//                    ArrayList<videoContent> allVideosAlbum;
+//                    ArrayList<pictureFolderContent> pictureFolders = new ArrayList<>();
+//                    pictureFolders.addAll(MediaFacer.withPictureContex(context).getPictureFolders());
+//                    allPhotosAlbum = MediaFacer.withPictureContex(this.context).getAllPictureContentByBucket_id(pictureFolders.get(position).getBucket_id());
+//                    photoModels = fitPhotoLibrary(allPhotosAlbum);
+                    ArrayList<PhotoModel> allPhotosAlbum = new ArrayList<PhotoModel>();
+                    albumName = albumData.get(position).getAlbumName();
+                    String test = dataPhotos.get(0).uri;
+                    for(int i = 0; i < dataPhotos.size(); i++){
+                        String cutNameAlbum[] = dataPhotos.get(i).uri.split("/");
+                        String nameCuted = cutNameAlbum[cutNameAlbum.length - 2];
+                        if(albumData.get(position).getAlbumName().equals(nameCuted) == true){
+                            allPhotosAlbum.add(dataPhotos.get(i));
+                        }
+                    }
+                    photoModels = allPhotosAlbum;
+                    System.out.println("abc");
+                }
+                Intent viewAlbumIntent = new Intent(this.context , AlbumsViewActivity.class);
+                viewAlbumIntent.putParcelableArrayListExtra("photoModels", photoModels);
+                viewAlbumIntent.putExtra("albumName", albumName);
+                //viewAlbumIntent.putExtra("currentPosition", position);
+                Log.d("onClickCardAlbum", "clicked " + position);
+                context.startActivity(viewAlbumIntent);
+            });
     }
     @Override
     public int getItemCount() {
         return albumData.size();
     }
-    public ArrayList<PhotoModel> fitPhotoLibrary(ArrayList<pictureContent> allPhotosAlbum){
-        ArrayList<PhotoModel> photoModels = new ArrayList<>();
-        Uri _uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-        PhotoModel photoModel;
-        for(int i = 0; i < allPhotosAlbum.size(); i++){
-            photoModel = new PhotoModel();
-            photoModel.id = allPhotosAlbum.get(i).getPictureId();
-            photoModel.dateModified = new Date(allPhotosAlbum.get(i).getDate_modified() * 1000);
-            photoModel.displayName = allPhotosAlbum.get(i).getPicturName();
-            photoModel.size = allPhotosAlbum.get(i).getPictureSize();
-            photoModel.uri = ContentUris.withAppendedId(_uri, photoModel.id).toString();
-            photoModels.add(photoModel);
-        }
-        return photoModels;
-    }
+//    public ArrayList<PhotoModel> fitPhotoLibrary(ArrayList<pictureContent> allPhotosAlbum){
+//        ArrayList<PhotoModel> photoModels = new ArrayList<>();
+//        Uri _uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+//        PhotoModel photoModel;
+//        for(int i = 0; i < allPhotosAlbum.size(); i++){
+//            photoModel = new PhotoModel();
+//            photoModel.id = allPhotosAlbum.get(i).getPictureId();
+//            photoModel.dateModified = new Date(allPhotosAlbum.get(i).getDate_modified() * 1000);
+//            photoModel.displayName = allPhotosAlbum.get(i).getPicturName();
+//            photoModel.size = allPhotosAlbum.get(i).getPictureSize();
+//            photoModel.uri = ContentUris.withAppendedId(_uri, photoModel.id).toString();
+//            photoModels.add(photoModel);
+//        }
+//        return photoModels;
+//    }
 }
 

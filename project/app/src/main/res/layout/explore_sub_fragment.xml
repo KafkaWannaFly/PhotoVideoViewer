@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+<!--        <ImageView-->
+<!--            android:id="@+id/avatar_explore"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_width="wrap_content"-->
+
+<!--            >-->
+<!--        </ImageView>-->
+<!--        <androidx.cardview.widget.CardView-->
+<!--            android:layout_width="150dp"-->
+<!--            android:layout_height="150dp"-->
+<!--            android:elevation="12dp"-->
+<!--            android:id="@+id/view"-->
+<!--            android:layout_marginEnd="@dimen/_8sdp"-->
+<!--            app:cardCornerRadius="@dimen/_100sdp">-->
+<!--        </androidx.cardview.widget.CardView>-->
+        <androidx.cardview.widget.CardView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="25dp"
+            android:layout_marginRight="@dimen/_8sdp"
+            app:cardPreventCornerOverlap="false">
+                <ImageView
+                    android:id="@+id/avatar_explore"
+                    android:layout_width="150dp"
+                    android:layout_height="150dp"/>
+        </androidx.cardview.widget.CardView>
+</RelativeLayout>

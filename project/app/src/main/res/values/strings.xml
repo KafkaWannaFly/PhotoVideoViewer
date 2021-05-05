@@ -34,4 +34,8 @@
     <string name="lorem">Lorem ipsum dolor sit amet, consectetur adipisicing elit.</string>
     <string name="location">Location:</string>
     <string name="unknown">Unknown</string>
+    <string name="people">Mọi người</string>
+    <string name="Location">Địa điểm</string>
+    <string name="peoples">Mọi người</string>
+    <string name="todo">TODO</string>
 </resources>

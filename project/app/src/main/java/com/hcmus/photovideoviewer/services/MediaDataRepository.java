@@ -4,27 +4,46 @@ import android.annotation.SuppressLint;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.ImageDecoder;
 import android.net.Uri;
+import android.os.Build;
+import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
+import android.util.Base64;
 import android.util.Log;
+
+import androidx.annotation.RequiresApi;
 
 import com.CodeBoy.MediaFacer.MediaFacer;
 import com.CodeBoy.MediaFacer.mediaHolders.pictureContent;
 import com.CodeBoy.MediaFacer.mediaHolders.pictureFolderContent;
 import com.CodeBoy.MediaFacer.mediaHolders.videoContent;
+import com.chaquo.python.PyObject;
+import com.chaquo.python.Python;
+import com.chaquo.python.android.AndroidPlatform;
 import com.google.gson.Gson;
 import com.hcmus.photovideoviewer.MainApplication;
 import com.hcmus.photovideoviewer.constants.FolderConstants;
 import com.hcmus.photovideoviewer.constants.PhotoPreferences;
 import com.hcmus.photovideoviewer.models.AlbumModel;
+import com.hcmus.photovideoviewer.models.ExploreModel;
 import com.hcmus.photovideoviewer.models.PhotoModel;
 import com.hcmus.photovideoviewer.models.VideoModel;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileDescriptor;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 public class MediaDataRepository {
 	@SuppressLint("StaticFieldLeak")
@@ -33,7 +52,8 @@ public class MediaDataRepository {
 	private final ArrayList<PhotoModel> photoModels = new ArrayList<>();
 	private final ArrayList<VideoModel> videoModels = new ArrayList<>();
 	private final ArrayList<AlbumModel> albumModels = new ArrayList<>();
-
+	private final ArrayList<ExploreModel> exploreModels = new ArrayList<>();
+	private final Python py = Python.getInstance();
 	private MediaDataRepository() {
 		context = MainApplication.getContext();
 	}
@@ -45,11 +65,13 @@ public class MediaDataRepository {
 		return instance;
 	}
 
+	@RequiresApi(api = Build.VERSION_CODES.P)
 	public void fetchData() {
 		try {
 			this.fetchPhotos();
 			this.fetchVideos();
 			this.fetchAlbums();
+			this.fetchExplores();
 		} catch (Exception exception) {
 			Log.d("Exception", exception.getMessage());
 		}
@@ -67,6 +89,8 @@ public class MediaDataRepository {
 	public ArrayList<AlbumModel> getAlbumModels() {
 		return albumModels;
 	}
+
+	public ArrayList<ExploreModel> getExploreModels(){return exploreModels;}
 
 	public ArrayList<PhotoModel> fetchPhotos() {
 		photoModels.clear();
@@ -226,7 +250,7 @@ public class MediaDataRepository {
 
 	public ArrayList<AlbumModel> fetchAlbums() {
 		albumModels.clear();
-		Uri _uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+
 		ArrayList<pictureContent> allPhotosAlbum;
 		ArrayList<videoContent> allVideosAlbum;
 
@@ -238,25 +262,167 @@ public class MediaDataRepository {
 			ArrayList<pictureContent> finalAllPhotos = allPhotosAlbum;
 			ArrayList<videoContent> finalAllVideos = allVideosAlbum;
 
-			PhotoModel photoModel = new PhotoModel() {
-				{
-					id = (long) finalAllPhotos.get(finalAllPhotos.size() - 1).getPictureId();
-					displayName = finalAllPhotos.get(finalAllPhotos.size() - 1).getPicturName();
-					size = finalAllPhotos.get(finalAllPhotos.size() - 1).getPictureSize();
-					dateModified = new Date(finalAllPhotos.get(finalAllPhotos.size() - 1).getDate_modified() * 1000);
-					uri = ContentUris.withAppendedId(_uri, id).toString();
-				}
-			};
 			AlbumModel albumModel = new AlbumModel() {
 				{
 					albumName = pictureFolders.get(index).getFolderName();
 					quantity = finalAllPhotos.size() + finalAllVideos.size();
-					imageUrl = photoModel;
+					imageUrl = finalAllPhotos.get(finalAllPhotos.size()-1).getPictureId();
 				}
 			};
 			albumModels.add(albumModel);
 		}
 		Log.d("Size of Album: ", "" + albumModels.get(0));
+		//mark favorite
+		SharedPreferences sharePref =  this.context.getSharedPreferences("Photos",Context.MODE_PRIVATE);
+		Map<String, ?> allEntries = sharePref.getAll();
+		if(!allEntries.isEmpty()){
+			ArrayList<PhotoModel> photoModels = this.getPhotoModels();
+			AlbumModel albumFavorite = new AlbumModel();
+			int sizeAlbum = 0;
+			for(int i = 0; i < photoModels.size(); i++){
+				if(photoModels.get(i).isFavorite == true){
+					sizeAlbum++;
+				}
+			}
+			int finalSizeAlbum = sizeAlbum;
+			albumFavorite = new AlbumModel() {
+				{
+					imageUrl = photoModels.get(finalSizeAlbum - 1).id;
+					albumName = "Favourites";
+					quantity = finalSizeAlbum;
+				}
+			};
+			albumModels.add(albumFavorite);
+		}
+		//mark private
+		//next
 		return albumModels;
+	}
+	@RequiresApi(api = Build.VERSION_CODES.P)
+	public ArrayList<ExploreModel> fetchExplores(){
+		exploreModels.clear();
+		List<PyObject> data_Face = recognizePerson();
+		for(int i = 0; i < data_Face.size(); i++){
+			byte data[] = android.util.Base64.decode(data_Face.get(i).toString(), Base64.DEFAULT);
+			Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
+			ExploreModel exploreModel = new ExploreModel(){
+				{
+					bitmapAvatar = bmp;
+				}
+			};
+			exploreModels.add(exploreModel);
+		}
+
+//		exploreModels.add(exploreModel);
+//		exploreModels.add(exploreModel);
+//		exploreModels.add(exploreModel);
+//		exploreModels.add(exploreModel);
+//		exploreModels.add(exploreModel);
+//		exploreModels.add(exploreModel);
+//		exploreModels.add(exploreModel);
+		//recognizePerson();
+		return exploreModels;
+	}
+	@RequiresApi(api = Build.VERSION_CODES.P)
+	public List<PyObject> recognizePerson(){
+
+		Uri _uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+//		long idPerson1 = photoModels.get(0).id;
+//		String uriPerson1 = ContentUris.withAppendedId(_uri, idPerson1).toString();
+//
+//		long idPerson2 = photoModels.get(1).id;
+//		String uriPerson2 = ContentUris.withAppendedId(_uri, idPerson2).toString();
+
+//		Bitmap bitmap = null;
+//		Bitmap bitmap2 = null;
+//		try {
+//			bitmap = getBitmapFromUri(Uri.parse(uriPerson1));//getBitmap(context.getContentResolver(), Uri.parse(uriPerson1));
+//			bitmap2 = getBitmapFromUri(Uri.parse(uriPerson2));
+//		}
+//	   catch (Exception e) {
+//	   }
+//		String imageString = getStringImage(bitmap);
+//		String imageString2 = getStringImage(bitmap2);
+
+		//ArrayList<PhotoModel> dataRegonize = new ArrayList<PhotoModel>();
+		PyObject pyo = py.getModule("myscript");
+
+//		PyObject obj = pyo.callAttr("main", imageString, imageString2);
+//		Log.d("Python Return: ", obj.toString());
+//		String result = obj.toString();
+//		PyObject obj2 = pyo.callAttr("main_test", imageString);
+		//Log.d("Python Return Test: ", obj2.toString());
+//		String str = obj2.toString();
+//		String str = getStringImage(bitmap);
+
+		//convert bitmap
+//		byte data[] = android.util.Base64.decode(str, Base64.DEFAULT);
+//		Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
+
+		//ti mo
+		String strCount = "";
+		for(int i = 0; i < photoModels.size(); i++){
+			Bitmap bitmap = null;
+			long idPerson = photoModels.get(i).id;
+			String uriPerson = ContentUris.withAppendedId(_uri, idPerson).toString();
+			try {
+				bitmap = getBitmapFromUri(Uri.parse(uriPerson));
+			}
+			catch (Exception e) {
+			}
+			String imageString = getStringImage(bitmap);
+			PyObject obj2 = pyo.callAttr("main_test", imageString);
+			String str = obj2.toString();
+			System.out.println("abc");
+		}
+		PyObject obj3 = pyo.callAttr("get_data_face");
+		List<PyObject> dataFace = new ArrayList<PyObject>();
+		dataFace = obj3.asList();
+		return dataFace;
+//		String sssss = dataFace.get(0).toString();
+//		String ssssss = dataFace.get(1).toString();
+//		for(int i = 0; i < dataFace.size(); i++){
+//			exploreModels.add()
+//		}
+//		System.out.println("abc");
+		//
+//		Bitmap bitmap = null;
+//		long idPerson = photoModels.get(1).id;
+//		Bitmap bitmap2 = null;
+//		long idPerson2 = photoModels.get(7).id;
+//		String uriPerson = ContentUris.withAppendedId(_uri, idPerson).toString();
+//		String uriPerson2 = ContentUris.withAppendedId(_uri, idPerson2).toString();
+//		try {
+//			bitmap = getBitmapFromUri(Uri.parse(uriPerson));
+//			bitmap2 = getBitmapFromUri(Uri.parse(uriPerson2));
+//		}
+//		catch (Exception e) {
+//		}
+//		String imageString = getStringImage(bitmap);
+//		String imageString2 = getStringImage(bitmap2);
+//
+//		PyObject obj2 = pyo.callAttr("main", imageString, imageString2);
+//		String str = obj2.toString();
+//		System.out.println("abc");
+
+//		byte data[] = android.util.Base64.decode(str, Base64.DEFAULT);
+//		Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
+//		return null;
+//		return dataRegonize;
+	}
+	private Bitmap getBitmapFromUri(Uri uri) throws IOException {
+		ParcelFileDescriptor parcelFileDescriptor =
+				context.getContentResolver().openFileDescriptor(uri, "r");
+		FileDescriptor fileDescriptor = parcelFileDescriptor.getFileDescriptor();
+		Bitmap image = BitmapFactory.decodeFileDescriptor(fileDescriptor);
+		parcelFileDescriptor.close();
+		return image;
+	}
+	private String getStringImage(Bitmap bitmap){
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
+		byte[] imageBytes = baos.toByteArray();
+		String encodedImage = android.util.Base64.encodeToString(imageBytes, Base64.DEFAULT);
+		return  encodedImage;
 	}
 }

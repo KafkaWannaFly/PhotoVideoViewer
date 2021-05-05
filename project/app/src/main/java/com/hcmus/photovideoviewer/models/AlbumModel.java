@@ -1,5 +1,6 @@
 package com.hcmus.photovideoviewer.models;
 
+import android.net.Uri;
 import android.provider.ContactsContract;
 
 import org.jetbrains.annotations.NotNull;
@@ -7,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 
 public class AlbumModel {
-    protected PhotoModel imageUrl;
+    protected long imageUrl;
     protected String albumName;
     protected int quantity;
     @NotNull
@@ -18,7 +19,7 @@ public class AlbumModel {
                 "albumName=" + albumName +
                 ", imageUrl='" + imageUrl + '\'' +
                 ", quantity='" + quantity + '\'' +
-                '}';
+               '}';
     }
 
     public int getQuantity() {
@@ -29,7 +30,7 @@ public class AlbumModel {
         return albumName;
     }
 
-    public PhotoModel getImageUrl() {
+    public long getImageUrl() {
         return imageUrl;
     }
 }
