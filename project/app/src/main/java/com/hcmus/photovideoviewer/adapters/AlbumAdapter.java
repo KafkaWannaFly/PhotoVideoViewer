@@ -21,6 +21,7 @@ import com.CodeBoy.MediaFacer.mediaHolders.pictureFolderContent;
 import com.CodeBoy.MediaFacer.mediaHolders.videoContent;
 import com.bumptech.glide.Glide;
 import com.hcmus.photovideoviewer.R;
+import com.hcmus.photovideoviewer.constants.PhotoPreferences;
 import com.hcmus.photovideoviewer.models.AlbumModel;
 import com.hcmus.photovideoviewer.models.PhotoModel;
 import com.hcmus.photovideoviewer.services.MediaDataRepository;
@@ -106,13 +107,18 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ViewHolder> 
             Log.d("Test data album", "" + albumData.get(position));
             viewHolder.getTextView().setText(albumData.get(position).getAlbumName());
             viewHolder.getQuantityAlbums().setText(albumData.get(position).getQuantity() + "");
-            Uri _uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-            String uri = ContentUris.withAppendedId(_uri, albumData.get(position).getImageUrl()).toString();
-            Picasso.get()
-                    .load(uri)
-                    .resize(700, 650)
-                    .centerCrop()
-                    .into(viewHolder.getImageView());
+            if(albumData.get(position).getAlbumName().equals(PhotoPreferences.PRIVATE)){
+                viewHolder.getImageView().setImageResource(R.drawable.ic_launcher_background);
+            }
+            else{
+                Uri _uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+                String uri = ContentUris.withAppendedId(_uri, albumData.get(position).getImageUrl()).toString();
+                Picasso.get()
+                        .load(uri)
+                        .resize(700, 650)
+                        .centerCrop()
+                        .into(viewHolder.getImageView());
+            }
         //Picasso.get().load(albumData.get(position).getImageUrl()).fit().into(viewHolder.getImageView());
 
 //        Glide.with(this.context).load(albumData.get(position).getImageUrl()).into(viewHolder.getImageView());
@@ -122,20 +128,28 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ViewHolder> 
                 TextView titleText = v.findViewById(R.id.title_of_album);
                 String albumName = "";
                 ArrayList<PhotoModel> dataPhotos = MediaDataRepository.getInstance().getPhotoModels();
-                if(albumData.get(position).getAlbumName().equals("Favourites") == true){
+                if(albumData.get(position).getAlbumName().equals("Favourites")){
                     ArrayList<PhotoModel> dataPhotoFavourite = new ArrayList<PhotoModel>();
                     for(int i = 0; i < dataPhotos.size(); i++){
-                        if(dataPhotos.get(i).isFavorite == true){
+                        if(dataPhotos.get(i).isFavorite){
                             dataPhotoFavourite.add(dataPhotos.get(i));
                         }
                     }
                     photoModels = dataPhotoFavourite;
                     System.out.println("aa");
-                    albumName = "Favourites";
+                    albumName = albumData.get(position).getAlbumName();
                 }
-                else if(albumData.get(position).getAlbumName().equals("Privacies") == true)
+                else if(albumData.get(position).getAlbumName().equals("Private"))
                 {
-                    albumName = "Privacies";
+                    ArrayList<PhotoModel> dataPhotoPrivate = new ArrayList<PhotoModel>();
+                    for(int i = 0; i < dataPhotos.size(); i++){
+                        if(dataPhotos.get(i).isSecret){
+                            dataPhotoPrivate.add(dataPhotos.get(i));
+                        }
+                    }
+                    photoModels = dataPhotoPrivate;
+                    System.out.println("aa");
+                    albumName = albumData.get(position).getAlbumName();
                 }
                 else{
 //                    ArrayList<videoContent> allVideosAlbum;
@@ -147,9 +161,9 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ViewHolder> 
                     albumName = albumData.get(position).getAlbumName();
                     String test = dataPhotos.get(0).uri;
                     for(int i = 0; i < dataPhotos.size(); i++){
-                        String cutNameAlbum[] = dataPhotos.get(i).uri.split("/");
+                        String[] cutNameAlbum = dataPhotos.get(i).uri.split("/");
                         String nameCuted = cutNameAlbum[cutNameAlbum.length - 2];
-                        if(albumData.get(position).getAlbumName().equals(nameCuted) == true){
+                        if(albumData.get(position).getAlbumName().equals(nameCuted)){
                             allPhotosAlbum.add(dataPhotos.get(i));
                         }
                     }

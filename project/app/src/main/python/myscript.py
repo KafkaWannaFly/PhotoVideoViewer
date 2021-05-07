@@ -22,8 +22,10 @@ def main(data1, data2):
 	# img2out = convertData(data2)
 
 	biden_encoding = face_recognition.face_encodings(img1out)[0]
-	unknown_encoding = face_recognition.face_encodings(img2out)[0]
-
+	try:
+		unknown_encoding = face_recognition.face_encodings(img2out)[0]
+	except:
+		return False
 	results = face_recognition.compare_faces([biden_encoding], unknown_encoding)
 
 	return results[0]

@@ -28,6 +28,7 @@ import com.chaquo.python.Python;
 import com.chaquo.python.android.AndroidPlatform;
 import com.google.gson.Gson;
 import com.hcmus.photovideoviewer.MainApplication;
+import com.hcmus.photovideoviewer.R;
 import com.hcmus.photovideoviewer.constants.FolderConstants;
 import com.hcmus.photovideoviewer.constants.PhotoPreferences;
 import com.hcmus.photovideoviewer.models.AlbumModel;
@@ -53,7 +54,7 @@ public class MediaDataRepository {
 	private final ArrayList<VideoModel> videoModels = new ArrayList<>();
 	private final ArrayList<AlbumModel> albumModels = new ArrayList<>();
 	private final ArrayList<ExploreModel> exploreModels = new ArrayList<>();
-	private final Python py = Python.getInstance();
+	private Python py = Python.getInstance();
 	private MediaDataRepository() {
 		context = MainApplication.getContext();
 	}
@@ -265,14 +266,14 @@ public class MediaDataRepository {
 		for (int i = 0; i < pictureFolders.size(); i++) {
 			int index = i;
 			allPhotosAlbum = MediaFacer.withPictureContex(context).getAllPictureContentByBucket_id(pictureFolders.get(index).getBucket_id());
-			allVideosAlbum = MediaFacer.withVideoContex(context).getAllVideoContentByBucket_id(pictureFolders.get(index).getBucket_id());
+			//allVideosAlbum = MediaFacer.withVideoContex(context).getAllVideoContentByBucket_id(pictureFolders.get(index).getBucket_id());
 			ArrayList<pictureContent> finalAllPhotos = allPhotosAlbum;
-			ArrayList<videoContent> finalAllVideos = allVideosAlbum;
+			//ArrayList<videoContent> finalAllVideos = allVideosAlbum;
 
 			AlbumModel albumModel = new AlbumModel() {
 				{
 					albumName = pictureFolders.get(index).getFolderName();
-					quantity = finalAllPhotos.size() + finalAllVideos.size();
+					quantity = finalAllPhotos.size();// + finalAllVideos.size();
 					imageUrl = finalAllPhotos.get(finalAllPhotos.size()-1).getPictureId();
 				}
 			};
@@ -282,26 +283,50 @@ public class MediaDataRepository {
 		//mark favorite
 		SharedPreferences sharePref =  this.context.getSharedPreferences("Photos",Context.MODE_PRIVATE);
 		Map<String, ?> allEntries = sharePref.getAll();
+//		SharedPreferences sharePrefPrivate =  this.context.getSharedPreferences("Private",Context.MODE_PRIVATE);
+//		Map<String, ?> allEntriesPrivate = sharePrefPrivate.getAll();
 		if(!allEntries.isEmpty()){
 			ArrayList<PhotoModel> photoModels = this.getPhotoModels();
-			AlbumModel albumFavorite = new AlbumModel();
-			int sizeAlbum = 0;
+			int sizeAlbumFavorite = 0;
+			int sizeAlbumPrivate = 0;
+			long idAvatarFavorite = 0;
 			for(int i = 0; i < photoModels.size(); i++){
-				if(photoModels.get(i).isFavorite == true){
-					sizeAlbum++;
+				if(photoModels.get(i).isFavorite){
+					sizeAlbumFavorite++;
+					idAvatarFavorite = photoModels.get(i).id;
+				}
+				if(photoModels.get(i).isSecret){
+					sizeAlbumPrivate++;
 				}
 			}
-			int finalSizeAlbum = sizeAlbum;
-			albumFavorite = new AlbumModel() {
-				{
-					imageUrl = photoModels.get(finalSizeAlbum - 1).id;
-					albumName = "Favourites";
-					quantity = finalSizeAlbum;
-				}
-			};
-			albumModels.add(albumFavorite);
+			int finalSizeFavorite = sizeAlbumFavorite;
+			int finalSizePrivate = sizeAlbumPrivate;
+			if(finalSizeFavorite > 0){
+				AlbumModel albumFavorite = new AlbumModel();
+				long finalIdAvatarFavorite = idAvatarFavorite;
+				albumFavorite = new AlbumModel() {
+					{
+						imageUrl = finalIdAvatarFavorite;
+						albumName = "Favourites";
+						quantity = finalSizeFavorite;
+					}
+				};
+				albumModels.add(albumFavorite);
+			}
+			if(finalSizePrivate > 0){
+				AlbumModel albumFavorite = new AlbumModel();
+				albumFavorite = new AlbumModel() {
+					{
+						imageUrl = R.drawable.ic_launcher_background;
+						albumName = "Private";
+						quantity = finalSizePrivate;
+					}
+				};
+				albumModels.add(albumFavorite);
+			}
 		}
 		//mark private
+
 		//next
 		return albumModels;
 	}

@@ -7,7 +7,9 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,15 +24,20 @@ import com.CodeBoy.MediaFacer.mediaHolders.pictureContent;
 import com.CodeBoy.MediaFacer.mediaHolders.pictureFolderContent;
 import com.CodeBoy.MediaFacer.mediaHolders.videoContent;
 import com.bumptech.glide.Glide;
+import com.chaquo.python.PyObject;
+import com.chaquo.python.Python;
 import com.hcmus.photovideoviewer.R;
 import com.hcmus.photovideoviewer.models.AlbumModel;
 import com.hcmus.photovideoviewer.models.ExploreModel;
 import com.hcmus.photovideoviewer.models.PhotoModel;
+import com.hcmus.photovideoviewer.services.MediaDataRepository;
 import com.hcmus.photovideoviewer.views.AlbumsFragment;
 import com.hcmus.photovideoviewer.views.AlbumsViewActivity;
 import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
+import java.io.FileDescriptor;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -46,6 +53,7 @@ public class ExploreAdapter extends RecyclerView.Adapter<ExploreAdapter.ViewHold
     private RecyclerView recyclerView;
     static int flag = 0;
     ArrayList<ExploreModel> exploreModels;
+    private Python py = Python.getInstance();
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         private final ImageView avatarExplore;
@@ -87,10 +95,41 @@ public class ExploreAdapter extends RecyclerView.Adapter<ExploreAdapter.ViewHold
 //                .into(viewHolder.getImageView());
         //viewHolder.getImageView().setImageBitmap(exploreModels.get(position).getBitmapAvatar());
         Bitmap a = exploreModels.get(position).getBitmapAvatar();
-        //viewHolder.getImageView().setImageBitmap(Bitmap.createScaledBitmap(a, 1200, 1200, false));
-        Glide.with(context).load(bitmapToByte(a)).override(500, 500).fitCenter().into(viewHolder.getImageView());
+        //Glide.with(context).load(bitmapToByte(a)).override(500, 500).fitCenter().into(viewHolder.getImageView());
+        viewHolder.getImageView().setImageBitmap(a);
+        ArrayList<PhotoModel> dataPhotos = MediaDataRepository.getInstance().getPhotoModels();
 
         viewHolder.getImageView().setOnClickListener(v->{
+            //get Data
+            PyObject pyo = py.getModule("myscript");
+            Uri _uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+            String faceBitmaptoString = getStringImage(exploreModels.get(position).getBitmapAvatar());
+            ArrayList<PhotoModel> photoModels = new ArrayList<PhotoModel>();
+            for(int i = 0; i < dataPhotos.size(); i++){
+                Bitmap bitmap = null;
+                long idPerson = dataPhotos.get(i).id;
+                String uriPerson = ContentUris.withAppendedId(_uri, idPerson).toString();
+                try {
+                    bitmap = getBitmapFromUri(Uri.parse(uriPerson));
+                }
+                catch (Exception e) {
+                }
+                String imageString = getStringImage(bitmap);
+                PyObject obj2 = pyo.callAttr("main",faceBitmaptoString, imageString);
+                if(obj2.toBoolean() == true){
+                    photoModels.add(dataPhotos.get(i));
+                }
+                System.out.println("abc");
+            }
+            //
+//            photoModels.add(dataPhotos.get(0));
+//            photoModels.add(dataPhotos.get(1));
+            Intent viewAlbumIntent = new Intent(this.context , AlbumsViewActivity.class);
+            viewAlbumIntent.putParcelableArrayListExtra("photoModels", photoModels);
+            //viewAlbumIntent.putExtra("albumName", albumName);
+            //viewAlbumIntent.putExtra("currentPosition", position);
+            Log.d("onClickCardAlbum", "clicked " + position);
+            context.startActivity(viewAlbumIntent);
         });
     }
     @Override
@@ -102,6 +141,21 @@ public class ExploreAdapter extends RecyclerView.Adapter<ExploreAdapter.ViewHold
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
         byte[] byteArray = stream.toByteArray();
         return byteArray;
+    }
+    private Bitmap getBitmapFromUri(Uri uri) throws IOException {
+        ParcelFileDescriptor parcelFileDescriptor =
+                context.getContentResolver().openFileDescriptor(uri, "r");
+        FileDescriptor fileDescriptor = parcelFileDescriptor.getFileDescriptor();
+        Bitmap image = BitmapFactory.decodeFileDescriptor(fileDescriptor);
+        parcelFileDescriptor.close();
+        return image;
+    }
+    private String getStringImage(Bitmap bitmap){
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
+        byte[] imageBytes = baos.toByteArray();
+        String encodedImage = android.util.Base64.encodeToString(imageBytes, Base64.DEFAULT);
+        return  encodedImage;
     }
 }
 
