@@ -48,15 +48,16 @@ public class PhotoViewActivity extends AppCompatActivity {
 			exception.printStackTrace();
 		}
 	};
-	ArrayList<PhotoModel> photoModels = null;
+//	ArrayList<PhotoModel> photoModels = null;
+	PhotoModel photoModel = null;
 	PhotoViewViewModel photoViewViewModel = null;
-	Integer currentPosition = null;
+//	Integer currentPosition = null;
 
 	private final View.OnClickListener shareTextClickListener = v -> {
 		Log.d("PhotoViewTextClick", "shareText click!");
 
 		try {
-			PhotoModel photoModel = photoModels.get(currentPosition);
+//			PhotoModel photoModel = photoModels.get(currentPosition);
 
 			Intent shareIntent = new Intent();
 			shareIntent.setAction(Intent.ACTION_SEND);
@@ -72,7 +73,7 @@ public class PhotoViewActivity extends AppCompatActivity {
 	};
 	private final View.OnClickListener favoriteTextClickListener = v -> {
 		try {
-			PhotoModel photoModel = photoModels.get(currentPosition);
+//			PhotoModel photoModel = photoModel;
 
 			photoViewViewModel.setFavorite(!photoModel.isFavorite);
 
@@ -85,7 +86,7 @@ public class PhotoViewActivity extends AppCompatActivity {
 	private final View.OnClickListener setPrivateTextClickListener = v -> {
 		Log.d("PhotoViewTextClick", "setPrivateText click!");
 		try {
-			PhotoModel photoModel = photoModels.get(currentPosition);
+//			PhotoModel photoModel = photoModel;
 
 			String msg;
 			if (photoModel.isSecret) {
@@ -115,7 +116,7 @@ public class PhotoViewActivity extends AppCompatActivity {
 		Log.d("PhotoViewTextClick", "deleteText click!");
 
 		try {
-			PhotoModel photoModel = photoModels.get(currentPosition);
+//			PhotoModel photoModel = photoModel;
 
 //			photoViewViewModel.deleteImage(photoModel, DELETE_REQUEST_CODE);
 
@@ -135,7 +136,7 @@ public class PhotoViewActivity extends AppCompatActivity {
 	private final View.OnClickListener setBackgroundTextClickListener = v -> {
 		Log.d("PhotoViewTextClick", "setBackgroundText click!");
 		try {
-			PhotoModel photoModel = photoModels.get(currentPosition);
+//			PhotoModel photoModel = photoModel;
 
 			photoViewViewModel.setImageAsBackground(photoModel);
 
@@ -147,7 +148,7 @@ public class PhotoViewActivity extends AppCompatActivity {
 	private final View.OnClickListener setLocationTextClickListener = v -> {
 		Log.d("PhotoViewTextClick", "setLocationText click!");
 		try {
-			PhotoModel photoModel = photoModels.get(currentPosition);
+//			PhotoModel photoModel = photoModel;
 
 			final EditText input = new EditText(this);
 			input.setInputType(InputType.TYPE_CLASS_TEXT);
@@ -219,13 +220,14 @@ public class PhotoViewActivity extends AppCompatActivity {
 
 		// Get data pass from PhotosFragment
 		Intent intent = getIntent();
-		photoModels = intent.getParcelableArrayListExtra("photoModels");
-		currentPosition = intent.getIntExtra("currentPosition", 0);
+//		photoModels = intent.getParcelableArrayListExtra("photoModels");
+//		currentPosition = intent.getIntExtra("currentPosition", 0);
+		photoModel = intent.getParcelableExtra("photoModel");
 
-		photoViewViewModel = new PhotoViewViewModel(this, photoModels.get(currentPosition));
+		photoViewViewModel = new PhotoViewViewModel(this, photoModel);
 
 		Glide.with(getApplicationContext())
-				.load(photoModels.get(currentPosition).uri)
+				.load(photoModel.uri)
 				.placeholder(R.drawable.pussy_cat)
 				.into(myPhotoImageView);
 
@@ -338,8 +340,6 @@ public class PhotoViewActivity extends AppCompatActivity {
 				}
 				case PICK_FOLDER_REQUEST_CODE: {
 					if (data != null) {
-						PhotoModel photoModel = photoModels.get(currentPosition);
-
 						Uri uri = data.getData();
 						Log.d("PhotoViewTextClick", "Selected folder: " + uri);
 

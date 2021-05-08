@@ -40,8 +40,9 @@ public class PhotosViewAdapter extends RecyclerView.Adapter<PhotosViewAdapter.Vi
 
 		imageView.setOnClickListener(v -> {
 			Intent viewPhotoIntent = new Intent(context, PhotoViewActivity.class);
-			viewPhotoIntent.putParcelableArrayListExtra("photoModels", photoModels);
-			viewPhotoIntent.putExtra("currentPosition", position);
+//			viewPhotoIntent.putParcelableArrayListExtra("photoModels", photoModels);
+//			viewPhotoIntent.putExtra("currentPosition", position);
+			viewPhotoIntent.putExtra("photoModel", photoModels.get(position));
 			context.startActivity(viewPhotoIntent);
 		});
 
