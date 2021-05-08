@@ -2,8 +2,7 @@ package com.hcmus.photovideoviewer.adapters;
 
 import android.content.Context;
 import android.content.Intent;
-import android.provider.MediaStore;
-import android.util.Log;
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,16 +11,17 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.hcmus.photovideoviewer.R;
+import com.hcmus.photovideoviewer.constants.VideoPreferences;
 import com.hcmus.photovideoviewer.models.VideoModel;
+import com.hcmus.photovideoviewer.views.VideoViewActivity;
 
-import java.time.Duration;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.TemporalUnit;
 import java.util.ArrayList;
 
 public class VideoViewAdapter extends RecyclerView.Adapter<VideoViewAdapter.ViewHolder> {
@@ -40,6 +40,7 @@ public class VideoViewAdapter extends RecyclerView.Adapter<VideoViewAdapter.View
 		return new ViewHolder(v);
 	}
 
+	@RequiresApi(api = Build.VERSION_CODES.O)
 	@Override
 	public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
 		ImageView videoView = holder.getVideoView();
@@ -50,6 +51,12 @@ public class VideoViewAdapter extends RecyclerView.Adapter<VideoViewAdapter.View
 
 		LocalTime localTime = LocalTime.ofSecondOfDay(videoModel.duration);
 		durationText.setText(localTime.format(DateTimeFormatter.ISO_LOCAL_TIME));
+
+		playButton.setOnClickListener(v -> {
+			Intent intent = new Intent(context, VideoViewActivity.class);
+			intent.putExtra(VideoPreferences.PARCEL_VIDEO_MODEL, videoModel);
+			context.startActivity(intent);
+		});
 
 		Glide.with(context)
 				.load(videoModel.uri)
