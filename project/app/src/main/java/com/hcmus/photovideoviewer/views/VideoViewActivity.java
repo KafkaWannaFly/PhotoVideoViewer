@@ -51,6 +51,8 @@ public class VideoViewActivity extends AppCompatActivity {
 
 		defaultTextColor = videoNameText.getTextColors();
 
+		// CLICK LISTENERS
+		favoriteText.setOnClickListener(this.favoriteTextListener());
 
 		Intent intent = getIntent();
 		videoModel = intent.getParcelableExtra(VideoPreferences.PARCEL_VIDEO_MODEL);
@@ -71,6 +73,17 @@ public class VideoViewActivity extends AppCompatActivity {
 		} catch (Exception e) {
 			Log.d("BottomSheet", e.getMessage());
 		}
+	}
+
+	private View.OnClickListener favoriteTextListener() {
+		return v -> {
+			try {
+				videoViewViewModel.setFavorite(!videoModel.isFavorite);
+			} catch (Exception exception) {
+				exception.printStackTrace();
+			}
+		};
+
 	}
 
 	private void bottomSheetSetup() {

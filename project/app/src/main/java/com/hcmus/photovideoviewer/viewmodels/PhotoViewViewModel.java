@@ -107,7 +107,7 @@ public class PhotoViewViewModel {
 
 			livePhotoModel.setValue(photoModel);
 
-			saveIsFavorite(photoModel, isFavorite);
+			saveIsFavoritePreference(photoModel, isFavorite);
 		}
 	}
 
@@ -199,7 +199,7 @@ public class PhotoViewViewModel {
 		Log.d("PhotoViewTextClick", "Is image deleted? " + isDeleted);
 	}
 
-	private void saveIsFavorite(PhotoModel photoModel, boolean isFavorite) {
+	private void saveIsFavoritePreference(PhotoModel photoModel, boolean isFavorite) {
 		SharedPreferences sharedPreferences =
 				context.getSharedPreferences(PhotoPreferences.PHOTOS, Context.MODE_PRIVATE);
 		SharedPreferences.Editor editor = sharedPreferences.edit();
