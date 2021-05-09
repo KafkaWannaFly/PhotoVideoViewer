@@ -1,6 +1,7 @@
 package com.hcmus.photovideoviewer.views;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.PorterDuff;
@@ -61,6 +62,7 @@ public class VideoViewActivity extends AppCompatActivity {
 		// CLICK LISTENERS
 		favoriteText.setOnClickListener(this.favoriteTextListener());
 		copyText.setOnClickListener(this.copyTextListener());
+		deleteText.setOnClickListener(this.deleteTextListener());
 
 		Intent intent = getIntent();
 		videoModel = intent.getParcelableExtra(VideoPreferences.PARCEL_VIDEO_MODEL);
@@ -81,6 +83,28 @@ public class VideoViewActivity extends AppCompatActivity {
 		} catch (Exception e) {
 			Log.d("BottomSheet", e.getMessage());
 		}
+	}
+
+	private View.OnClickListener deleteTextListener() {
+		return v -> {
+			try {
+//			PhotoModel photoModel = photoModel;
+
+//			photoViewViewModel.deleteImage(photoModel, DELETE_REQUEST_CODE);
+
+				new AlertDialog.Builder(this)
+						.setMessage(R.string.ask_sure_delete)
+						.setPositiveButton(R.string.yes_im_sure, (dialog, which) -> {
+							MediaFileServices.delete(this, videoModel.uri.toString());
+							this.finish();
+						})
+						.setNegativeButton(R.string.cancel, null)
+						.show();
+
+			} catch (Exception exception) {
+				exception.printStackTrace();
+			}
+		};
 	}
 
 	@Override
