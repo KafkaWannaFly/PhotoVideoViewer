@@ -42,4 +42,6 @@
     <string name="ask_sure_delete">Are you sure want to delete?</string>
     <string name="set_background_success">Set background successfully</string>
     <string name="copy_image_success">Copy image successfully</string>
+    <string name="detail_info">Detail Info</string>
+    <string name="duration">Duration</string>
 </resources>

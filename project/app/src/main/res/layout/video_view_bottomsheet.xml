@@ -10,7 +10,7 @@
 
         android:background="@drawable/bottom_sheet_bg"
 
-        app:behavior_peekHeight="@dimen/_66sdp"
+        app:behavior_peekHeight="@dimen/_20sdp"
         app:layout_behavior="@string/bottom_sheet_behavior"
 
         android:fitsSystemWindows="true"
@@ -27,7 +27,6 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/_4sdp"
             android:background="@drawable/horizontal_line" />
-
 
     <LinearLayout
             android:layout_width="match_parent"
@@ -47,112 +46,6 @@
 
                 android:layout_weight="1"
                 />
-
-
-        <TextView
-                android:id="@+id/editText"
-
-                android:textAlignment="center"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/edit"
-                app:drawableTopCompat="@drawable/ic_baseline_edit_24"
-
-                android:layout_weight="1" />
-
-
-        <TextView
-                android:id="@+id/slideShowText"
-
-                android:textAlignment="center"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/slide_show"
-                app:drawableTopCompat="@drawable/ic_baseline_slideshow_24"
-
-                android:layout_weight="1" />
-
-
-        <TextView
-                android:id="@+id/setBackgroundText"
-
-                android:textAlignment="center"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/set_as_background"
-                app:drawableTopCompat="@drawable/ic_baseline_image_24"
-
-                android:layout_weight="1" />
-    </LinearLayout>
-
-    <View
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/_1sdp"
-            android:background="@drawable/horizontal_line"
-            android:foreground="@color/gray"
-            android:layout_marginTop="@dimen/_6sdp" />
-
-
-    <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingTop="@dimen/_10sdp"
-            android:paddingHorizontal="15dp">
-
-        <TextView
-                android:id="@+id/setPrivateText"
-
-                android:textAlignment="center"
-                android:layout_gravity="center_horizontal"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/set_private"
-                app:drawableTopCompat="@drawable/ic_baseline_lock_24"
-
-                android:layout_weight="1" />
-
-
-        <TextView
-                android:id="@+id/setLocationText"
-
-                android:textAlignment="center"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/set_location"
-                app:drawableTopCompat="@drawable/ic_baseline_location_on_24"
-
-                android:layout_weight="1" />
-
-
-    </LinearLayout>
-
-    <View
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/_1sdp"
-            android:background="@drawable/horizontal_line"
-            android:foreground="@color/gray"
-            android:layout_marginTop="@dimen/_6sdp" />
-
-    <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingTop="@dimen/_10sdp"
-            android:paddingHorizontal="15dp">
-
-        <TextView
-                android:id="@+id/shareText"
-
-                android:textAlignment="center"
-                android:layout_gravity="center_horizontal"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/share"
-                app:drawableTopCompat="@drawable/ic_baseline_share_24"
-
-                android:layout_weight="1" />
-
 
         <TextView
                 android:id="@+id/copyText"
@@ -209,7 +102,7 @@
                 android:layout_height="wrap_content"
 
                 android:text="@string/lorem"
-                android:id="@+id/photoNameText" />
+                android:id="@+id/videoNameText" />
 
         <TextView
                 android:layout_width="wrap_content"
@@ -257,36 +150,16 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
 
-                android:text="@string/location"
+                android:text="@string/duration"
                 android:textStyle="bold"
                 android:textColor="@color/gray"
 
 
                 android:layout_marginTop="@dimen/_15sdp"
-                android:id="@+id/locationLabel" />
+                android:id="@+id/durationLabel" />
 
         <TextView
-                android:id="@+id/locationText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-
-
-                android:text="@string/lorem" />
-
-        <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-
-                android:text="@string/dimensions"
-                android:textStyle="bold"
-                android:textColor="@color/gray"
-
-
-                android:layout_marginTop="@dimen/_15sdp"
-                android:id="@+id/dimensionLabel" />
-
-        <TextView
-                android:id="@+id/dimensionText"
+                android:id="@+id/durationText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
 

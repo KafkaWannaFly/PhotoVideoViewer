@@ -282,23 +282,7 @@ public class PhotoViewActivity extends AppCompatActivity {
 				locationText.setText(photoModel.location);
 			}
 
-			double size = photoModel.size;
-			String postfix = "B";
-
-			if (size > 1024) {
-				postfix = "KB";
-				size = size / 1024;
-			}
-			if (size > 1024) {
-				postfix = "MB";
-				size = size / 1024;
-			}
-			if (size > 1024) {
-				postfix = "GB";
-				size = size / 1024;
-			}
-			size = Math.round(size * 100) / 100;
-			String sizeStr = size + " " + postfix;
+			String sizeStr = this.rawByteToStringSize(photoModel.size);
 			this.sizeText.setText(sizeStr);
 
 			String dimenStr = this.myPhotoImageView.getHeight() + "x" + this.myPhotoImageView.getWidth();
@@ -317,6 +301,26 @@ public class PhotoViewActivity extends AppCompatActivity {
 					photoModel.isSecret ? R.attr.colorOnPrimary : defaultTextColor.getDefaultColor());
 
 		});
+	}
+
+	private String rawByteToStringSize(double bytes) {
+		String postfix = "B";
+
+		if (bytes > 1024) {
+			postfix = "KB";
+			bytes = bytes / 1024;
+		}
+		if (bytes > 1024) {
+			postfix = "MB";
+			bytes = bytes / 1024;
+		}
+		if (bytes > 1024) {
+			postfix = "GB";
+			bytes = bytes / 1024;
+		}
+		bytes = Math.round(bytes * 100D) / 100D;
+
+		return bytes + " " + postfix;
 	}
 
 	private void setTextViewDrawableTint(TextView textView, int color) {

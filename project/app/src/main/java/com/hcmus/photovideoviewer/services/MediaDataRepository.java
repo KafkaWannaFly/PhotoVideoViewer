@@ -18,6 +18,7 @@ import com.google.gson.Gson;
 import com.hcmus.photovideoviewer.MainApplication;
 import com.hcmus.photovideoviewer.constants.FolderConstants;
 import com.hcmus.photovideoviewer.constants.PhotoPreferences;
+import com.hcmus.photovideoviewer.constants.VideoPreferences;
 import com.hcmus.photovideoviewer.models.AlbumModel;
 import com.hcmus.photovideoviewer.models.PhotoModel;
 import com.hcmus.photovideoviewer.models.VideoModel;
@@ -30,6 +31,7 @@ public class MediaDataRepository {
 	@SuppressLint("StaticFieldLeak")
 	private static MediaDataRepository instance = null;
 	private final Context context;
+
 	private final ArrayList<PhotoModel> photoModels = new ArrayList<>();
 	private final ArrayList<VideoModel> videoModels = new ArrayList<>();
 	private final ArrayList<AlbumModel> albumModels = new ArrayList<>();
@@ -125,7 +127,7 @@ public class MediaDataRepository {
 					}
 				};
 
-				photoModel.isFavorite = getIsFavorite(photoModel);
+				photoModel.isFavorite = getIsFavoritePhoto(photoModel);
 				photoModel.location = getImageLocation(photoModel);
 
 				models.add(photoModel);
@@ -140,16 +142,23 @@ public class MediaDataRepository {
 				context.getSharedPreferences(PhotoPreferences.PHOTOS, Context.MODE_PRIVATE);
 		return sharedPreferences.getString(PhotoPreferences.locationPreferenceOf(photoModel.displayName), "");
 	}
+
 	/**
 	 * Check if this photo is in Favorite list
 	 */
-	private boolean getIsFavorite(PhotoModel photoModel) {
+	private boolean getIsFavoritePhoto(PhotoModel photoModel) {
 		SharedPreferences sharedPreferences =
 				context.getSharedPreferences(PhotoPreferences.PHOTOS, Context.MODE_PRIVATE);
 
 		return sharedPreferences.getBoolean(
 				PhotoPreferences.favoritePreferenceOf(photoModel.displayName),
 				false);
+	}
+
+	private boolean getIsFavoriteVideo(VideoModel videoModel) {
+		SharedPreferences sharedPreferences =
+				context.getSharedPreferences(VideoPreferences.VIDEOS, Context.MODE_PRIVATE);
+		return sharedPreferences.getBoolean(VideoPreferences.favoritePreferenceOf(videoModel), false);
 	}
 
 	private ArrayList<PhotoModel> getPrivatePhotos(File directory) {
@@ -173,7 +182,6 @@ public class MediaDataRepository {
 						internalPhotoModels.add(photoModel);
 					}
 				}
-				;
 			}
 		}
 
@@ -189,7 +197,8 @@ public class MediaDataRepository {
 				MediaStore.Video.Media.DISPLAY_NAME,
 				MediaStore.Video.Media.DATE_MODIFIED,
 				MediaStore.Video.Media.SIZE,
-				MediaStore.Video.Media.DURATION
+				MediaStore.Video.Media.DURATION,
+				MediaStore.Video.Media.DATA,
 		};
 
 		ContentResolver contentResolver = context.getContentResolver();
@@ -203,6 +212,7 @@ public class MediaDataRepository {
 			int sizeColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.SIZE);
 			int dateColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATE_MODIFIED);
 			int durationColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DURATION);
+			int pathColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATA);
 
 			while (cursor.moveToNext()) {
 				long _id = cursor.getLong(idColumn);
@@ -210,6 +220,7 @@ public class MediaDataRepository {
 				Long _size = cursor.getLong(sizeColumn);
 				Long date = cursor.getLong(dateColumn);
 				Long _duration = cursor.getLong(durationColumn);
+				String filePath = cursor.getString(pathColumn);
 
 				VideoModel videoModel = new VideoModel() {
 					{
@@ -218,9 +229,12 @@ public class MediaDataRepository {
 						size = _size;
 						dateModified = new Date(date * 1000);
 						duration = _duration / 1000;
-						uri = ContentUris.withAppendedId(_uri, id);
+//						uri = ContentUris.withAppendedId(_uri, id);
+						uri = Uri.parse(filePath);
 					}
 				};
+
+				videoModel.isFavorite = this.getIsFavoriteVideo(videoModel);
 
 				videoModels.add(videoModel);
 			}

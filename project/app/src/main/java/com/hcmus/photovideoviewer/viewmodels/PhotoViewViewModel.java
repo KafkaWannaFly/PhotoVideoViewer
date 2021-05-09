@@ -35,11 +35,8 @@ import java.io.InputStream;
 public class PhotoViewViewModel {
 	private final MutableLiveData<PhotoModel> livePhotoModel = new MutableLiveData<>();
 	private Context context = null;
-	private Activity activity = null;
 
 	public PhotoViewViewModel(Activity activity, PhotoModel photoModel) {
-//		this.context = context;
-		this.activity = activity;
 		this.context = activity.getApplicationContext();
 		livePhotoModel.setValue(photoModel);
 	}

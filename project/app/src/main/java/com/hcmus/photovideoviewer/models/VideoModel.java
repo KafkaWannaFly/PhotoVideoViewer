@@ -16,9 +16,12 @@ public class VideoModel implements Parcelable {
 	public long duration; //seconds
 	public Uri uri;
 
+	public boolean isFavorite = false;
+
 	public VideoModel() {
 
 	}
+
 
 	protected VideoModel(Parcel in) {
 		id = in.readLong();
@@ -26,6 +29,8 @@ public class VideoModel implements Parcelable {
 		size = in.readLong();
 		duration = in.readLong();
 		uri = in.readParcelable(Uri.class.getClassLoader());
+		isFavorite = in.readByte() != 0;
+		dateModified = new Date(in.readLong());
 	}
 
 	@Override
@@ -35,6 +40,8 @@ public class VideoModel implements Parcelable {
 		dest.writeLong(size);
 		dest.writeLong(duration);
 		dest.writeParcelable(uri, flags);
+		dest.writeByte((byte) (isFavorite ? 1 : 0));
+		dest.writeLong(dateModified.getTime());
 	}
 
 	@Override
@@ -53,17 +60,4 @@ public class VideoModel implements Parcelable {
 			return new VideoModel[size];
 		}
 	};
-
-	@NotNull
-	@Override
-	public String toString() {
-		return "VideoModel{" +
-				       "id=" + id +
-				       ", displayName='" + displayName + '\'' +
-				       ", size=" + size +
-				       ", dateModified=" + dateModified +
-				       ", duration=" + duration +
-				       ", uri=" + uri +
-				       '}';
-	}
 }

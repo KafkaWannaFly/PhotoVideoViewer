@@ -2,6 +2,7 @@ package com.hcmus.photovideoviewer.adapters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,6 +21,7 @@ import com.hcmus.photovideoviewer.constants.VideoPreferences;
 import com.hcmus.photovideoviewer.models.VideoModel;
 import com.hcmus.photovideoviewer.views.VideoViewActivity;
 
+import java.io.File;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -59,7 +61,8 @@ public class VideoViewAdapter extends RecyclerView.Adapter<VideoViewAdapter.View
 		});
 
 		Glide.with(context)
-				.load(videoModel.uri)
+				.asBitmap()
+				.load(Uri.fromFile(new File(String.valueOf(videoModel.uri))))
 				.thumbnail(0.1f)
 				.placeholder(R.drawable.pussy_cat)
 				.into(videoView);
