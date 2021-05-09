@@ -23,7 +23,6 @@ public class VideosFragment extends Fragment {
 	private RecyclerView recyclerView = null;
 	private RecyclerView.LayoutManager layoutManager = null;
 	private VideoViewAdapter videoViewAdapter = null;
-//	private MutableLiveData<Integer> liveColumnSpan = null;
 	private AppBarViewModel appBarViewModel = null;
 
 	public VideosFragment() {

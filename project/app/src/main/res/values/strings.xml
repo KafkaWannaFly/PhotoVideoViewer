@@ -44,4 +44,5 @@
     <string name="copy_image_success">Copy image successfully</string>
     <string name="detail_info">Detail Info</string>
     <string name="duration">Duration</string>
+    <string name="copy_successfully">Copy successfully</string>
 </resources>

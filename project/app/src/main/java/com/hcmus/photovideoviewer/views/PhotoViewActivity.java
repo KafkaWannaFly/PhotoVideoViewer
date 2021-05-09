@@ -341,6 +341,7 @@ public class PhotoViewActivity extends AppCompatActivity {
 					if (resultCode == RESULT_OK) {
 						this.finish();
 					}
+					break;
 				}
 				case PICK_FOLDER_REQUEST_CODE: {
 					if (data != null) {
@@ -360,6 +361,7 @@ public class PhotoViewActivity extends AppCompatActivity {
 
 						Toast.makeText(this, getString(R.string.copy_image_success), Toast.LENGTH_SHORT).show();
 					}
+					break;
 				}
 			}
 		} catch (Exception exception) {

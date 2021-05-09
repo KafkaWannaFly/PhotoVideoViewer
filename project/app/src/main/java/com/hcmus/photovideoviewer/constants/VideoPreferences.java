@@ -8,6 +8,6 @@ public class VideoPreferences {
 	static public String FAVORITE = "Favorite";
 
 	public static String favoritePreferenceOf(VideoModel videoModel) {
-		return FAVORITE + ":" + videoModel.displayName;
+		return FAVORITE + ":" + videoModel.uri;
 	}
 }
