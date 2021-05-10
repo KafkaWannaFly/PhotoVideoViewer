@@ -7,12 +7,14 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
@@ -26,8 +28,11 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.hcmus.photovideoviewer.adapters.MainPagerAdapter;
+import com.hcmus.photovideoviewer.adapters.SlideShowAdapter;
+import com.hcmus.photovideoviewer.constants.PhotoPreferences;
 import com.hcmus.photovideoviewer.services.MediaDataRepository;
 import com.hcmus.photovideoviewer.viewmodels.AppBarViewModel;
+import com.hcmus.photovideoviewer.views.SlideShowActivity;
 
 import static android.provider.Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION;
 
@@ -42,6 +47,7 @@ public class MainActivity extends AppCompatActivity
 	private BottomNavigationView bottomNavigationView = null;
 	private FragmentStateAdapter fragmentStateAdapter = null;
 
+	@RequiresApi(api = Build.VERSION_CODES.R)
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -117,6 +123,12 @@ public class MainActivity extends AppCompatActivity
 				appBarViewModel.liveSortOrder.setValue(currentOrder);
 				return true;
 			}
+			else if (item.getItemId() == R.id.slideShowButton) {
+				Intent intent = new Intent(this, SlideShowActivity.class);
+				intent.putExtra(PhotoPreferences.PARCEL_PHOTOS, MediaDataRepository.getInstance().fetchPhotos());
+
+				startActivity(intent);
+			}
 
 			return false;
 		});
@@ -129,6 +141,7 @@ public class MainActivity extends AppCompatActivity
 		Log.d("ActivityLife", "MainActivity resume");
 	}
 
+	@RequiresApi(api = Build.VERSION_CODES.R)
 	private void checkManageExternalStoragePermission() {
 		boolean needPermission =
 				ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)

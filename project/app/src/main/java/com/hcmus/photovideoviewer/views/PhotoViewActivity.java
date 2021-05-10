@@ -27,6 +27,7 @@ import com.bumptech.glide.Glide;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.hcmus.photovideoviewer.R;
 import com.hcmus.photovideoviewer.models.PhotoModel;
+import com.hcmus.photovideoviewer.services.MediaFileServices;
 import com.hcmus.photovideoviewer.viewmodels.PhotoViewViewModel;
 
 import java.io.IOException;
@@ -123,7 +124,7 @@ public class PhotoViewActivity extends AppCompatActivity {
 			new AlertDialog.Builder(this)
 					.setMessage(R.string.ask_sure_delete)
 					.setPositiveButton(R.string.yes_im_sure, (dialog, which) -> {
-						photoViewViewModel.deletePhotoWithoutAsking(photoModel.uri);
+						MediaFileServices.delete(this, photoModel.uri);
 						this.finish();
 					})
 					.setNegativeButton(R.string.cancel, null)

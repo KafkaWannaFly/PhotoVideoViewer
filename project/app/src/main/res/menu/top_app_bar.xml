@@ -17,7 +17,7 @@
         />
 
     <item
-            android:id="@+id/moreOptionsButton"
+            android:id="@+id/slideShowButton"
             android:title="@string/slide_show"
             android:icon="@drawable/ic_baseline_more_vert_24"
             android:contentDescription="@string/more"
@@ -25,7 +25,7 @@
         />
 
     <item
-            android:id="@+id/slideShowButton"
+            android:id="@+id/settingButton"
             android:title="@string/setting"
             android:icon="@drawable/ic_baseline_slideshow_24"
         />
