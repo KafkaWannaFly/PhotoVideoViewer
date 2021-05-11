@@ -378,11 +378,25 @@ public class MediaDataRepository {
 				};
 				albumModels.add(albumFavorite);
 			}
+			if(finalSizeFavorite == 0 && sizeVideoFavorite > 0){
+				AlbumModel albumFavorite = new AlbumModel();
+				long finalIdAvatarFavorite1 = idAvatarFavorite;
+				int finalSizeVideoFavorite1 = sizeVideoFavorite;
+				albumFavorite = new AlbumModel() {
+					{
+						imageUrl = finalIdAvatarFavorite1;
+						albumName = "Favourites";
+						quantityPhoto = finalSizeFavorite;
+						quantityVideo = finalSizeVideoFavorite1;
+					}
+				};
+				albumModels.add(albumFavorite);
+			}
 //		}
 		//mark private
 
 		//next
-		for(int i = 0; i < mapQuantityPhoto.size(); i++){
+		for(int i = 0; i < mapIdAlbum.size(); i++){
 			String nameOfAlbum = ListNameAlbum.get(i);
 			if(nameOfAlbum.equals("app_PrivatePictures")){
 				nameOfAlbum = "Private";
@@ -392,7 +406,7 @@ public class MediaDataRepository {
 			AlbumModel albumModel = new AlbumModel() {
 				{
 					albumName = finalNameOfAlbum;
-					quantityPhoto = mapQuantityPhoto.get(ListNameAlbum.get(finalI));
+					quantityPhoto = mapQuantityPhoto.get(ListNameAlbum.get(finalI)) == null ? 0 : mapQuantityPhoto.get(ListNameAlbum.get(finalI));
 					imageUrl = mapIdAlbum.get(ListNameAlbum.get(finalI));
 					quantityVideo = mapQuantityVideo.get(ListNameAlbum.get(finalI));
 				}

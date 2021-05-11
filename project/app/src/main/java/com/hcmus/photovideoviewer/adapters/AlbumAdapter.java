@@ -7,6 +7,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.text.InputType;
@@ -19,6 +21,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.CodeBoy.MediaFacer.MediaFacer;
@@ -35,7 +40,9 @@ import com.hcmus.photovideoviewer.services.MediaDataRepository;
 import com.hcmus.photovideoviewer.viewmodels.PhotoViewViewModel;
 import com.hcmus.photovideoviewer.viewmodels.PhotosFragmentViewModel;
 import com.hcmus.photovideoviewer.views.AlbumsFragment;
+import com.hcmus.photovideoviewer.views.AlbumsVideoViewActivity;
 import com.hcmus.photovideoviewer.views.AlbumsViewActivity;
+import com.hcmus.photovideoviewer.views.VideosFragment;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -124,10 +131,12 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ViewHolder> 
             if(albumData.get(position).getAlbumName().equals(PhotoPreferences.PRIVATE)){
                 viewHolder.getTextView().setText(albumData.get(position).getAlbumName());
                 //String quantityPhoto = viewHolder.getQuantityAlbums().getText().toString();
-                viewHolder.getQuantityAlbums().setText("");
+                viewHolder.getQuantityAlbums().setText("* Ảnh");
                 //String quatityVideo = viewHolder.getQuantityVideo().getText().toString();
-                viewHolder.getQuantityVideo().setText("");
+                viewHolder.getQuantityVideo().setText("* Video");
                 viewHolder.getImageView().setImageResource(R.drawable.pussy_cat);
+                //viewHolder.getImageView().setImageBitmap(Bitmap.createScaledBitmap(, 120, 120, false));
+
 //=======
 //                //viewHolder.getImageView().setImageResource(R.drawable.ic_baseline_privacy_tip_24);
 //                viewHolder.getImageView().set
@@ -146,13 +155,24 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ViewHolder> 
                 viewHolder.getQuantityAlbums().setText(albumData.get(position).getQuantityPhoto() + " " + "Ảnh");
                 //String quatityVideo = viewHolder.getQuantityVideo().getText().toString();
                 viewHolder.getQuantityVideo().setText(albumData.get(position).getQuantityVideo() + " " + "Video");
-                Uri _uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-                String uri = ContentUris.withAppendedId(_uri, albumData.get(position).getImageUrl()).toString();
-                Picasso.get()
-                        .load(uri)
-                        .resize(700, 650)
-                        .centerCrop()
-                        .into(viewHolder.getImageView());
+                Uri _uri;
+                if(albumData.get(position).getQuantityPhoto() != 0){
+                    _uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+                }
+                else{
+                    _uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
+                }
+                    String uri = ContentUris.withAppendedId(_uri, albumData.get(position).getImageUrl()).toString();
+                    Glide.with(context)
+                            .load(uri)
+                            .placeholder(R.drawable.pussy_cat)
+                            .into(viewHolder.getImageView());
+//                    Picasso.get()
+//                            .load(uri)
+//                            .resize(700, 650)
+//                            .centerCrop()
+//                            .into(viewHolder.getImageView());
+
             }
         //Picasso.get().load(albumData.get(position).getImageUrl()).fit().into(viewHolder.getImageView());
 
@@ -164,6 +184,7 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ViewHolder> 
                 photoModels = new ArrayList<>();
                 videoModels = new ArrayList<>();
                 ArrayList<PhotoModel> dataPhotos = MediaDataRepository.getInstance().getPhotoModels();
+                ArrayList<VideoModel> dataVideos = MediaDataRepository.getInstance().getVideoModels();
                 if(albumData.get(position).getAlbumName().equals("Favourites")){
                     ArrayList<PhotoModel> dataPhotoFavourite = new ArrayList<PhotoModel>();
                     for(int i = 0; i < dataPhotos.size(); i++){
@@ -172,38 +193,13 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ViewHolder> 
                         }
                     }
                     photoModels = dataPhotoFavourite;
-                    AlertDialog.Builder builder = new AlertDialog.Builder(this.context);
-                    builder.setTitle("Chọn chế độ xem");
-                    builder.setPositiveButton("Ảnh", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            if (photoModels.size() > 0) {
-                                System.out.println("aa");
-                                albumName = albumData.get(position).getAlbumName();
-                                Intent viewAlbumIntent = new Intent(context , AlbumsViewActivity.class);
-                                viewAlbumIntent.putParcelableArrayListExtra("photoModels", photoModels);
-                                viewAlbumIntent.putExtra("albumName", albumName);
-                                //viewAlbumIntent.putExtra("currentPosition", position);
-                                Log.d("onClickCardAlbum", "clicked " + position);
-                                context.startActivity(viewAlbumIntent);
-                            }
-                            else{
-                                Toast.makeText(context, "Không có ảnh để hiện thị", Toast.LENGTH_LONG).show();
-                            }
-                        }
-                    });
-                    builder.setNegativeButton("Video", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            if(videoModels.size() > 0){
 
-                            }else{
-                                Toast.makeText(context, "Không có video để hiện thị", Toast.LENGTH_LONG).show();
-                            }
+                    for(int i = 0; i < dataVideos.size(); i++){
+                        if(dataVideos.get(i).isFavorite){
+                            videoModels.add(dataVideos.get(i));
                         }
-                    });
-                    builder.show();
-
+                    }
+                    createAlertDialog(photoModels, videoModels, position);
                 }
                 else if(albumData.get(position).getAlbumName().equals("Private"))
                 {
@@ -279,29 +275,32 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ViewHolder> 
                     }
                 }
                 else{
-//                    ArrayList<videoContent> allVideosAlbum;
-//                    ArrayList<pictureFolderContent> pictureFolders = new ArrayList<>();
-//                    pictureFolders.addAll(MediaFacer.withPictureContex(context).getPictureFolders());
-//                    allPhotosAlbum = MediaFacer.withPictureContex(this.context).getAllPictureContentByBucket_id(pictureFolders.get(position).getBucket_id());
-//                    photoModels = fitPhotoLibrary(allPhotosAlbum);
                     ArrayList<PhotoModel> allPhotosAlbum = new ArrayList<PhotoModel>();
                     albumName = albumData.get(position).getAlbumName();
                     String test = dataPhotos.get(0).uri;
                     for(int i = 0; i < dataPhotos.size(); i++){
                         String[] cutNameAlbum = dataPhotos.get(i).uri.split("/");
                         String nameCuted = cutNameAlbum[cutNameAlbum.length - 2];
-                        if(albumData.get(position).getAlbumName().equals(nameCuted)){
+                        if(albumName.equals(nameCuted)){
                             allPhotosAlbum.add(dataPhotos.get(i));
                         }
                     }
                     photoModels = allPhotosAlbum;
-                    System.out.println("abc");
-                    Intent viewAlbumIntent = new Intent(this.context , AlbumsViewActivity.class);
-                    viewAlbumIntent.putParcelableArrayListExtra("photoModels", photoModels);
-                    viewAlbumIntent.putExtra("albumName", albumName);
-                    //viewAlbumIntent.putExtra("currentPosition", position);
-                    Log.d("onClickCardAlbum", "clicked " + position);
-                    context.startActivity(viewAlbumIntent);
+                    for(int i = 0; i <dataVideos.size(); i++){
+                        String[] cutNameAlbum = String.valueOf(dataVideos.get(i).uri).split("/");
+                        String nameCuted = cutNameAlbum[cutNameAlbum.length - 2];
+                        if(albumName.equals(nameCuted)){
+                            videoModels.add(dataVideos.get(i));
+                        }
+                    }
+                    createAlertDialog(photoModels, videoModels, position);
+//                    System.out.println("abc");
+//                    Intent viewAlbumIntent = new Intent(this.context , AlbumsViewActivity.class);
+//                    viewAlbumIntent.putParcelableArrayListExtra("photoModels", photoModels);
+//                    viewAlbumIntent.putExtra("albumName", albumName);
+//                    //viewAlbumIntent.putExtra("currentPosition", position);
+//                    Log.d("onClickCardAlbum", "clicked " + position);
+//                    context.startActivity(viewAlbumIntent);
                 }
             });
     }
@@ -309,20 +308,47 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ViewHolder> 
     public int getItemCount() {
         return albumData.size();
     }
-//    public ArrayList<PhotoModel> fitPhotoLibrary(ArrayList<pictureContent> allPhotosAlbum){
-//        ArrayList<PhotoModel> photoModels = new ArrayList<>();
-//        Uri _uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-//        PhotoModel photoModel;
-//        for(int i = 0; i < allPhotosAlbum.size(); i++){
-//            photoModel = new PhotoModel();
-//            photoModel.id = allPhotosAlbum.get(i).getPictureId();
-//            photoModel.dateModified = new Date(allPhotosAlbum.get(i).getDate_modified() * 1000);
-//            photoModel.displayName = allPhotosAlbum.get(i).getPicturName();
-//            photoModel.size = allPhotosAlbum.get(i).getPictureSize();
-//            photoModel.uri = ContentUris.withAppendedId(_uri, photoModel.id).toString();
-//            photoModels.add(photoModel);
-//        }
-//        return photoModels;
-//    }
+    public Bitmap createVideoThumbNail(String path){
+        return ThumbnailUtils.createVideoThumbnail(path,MediaStore.Images.Thumbnails.MINI_KIND);
+    }
+    public void createAlertDialog(ArrayList<PhotoModel> photoModels, ArrayList<VideoModel> videoModels, int position){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this.context);
+        builder.setTitle("Chọn chế độ xem");
+        builder.setPositiveButton("Ảnh", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (photoModels.size() > 0) {
+                    System.out.println("aa");
+                    albumName = albumData.get(position).getAlbumName();
+                    Intent viewAlbumIntent = new Intent(context , AlbumsViewActivity.class);
+                    viewAlbumIntent.putParcelableArrayListExtra("photoModels", photoModels);
+                    viewAlbumIntent.putExtra("albumName", albumName);
+                    //viewAlbumIntent.putExtra("currentPosition", position);
+                    Log.d("onClickCardAlbum", "clicked " + position);
+                    context.startActivity(viewAlbumIntent);
+                }
+                else{
+                    Toast.makeText(context, "Không có ảnh để hiện thị", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+        builder.setNegativeButton("Video", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if(videoModels.size() > 0){
+                    albumName = albumData.get(position).getAlbumName();
+                    Intent viewAlbumIntent = new Intent(context , AlbumsVideoViewActivity.class);
+                    viewAlbumIntent.putParcelableArrayListExtra("videoModels", videoModels);
+                    viewAlbumIntent.putExtra("albumName", albumName);
+                    //viewAlbumIntent.putExtra("currentPosition", position);
+                    Log.d("onClickCardAlbum", "clicked " + position);
+                    context.startActivity(viewAlbumIntent);
+                }else{
+                    Toast.makeText(context, "Không có video để hiện thị", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+        builder.show();
+    }
 }
 

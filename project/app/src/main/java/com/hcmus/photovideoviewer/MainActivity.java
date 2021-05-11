@@ -34,6 +34,7 @@ import com.hcmus.photovideoviewer.adapters.SlideShowAdapter;
 import com.hcmus.photovideoviewer.constants.PhotoPreferences;
 import com.hcmus.photovideoviewer.services.MediaDataRepository;
 import com.hcmus.photovideoviewer.viewmodels.AppBarViewModel;
+import com.hcmus.photovideoviewer.views.SettingActivity;
 import com.hcmus.photovideoviewer.views.SlideShowActivity;
 
 import static android.provider.Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION;
@@ -128,7 +129,10 @@ public class MainActivity extends AppCompatActivity
 			else if (item.getItemId() == R.id.slideShowButton) {
 				Intent intent = new Intent(this, SlideShowActivity.class);
 				intent.putExtra(PhotoPreferences.PARCEL_PHOTOS, MediaDataRepository.getInstance().fetchPhotos());
-
+				startActivity(intent);
+			}else if(item.getItemId() == R.id.settingButton){
+				Intent intent = new Intent(this, SettingActivity.class);
+				intent.putExtra("Setting", "");
 				startActivity(intent);
 			}
 
