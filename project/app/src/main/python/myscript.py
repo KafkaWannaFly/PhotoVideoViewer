@@ -4,25 +4,28 @@ from PIL import Image
 import base64
 import io
 import face_recognition
-# f = open("input.txt", "r")
-# data1 = f.read()
+#f = open("input.txt", "r")
+#data1 = f.read()
+#allFace = set()
 allFace = []
 
 def main(data1, data2):
 	decoded_data1 = base64.b64decode(data1)
-	np_data1 = np.fromstring(decoded_data1, np.uint8)
+	#np_data1 = np.fromstring(decoded_data1, np.uint8)
+	np_data1 = np.frombuffer(decoded_data1, np.uint8)
 	img1 = cv2.imdecode(np_data1, cv2.IMREAD_UNCHANGED)
 	img1out = cv2.cvtColor(img1, cv2.COLOR_BGR2RGB)
 
 	decoded_data2 = base64.b64decode(data2)
-	np_data2 = np.fromstring(decoded_data2, np.uint8)
+	#np_data2 = np.fromstring(decoded_data2, np.uint8)
+	np_data2 = np.frombuffer(decoded_data2, np.uint8)
 	img2 = cv2.imdecode(np_data2, cv2.IMREAD_UNCHANGED)
 	img2out = cv2.cvtColor(img2, cv2.COLOR_BGR2RGB)
 	# img1out = convertData(data1)
 	# img2out = convertData(data2)
 
-	biden_encoding = face_recognition.face_encodings(img1out)[0]
 	try:
+		biden_encoding = face_recognition.face_encodings(img1out)[0]
 		unknown_encoding = face_recognition.face_encodings(img2out)[0]
 	except:
 		return False
@@ -31,7 +34,8 @@ def main(data1, data2):
 	return results[0]
 def main_test(data1):
 	decoded_data1 = base64.b64decode(data1)
-	np_data1 = np.fromstring(decoded_data1, np.uint8)
+	#np_data1 = np.fromstring(decoded_data1, np.uint8)
+	np_data1 = np.frombuffer(decoded_data1, np.uint8)
 	img1 = cv2.imdecode(np_data1, cv2.IMREAD_UNCHANGED)
 	img1out = cv2.cvtColor(img1, cv2.COLOR_BGR2RGB)
 	img_gray = cv2.cvtColor(img1, cv2.COLOR_BGR2GRAY)
@@ -59,11 +63,19 @@ def main_test(data1):
 			if(check == 0):
 				allFace.append(inputFace)
 	return ""
-	# return "" + str(img_str, 'UTF-8');
+	#return "" + str(img_str, 'UTF-8');
+
 # def createDataPeopleExplore():
 
 def get_data_face():
-	return allFace	
+	output = allFace
+	return output
+def set_data_face(data):
+    allFace.append(data)
+    return ""
+def reset_data():
+	allFace.clear()
+	return ""
 # def main_test(data1):
 # 	decoded_data1 = base64.b64decode(data1)
 # 	np_data1 = np.fromstring(decoded_data1, np.uint8)
@@ -81,3 +93,4 @@ def get_data_face():
 #     	return ""+str(img_str, 'utf-8')
 #     return ""
 #main_test(data1)
+reset_data()

@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -38,8 +39,10 @@ import com.squareup.picasso.Picasso;
 import java.io.ByteArrayOutputStream;
 import java.io.FileDescriptor;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Map;
 
 import static android.app.PendingIntent.getActivity;
 
@@ -85,7 +88,7 @@ public class ExploreAdapter extends RecyclerView.Adapter<ExploreAdapter.ViewHold
     }
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, final int position) {
-        Log.d(TAG, "Element " + position + " set.");
+        //Log.d(TAG, "Element " + position + " set.");
         //get database
 //        Uri _uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
 //        long idPerson = exploreModels.get(position).getAvatarUrl();
@@ -97,30 +100,74 @@ public class ExploreAdapter extends RecyclerView.Adapter<ExploreAdapter.ViewHold
         Bitmap a = exploreModels.get(position).getBitmapAvatar();
         //Glide.with(context).load(bitmapToByte(a)).override(500, 500).fitCenter().into(viewHolder.getImageView());
         viewHolder.getImageView().setImageBitmap(a);
-        ArrayList<PhotoModel> dataPhotos = MediaDataRepository.getInstance().getPhotoModels();
+//        SharedPreferences sharedPhotoDetected = this.context.getSharedPreferences("CurrentPhotoDetected", Context.MODE_PRIVATE);
+//        Map<String, ?> mapSharedPhotoDetected = sharedPhotoDetected.getAll();
 
         viewHolder.getImageView().setOnClickListener(v->{
             //get Data
+            ArrayList<PhotoModel> dataPhotos = MediaDataRepository.getInstance().getPhotoModels();
+            ArrayList<PhotoModel> photoModels = new ArrayList<PhotoModel>();
+            SharedPreferences sharedPhoto = this.context.getSharedPreferences(exploreModels.get(position).getIdPerson() + "", Context.MODE_PRIVATE);
+            Map<String,Boolean> mapSharedPhoto = (Map<String, Boolean>) sharedPhoto.getAll();
             PyObject pyo = py.getModule("myscript");
             Uri _uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-            String faceBitmaptoString = getStringImage(exploreModels.get(position).getBitmapAvatar());
-            ArrayList<PhotoModel> photoModels = new ArrayList<PhotoModel>();
             for(int i = 0; i < dataPhotos.size(); i++){
-                Bitmap bitmap = null;
-                long idPerson = dataPhotos.get(i).id;
-                String uriPerson = ContentUris.withAppendedId(_uri, idPerson).toString();
-                try {
-                    bitmap = getBitmapFromUri(Uri.parse(uriPerson));
+                if(dataPhotos.get(i).isSecret == true)
+                    continue;
+                if(checkExistRecognizePerson(mapSharedPhoto, dataPhotos.get(i).id)){
+                    if(mapSharedPhoto.get(dataPhotos.get(i).id + "")) {
+                        photoModels.add(dataPhotos.get(i));
+                    }
+                    continue;
                 }
-                catch (Exception e) {
+                else{
+                    String faceBitmaptoString = getStringImage(exploreModels.get(position).getBitmapAvatar());
+                    Bitmap bitmap = null;
+                    long idPerson = dataPhotos.get(i).id;
+                    String uriPerson = ContentUris.withAppendedId(_uri, idPerson).toString();
+                    try {
+                        bitmap = MediaDataRepository.getBitmapFormUri(context,Uri.parse(uriPerson));
+                    }
+                    catch (Exception e) {
+                    }
+                    String imageString = getStringImage(bitmap);
+                    PyObject obj2 = pyo.callAttr("main",faceBitmaptoString, imageString);
+                    if(obj2.toBoolean() == true){
+                        photoModels.add(dataPhotos.get(i));
+                        SharedPreferences.Editor editor = sharedPhoto.edit();
+                        editor.putBoolean(dataPhotos.get(i).id + "", true);
+                        editor.commit();
+                    }else{
+                        SharedPreferences.Editor editor = sharedPhoto.edit();
+                        editor.putBoolean(dataPhotos.get(i).id + "", false);
+                        editor.commit();
+                    }
                 }
-                String imageString = getStringImage(bitmap);
-                PyObject obj2 = pyo.callAttr("main",faceBitmaptoString, imageString);
-                if(obj2.toBoolean() == true){
-                    photoModels.add(dataPhotos.get(i));
-                }
-                System.out.println("abc");
             }
+
+//            Log.d(TAG, "Element " + position + " set.");
+//            PyObject pyo = py.getModule("myscript");
+//            Uri _uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+//            String faceBitmaptoString = getStringImage(exploreModels.get(position).getBitmapAvatar());
+//            ArrayList<PhotoModel> photoModels = new ArrayList<PhotoModel>();
+//            for(int i = 0; i < dataPhotos.size(); i++){
+//                if(dataPhotos.get(i).isSecret == true)
+//                    continue;
+//                Bitmap bitmap = null;
+//                long idPerson = dataPhotos.get(i).id;
+//                String uriPerson = ContentUris.withAppendedId(_uri, idPerson).toString();
+//                try {
+//                    bitmap = MediaDataRepository.getBitmapFormUri(context,Uri.parse(uriPerson));
+//                }
+//                catch (Exception e) {
+//                }
+//                String imageString = getStringImage(bitmap);
+//                PyObject obj2 = pyo.callAttr("main",faceBitmaptoString, imageString);
+//                if(obj2.toBoolean() == true){
+//                    photoModels.add(dataPhotos.get(i));
+//                }
+//                System.out.println("abc");
+//            }
             //
 //            photoModels.add(dataPhotos.get(0));
 //            photoModels.add(dataPhotos.get(1));
@@ -156,6 +203,14 @@ public class ExploreAdapter extends RecyclerView.Adapter<ExploreAdapter.ViewHold
         byte[] imageBytes = baos.toByteArray();
         String encodedImage = android.util.Base64.encodeToString(imageBytes, Base64.DEFAULT);
         return  encodedImage;
+    }
+    private boolean checkExistRecognizePerson(Map<String, ?> mapPrefPhotoOfFace, Long id){
+        try{
+            String a = mapPrefPhotoOfFace.get(id + "").toString();
+            return true;
+        }catch (Exception e){
+            return false;
+        }
     }
 }
 

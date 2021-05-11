@@ -1,5 +1,6 @@
 package com.hcmus.photovideoviewer.views;
 
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.app.Activity;
@@ -27,6 +28,7 @@ import android.view.ViewGroup;
 
 import com.CodeBoy.MediaFacer.MediaFacer;
 import com.hcmus.photovideoviewer.adapters.AlbumAdapter;
+import com.hcmus.photovideoviewer.adapters.PhotosViewAdapter;
 import com.hcmus.photovideoviewer.models.AlbumModel;
 import com.hcmus.photovideoviewer.models.PhotoModel;
 import com.hcmus.photovideoviewer.services.MediaDataRepository;
@@ -34,25 +36,28 @@ import com.hcmus.photovideoviewer.viewmodels.AlbumsViewModel;
 import com.hcmus.photovideoviewer.R;
 import com.hcmus.photovideoviewer.viewmodels.AppBarViewModel;
 import com.hcmus.photovideoviewer.viewmodels.PhotoViewViewModel;
+import com.hcmus.photovideoviewer.viewmodels.PhotosFragmentViewModel;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 public class AlbumsFragment extends Fragment {
 	enum LayoutManagerType {
 		GRID_LAYOUT_MANAGER,
 		LINEAR_LAYOUT_MANAGER
 	}
-	private AlbumsViewModel mViewModel;
 	private RecyclerView mRecyclerView;
 	private GridLayoutManager gridLayoutManager;
 	protected RecyclerView.LayoutManager mLayoutManager;
 	protected LayoutManagerType mCurrentLayoutManagerType;
 	//	protected String[] mDataset;
 	private AlbumAdapter albumAdapter;
-	private AlbumsViewModel albumsViewModel;
+	//private AlbumsViewModel albumsViewModel;
 	public static AppBarViewModel appBarViewModel = null;
+	private ArrayList<AlbumModel> albumModels = new ArrayList<AlbumModel>();
+	private PhotosFragmentViewModel photosViewModel = null;
 
 	public AlbumsFragment(AppBarViewModel appBarViewModel){
 		this.appBarViewModel = appBarViewModel;
@@ -64,7 +69,23 @@ public class AlbumsFragment extends Fragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		albumsViewModel = new ViewModelProvider(this).get(AlbumsViewModel.class);
+		//albumsViewModel = new ViewModelProvider(this).get(AlbumsViewModel.class);
+		photosViewModel = new PhotosFragmentViewModel(MediaDataRepository.getInstance().getPhotoModels());
+
+//		albumModels = MediaDataRepository.getInstance().fetchAlbums(photoModels);
+	}
+
+	@Override
+	public void onStart() {
+		super.onStart();
+		photosViewModel.getLivePhotoModels().setValue(MediaDataRepository.getInstance().fetchPhotos());
+//		albumModels = MediaDataRepository.getInstance().fetchAlbums(photoModels);
+//		CompletableFuture.supplyAsync(() -> {
+//			// ABC
+//			return 0;
+//		}).thenAccept(u -> {
+//
+//		});
 	}
 
 	@Override
@@ -81,19 +102,36 @@ public class AlbumsFragment extends Fragment {
 	public void onActivityCreated(@Nullable Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 		//set live data
-		appBarViewModel.liveColumnSpan.observe(getViewLifecycleOwner(), columnSpan -> {
-			mLayoutManager = new GridLayoutManager(getActivity(), columnSpan);
-			mRecyclerView.setLayoutManager(mLayoutManager);
-		});
+//		appBarViewModel.liveColumnSpan.observe(getViewLifecycleOwner(), columnSpan -> {
+//			mLayoutManager = new GridLayoutManager(getActivity(), columnSpan);
+//			mRecyclerView.setLayoutManager(mLayoutManager);
+//		});
 
 		if (savedInstanceState != null) {
 			// Restore saved layout manager type.
 			mCurrentLayoutManagerType = (LayoutManagerType) savedInstanceState
 					.getSerializable("layoutManager");
 		}
+		try{
+			photosViewModel.getLivePhotoModels().observe(AlbumsFragment.this, new Observer<ArrayList<PhotoModel>>() {
+				@Override
+				public void onChanged(ArrayList<PhotoModel> photoModels) {
+					Log.d("ActivityLife", "AlbumsFragment data changed");
+					albumModels = MediaDataRepository.getInstance().fetchAlbums(photoModels);
+					albumAdapter = new AlbumAdapter(getContext(), albumModels);
+					mRecyclerView.setAdapter(albumAdapter);
+				}
+			});
 
-		albumAdapter = new AlbumAdapter(this.getContext(),albumsViewModel.getAlbumModels());
-		mRecyclerView.setAdapter(albumAdapter);
+			appBarViewModel.liveColumnSpan.observe(getViewLifecycleOwner(), columnSpan -> {
+				mLayoutManager = new GridLayoutManager(getActivity(), columnSpan);
+				mRecyclerView.setLayoutManager(mLayoutManager);
+			});
+		} catch (Exception exception) {
+			Log.e("PhotosFragmentException", exception.getMessage());
+		}
+		//albumAdapter = new AlbumAdapter(this.getContext(),albumModels);
+		//mRecyclerView.setAdapter(albumAdapter);
 	}
 	@Override
 	public void onSaveInstanceState(Bundle savedInstanceState) {

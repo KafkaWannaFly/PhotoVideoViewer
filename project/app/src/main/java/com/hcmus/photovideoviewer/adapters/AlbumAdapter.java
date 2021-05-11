@@ -121,6 +121,10 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ViewHolder> 
             viewHolder.getQuantityAlbums().setText(albumData.get(position).getQuantity() + "");
             if(albumData.get(position).getAlbumName().equals(PhotoPreferences.PRIVATE)){
                 viewHolder.getImageView().setImageResource(R.drawable.pussy_cat);
+//=======
+//                //viewHolder.getImageView().setImageResource(R.drawable.ic_baseline_privacy_tip_24);
+//                viewHolder.getImageView().set
+//>>>>>>> Stashed changes
 //                Picasso.get()
 //                        .load(R.drawable.ic_baseline_privacy_tip_24)
 //                        .placeholder(R.drawable.ic_baseline_privacy_tip_24)
