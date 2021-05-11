@@ -15,4 +15,8 @@
     <color name="light_blue_A400">#FF00B0FF</color>
     <color name="black_overlay">#66000000</color>
     <color name="favorite_red">#DD2C00</color>
+    <color name="explore_title">#FF000000</color>
+    <color name="tilteAlbum">#FF000000</color>
+    <color name="lineExplore">#FF000000</color>
+    <color name="backgroundAlbumColor">#FFFFFFFF</color>
 </resources>

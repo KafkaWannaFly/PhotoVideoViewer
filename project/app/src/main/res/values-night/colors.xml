@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="explore_title">#FFFFFFFF</color>
+    <color name="tilteAlbum">#FFFFFFFF</color>
+    <color name="lineExplore">#FFFFFFFF</color>
+    <color name="backgroundAlbumColor">#FF000000</color>
+</resources>

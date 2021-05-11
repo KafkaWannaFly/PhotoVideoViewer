@@ -4,28 +4,51 @@ import android.annotation.SuppressLint;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.ImageDecoder;
 import android.net.Uri;
+import android.os.Build;
+import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
+import android.util.Base64;
 import android.util.Log;
+
+import androidx.annotation.RequiresApi;
 
 import com.CodeBoy.MediaFacer.MediaFacer;
 import com.CodeBoy.MediaFacer.mediaHolders.pictureContent;
 import com.CodeBoy.MediaFacer.mediaHolders.pictureFolderContent;
 import com.CodeBoy.MediaFacer.mediaHolders.videoContent;
+import com.chaquo.python.PyObject;
+import com.chaquo.python.Python;
+import com.chaquo.python.android.AndroidPlatform;
 import com.google.gson.Gson;
 import com.hcmus.photovideoviewer.MainApplication;
+import com.hcmus.photovideoviewer.R;
 import com.hcmus.photovideoviewer.constants.FolderConstants;
 import com.hcmus.photovideoviewer.constants.PhotoPreferences;
 import com.hcmus.photovideoviewer.constants.VideoPreferences;
 import com.hcmus.photovideoviewer.models.AlbumModel;
+import com.hcmus.photovideoviewer.models.ExploreModel;
 import com.hcmus.photovideoviewer.models.PhotoModel;
 import com.hcmus.photovideoviewer.models.VideoModel;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileDescriptor;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class MediaDataRepository {
 	@SuppressLint("StaticFieldLeak")
@@ -35,7 +58,8 @@ public class MediaDataRepository {
 	private final ArrayList<PhotoModel> photoModels = new ArrayList<>();
 	private final ArrayList<VideoModel> videoModels = new ArrayList<>();
 	private final ArrayList<AlbumModel> albumModels = new ArrayList<>();
-
+	private final ArrayList<ExploreModel> exploreModels = new ArrayList<>();
+	private Python py = Python.getInstance();
 	private MediaDataRepository() {
 		context = MainApplication.getContext();
 	}
@@ -51,7 +75,8 @@ public class MediaDataRepository {
 		try {
 			this.fetchPhotos();
 			this.fetchVideos();
-			this.fetchAlbums();
+			//this.fetchAlbums();
+			//this.fetchExplores();
 		} catch (Exception exception) {
 			Log.d("Exception", exception.getMessage());
 		}
@@ -69,6 +94,8 @@ public class MediaDataRepository {
 	public ArrayList<AlbumModel> getAlbumModels() {
 		return albumModels;
 	}
+
+	public ArrayList<ExploreModel> getExploreModels(){return exploreModels;}
 
 	public ArrayList<PhotoModel> fetchPhotos() {
 		photoModels.clear();
@@ -245,39 +272,333 @@ public class MediaDataRepository {
 		return this.videoModels;
 	}
 
-	public ArrayList<AlbumModel> fetchAlbums() {
+	public ArrayList<AlbumModel> fetchAlbums(ArrayList<PhotoModel> photoModelsInput) {
 		albumModels.clear();
-		Uri _uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+
 		ArrayList<pictureContent> allPhotosAlbum;
 		ArrayList<videoContent> allVideosAlbum;
 
-		ArrayList<pictureFolderContent> pictureFolders = new ArrayList<>(MediaFacer.withPictureContex(context).getPictureFolders());
-		for (int i = 0; i < pictureFolders.size(); i++) {
-			int index = i;
-			allPhotosAlbum = MediaFacer.withPictureContex(context).getAllPictureContentByBucket_id(pictureFolders.get(index).getBucket_id());
-			allVideosAlbum = MediaFacer.withVideoContex(context).getAllVideoContentByBucket_id(pictureFolders.get(index).getBucket_id());
-			ArrayList<pictureContent> finalAllPhotos = allPhotosAlbum;
-			ArrayList<videoContent> finalAllVideos = allVideosAlbum;
-
-			PhotoModel photoModel = new PhotoModel() {
-				{
-					id = (long) finalAllPhotos.get(finalAllPhotos.size() - 1).getPictureId();
-					displayName = finalAllPhotos.get(finalAllPhotos.size() - 1).getPicturName();
-					size = finalAllPhotos.get(finalAllPhotos.size() - 1).getPictureSize();
-					dateModified = new Date(finalAllPhotos.get(finalAllPhotos.size() - 1).getDate_modified() * 1000);
-					uri = ContentUris.withAppendedId(_uri, id).toString();
+//		ArrayList<pictureFolderContent> pictureFolders = new ArrayList<>(MediaFacer.withPictureContex(context).getPictureFolders());
+//		for (int i = 0; i < pictureFolders.size(); i++) {
+//			int index = i;
+//			allPhotosAlbum = MediaFacer.withPictureContex(context).getAllPictureContentByBucket_id(pictureFolders.get(index).getBucket_id());
+//			//allVideosAlbum = MediaFacer.withVideoContex(context).getAllVideoContentByBucket_id(pictureFolders.get(index).getBucket_id());
+//			ArrayList<pictureContent> finalAllPhotos = allPhotosAlbum;
+//			//ArrayList<videoContent> finalAllVideos = allVideosAlbum;
+//
+//			AlbumModel albumModel = new AlbumModel() {
+//				{
+//					albumName = pictureFolders.get(index).getFolderName();
+//					quantity = finalAllPhotos.size();// + finalAllVideos.size();
+//					imageUrl = finalAllPhotos.get(finalAllPhotos.size()-1).getPictureId();
+//				}
+//			};
+//			albumModels.add(albumModel);
+//		}
+		//mark favorite
+		SharedPreferences sharePref =  this.context.getSharedPreferences("Photos",Context.MODE_PRIVATE);
+		Map<String, ?> allEntries = sharePref.getAll();
+//		SharedPreferences sharePrefPrivate =  this.context.getSharedPreferences("Private",Context.MODE_PRIVATE);
+//		Map<String, ?> allEntriesPrivate = sharePrefPrivate.getAll();
+//		if(!allEntries.isEmpty()){
+			//ArrayList<PhotoModel> photoModelsInput = this.fetchPhotos();
+			Map<String, Integer> mapNameAlbum = new HashMap<>();
+			Map<String, Long> mapIdAlbum = new HashMap<>();
+			ArrayList<String> ListNameAlbum = new ArrayList<String>();
+			int sizeAlbumFavorite = 0;
+			int sizeAlbumPrivate = 0;
+			long idAvatarFavorite = 0;
+			for(int i = 0; i < photoModelsInput.size(); i++){
+				String[] getAlbumFromPhoto = photoModelsInput.get(i).uri.split("/");
+				String newAlbum = getAlbumFromPhoto[getAlbumFromPhoto.length - 2];
+				if(!checkExistAlbum(ListNameAlbum, newAlbum)){
+					mapNameAlbum.put(newAlbum, 1);
+					ListNameAlbum.add(newAlbum);
+					mapIdAlbum.put(newAlbum, photoModelsInput.get(i).id);
 				}
-			};
+				else{
+					int count = mapNameAlbum.get(newAlbum);
+					mapNameAlbum.put(newAlbum, ++count);
+					mapIdAlbum.put(newAlbum, photoModelsInput.get(i).id);
+				}
+				if(photoModelsInput.get(i).isFavorite){
+					sizeAlbumFavorite++;
+					idAvatarFavorite = photoModelsInput.get(i).id;
+				}
+			}
+			int finalSizeFavorite = sizeAlbumFavorite;
+			int finalSizePrivate = sizeAlbumPrivate;
+			if(finalSizeFavorite > 0){
+				AlbumModel albumFavorite = new AlbumModel();
+				long finalIdAvatarFavorite = idAvatarFavorite;
+				albumFavorite = new AlbumModel() {
+					{
+						imageUrl = finalIdAvatarFavorite;
+						albumName = "Favourites";
+						quantity = finalSizeFavorite;
+					}
+				};
+				albumModels.add(albumFavorite);
+			}
+//		}
+		//mark private
+
+		//next
+		for(int i = 0; i < mapNameAlbum.size(); i++){
+			String nameOfAlbum = ListNameAlbum.get(i);
+			if(nameOfAlbum.equals("app_PrivatePictures")){
+				nameOfAlbum = "Private";
+			}
+			String finalNameOfAlbum = nameOfAlbum;
+			int finalI = i;
 			AlbumModel albumModel = new AlbumModel() {
 				{
-					albumName = pictureFolders.get(index).getFolderName();
-					quantity = finalAllPhotos.size() + finalAllVideos.size();
-					imageUrl = photoModel;
+					albumName = finalNameOfAlbum;
+					quantity = mapNameAlbum.get(ListNameAlbum.get(finalI));
+					imageUrl = mapIdAlbum.get(ListNameAlbum.get(finalI));
 				}
 			};
 			albumModels.add(albumModel);
 		}
-		Log.d("Size of Album: ", "" + albumModels.get(0));
+		System.out.println("Debug");
 		return albumModels;
+	}
+	public ArrayList<ExploreModel> fetchExplores(ArrayList<PhotoModel> photoModelsInput){
+		exploreModels.clear();
+		//ArrayList<PhotoModel> photoModelsInput = this.getPhotoModels();
+
+		List<PyObject> data_Face = recognizePerson(photoModelsInput);
+		for(int i = 0; i < data_Face.size(); i++){
+			byte data[] = android.util.Base64.decode(data_Face.get(i).toString(), Base64.DEFAULT);
+			Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
+            int finalI = i;
+            ExploreModel exploreModel = new ExploreModel(){
+				{
+				    idPerson = finalI + 10;
+					bitmapAvatar = bmp;
+				}
+			};
+			exploreModels.add(exploreModel);
+		}
+
+//		exploreModels.add(exploreModel);
+//		exploreModels.add(exploreModel);
+//		exploreModels.add(exploreModel);
+//		exploreModels.add(exploreModel);
+//		exploreModels.add(exploreModel);
+//		exploreModels.add(exploreModel);
+//		exploreModels.add(exploreModel);
+		//recognizePerson();
+		return exploreModels;
+	}
+	public List<PyObject> recognizePerson(ArrayList<PhotoModel> photoModelsInput){
+		Log.d("RecognizePerson:", "" + photoModelsInput.size());
+		SharedPreferences sharedPrefStringPhoto = this.context.getSharedPreferences("StringPhoto", Context.MODE_PRIVATE);
+		SharedPreferences sharedPrefRecognize = this.context.getSharedPreferences("Recognize", Context.MODE_PRIVATE);
+		SharedPreferences sharedPreFaceDetect = this.context.getSharedPreferences("FaceDetect", Context.MODE_PRIVATE);
+		Map<String, ?> mapPrefRecognize = sharedPrefRecognize.getAll();
+		Map<String, ?> mapPrefStringPhoto = sharedPrefStringPhoto.getAll();
+		Map<String, ?> mapPrefFaceDetect = sharedPreFaceDetect.getAll();
+		Uri _uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+//		long idPerson1 = photoModels.get(0).id;
+//		String uriPerson1 = ContentUris.withAppendedId(_uri, idPerson1).toString();
+//
+//		long idPerson2 = photoModels.get(1).id;
+//		String uriPerson2 = ContentUris.withAppendedId(_uri, idPerson2).toString();
+
+//		Bitmap bitmap = null;
+//		Bitmap bitmap2 = null;
+//		try {
+//			bitmap = getBitmapFromUri(Uri.parse(uriPerson1));//getBitmap(context.getContentResolver(), Uri.parse(uriPerson1));
+//			bitmap2 = getBitmapFromUri(Uri.parse(uriPerson2));
+//		}
+//	   catch (Exception e) {
+//	   }
+//		String imageString = getStringImage(bitmap);
+//		String imageString2 = getStringImage(bitmap2);
+
+		//ArrayList<PhotoModel> dataRegonize = new ArrayList<PhotoModel>();
+		PyObject pyo = py.getModule("myscript");
+
+//		PyObject obj = pyo.callAttr("main", imageString, imageString2);
+//		Log.d("Python Return: ", obj.toString());
+//		String result = obj.toString();
+//		PyObject obj2 = pyo.callAttr("main_test", imageString);
+		//Log.d("Python Return Test: ", obj2.toString());
+//		String str = obj2.toString();
+//		String str = getStringImage(bitmap);
+
+		//convert bitmap
+//		byte data[] = android.util.Base64.decode(str, Base64.DEFAULT);
+//		Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
+
+		//ti mo
+        //content://media/external/images/media/57
+		String strCount = "";
+		List<PyObject> dataFace = new ArrayList<PyObject>();
+		if(mapPrefFaceDetect.size() > 0){
+			pyo.callAttr("reset_data");
+			for(int i = 0; i < mapPrefFaceDetect.size(); i++){
+				pyo.callAttr("set_data_face", mapPrefFaceDetect.get(i + ""));
+			}
+			PyObject obj3 = pyo.callAttr("get_data_face");
+			dataFace = obj3.asList();
+		}
+		int flag = 0;
+		for(int i = 0; i < photoModelsInput.size(); i++){
+			if (photoModelsInput.get(i).isSecret)
+				continue;
+			String imageString = "";
+			if(checkExistRecognizePerson(mapPrefRecognize, photoModelsInput.get(i).id)){
+				//imageString = mapPrefStringPhoto.get(photoModelsInput.get(i).id + "").toString();
+				continue;
+			}
+			else {
+				Bitmap bitmap = null;
+				long idPerson = photoModelsInput.get(i).id;
+				Uri uriPerson = ContentUris.withAppendedId(_uri, idPerson);
+				try {
+					//bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), uriPerson);
+					bitmap = getBitmapFormUri(context, uriPerson);
+					//int degree = getBitmapDegree(file.getAbsolutePath());
+				} catch (Exception e) {
+					Log.e("RecognizePerson Error: ", "Error");
+				}
+				imageString = getStringImage(bitmap); //cham
+				String debugg = "";
+				System.out.println("abc");
+				SharedPreferences.Editor editorListRecognize = sharedPrefRecognize.edit();
+				editorListRecognize.putBoolean(photoModelsInput.get(i).id + "", true);
+				editorListRecognize.commit();
+//				SharedPreferences.Editor editorListPhotoString = sharedPrefStringPhoto.edit();
+//				editorListPhotoString.putString(photoModelsInput.get(i).id + "", imageString);
+//				editorListPhotoString.commit();
+				flag = 1;
+			}
+			PyObject obj2 = pyo.callAttr("main_test", imageString); //anh so 14
+			String str = obj2.toString();
+		}
+		if(flag == 1){
+			PyObject obj3 = pyo.callAttr("get_data_face");
+			dataFace = obj3.asList();
+			for(int i = 0; i < dataFace.size(); i++){
+				SharedPreferences.Editor editDetectFace = sharedPreFaceDetect.edit();
+				editDetectFace.putString(i + "", dataFace.get(i).toString());
+				editDetectFace.commit();
+			}
+		}
+
+		return dataFace;
+//		String sssss = dataFace.get(0).toString();
+//		String ssssss = dataFace.get(1).toString();
+//		for(int i = 0; i < dataFace.size(); i++){
+//			exploreModels.add()
+//		}
+//		System.out.println("abc");
+		//
+//		Bitmap bitmap = null;
+//		long idPerson = photoModels.get(1).id;
+//		Bitmap bitmap2 = null;
+//		long idPerson2 = photoModels.get(7).id;
+//		String uriPerson = ContentUris.withAppendedId(_uri, idPerson).toString();
+//		String uriPerson2 = ContentUris.withAppendedId(_uri, idPerson2).toString();
+//		try {
+//			bitmap = getBitmapFromUri(Uri.parse(uriPerson));
+//			bitmap2 = getBitmapFromUri(Uri.parse(uriPerson2));
+//		}
+//		catch (Exception e) {
+//		}
+//		String imageString = getStringImage(bitmap);
+//		String imageString2 = getStringImage(bitmap2);
+//
+//		PyObject obj2 = pyo.callAttr("main", imageString, imageString2);
+//		String str = obj2.toString();
+//		System.out.println("abc");
+
+//		byte data[] = android.util.Base64.decode(str, Base64.DEFAULT);
+//		Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
+//		return null;
+//		return dataRegonize;
+	}
+//	private Bitmap getBitmapFromUri(Uri uri) throws IOException {
+//		ParcelFileDescriptor parcelFileDescriptor =
+//				context.getContentResolver().openFileDescriptor(uri, "r");
+//		FileDescriptor fileDescriptor = parcelFileDescriptor.getFileDescriptor();
+//		Bitmap image = BitmapFactory.decodeFileDescriptor(fileDescriptor);
+//		parcelFileDescriptor.close();
+//		return image;
+//	}
+public static Bitmap getBitmapFormUri(Context ac, Uri uri) throws FileNotFoundException, IOException {
+	InputStream input = ac.getContentResolver().openInputStream(uri);
+	BitmapFactory.Options onlyBoundsOptions = new BitmapFactory.Options();
+	onlyBoundsOptions.inJustDecodeBounds = true;
+	onlyBoundsOptions.inDither = true;//optional
+	onlyBoundsOptions.inPreferredConfig = Bitmap.Config.ARGB_8888;//optional
+	BitmapFactory.decodeStream(input, null, onlyBoundsOptions);
+	input.close();
+	int originalWidth = onlyBoundsOptions.outWidth;
+	int originalHeight = onlyBoundsOptions.outHeight;
+	if ((originalWidth == -1) || (originalHeight == -1))
+		return null;
+	//Image resolution is based on 480x800
+	float hh = 800f;//The height is set as 800f here
+	float ww = 480f;//Set the width here to 480f
+	//Zoom ratio. Because it is a fixed scale, only one data of height or width is used for calculation
+	int be = 1;//be=1 means no scaling
+	if (originalWidth > originalHeight && originalWidth > ww) {//If the width is large, scale according to the fixed size of the width
+		be = (int) (originalWidth / ww);
+	} else if (originalWidth < originalHeight && originalHeight > hh) {//If the height is high, scale according to the fixed size of the width
+		be = (int) (originalHeight / hh);
+	}
+	if (be <= 0)
+		be = 1;
+	//Proportional compression
+	BitmapFactory.Options bitmapOptions = new BitmapFactory.Options();
+	bitmapOptions.inSampleSize = be;//Set scaling
+	bitmapOptions.inDither = true;//optional
+	bitmapOptions.inPreferredConfig = Bitmap.Config.ARGB_8888;//optional
+	input = ac.getContentResolver().openInputStream(uri);
+	Bitmap bitmap = BitmapFactory.decodeStream(input, null, bitmapOptions);
+	input.close();
+
+	return compressImage(bitmap);//Mass compression again
+}
+	public static Bitmap compressImage(Bitmap image) {
+
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		image.compress(Bitmap.CompressFormat.JPEG, 100, baos);//Quality compression method, here 100 means no compression, store the compressed data in the BIOS
+		int options = 100;
+		while (baos.toByteArray().length / 1024 > 100) {  //Cycle to determine if the compressed image is greater than 100kb, greater than continue compression
+			baos.reset();//Reset the BIOS to clear it
+			//First parameter: picture format, second parameter: picture quality, 100 is the highest, 0 is the worst, third parameter: save the compressed data stream
+			image.compress(Bitmap.CompressFormat.JPEG, options, baos);//Here, the compression options are used to store the compressed data in the BIOS
+			options -= 10;//10 less each time
+		}
+		ByteArrayInputStream isBm = new ByteArrayInputStream(baos.toByteArray());//Store the compressed data in ByteArrayInputStream
+		Bitmap bitmap = BitmapFactory.decodeStream(isBm, null, null);//Generate image from ByteArrayInputStream data
+		return bitmap;
+	}
+	private String getStringImage(Bitmap bitmap){
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
+		byte[] imageBytes = baos.toByteArray();
+		String encodedImage = android.util.Base64.encodeToString(imageBytes, Base64.DEFAULT);
+		return  encodedImage;
+	}
+	private boolean checkExistAlbum(ArrayList<String> albumModels, String newAlbum){
+		for(int i =0; i < albumModels.size(); i++){
+			if(albumModels.get(i).equals(newAlbum)){
+				return true;
+			}
+		}
+		return false;
+	}
+	private boolean checkExistRecognizePerson(Map<String, ?> mapPhotoRegconize, Long id){
+		try{
+			String a = mapPhotoRegconize.get(id + "").toString();
+			return true;
+		}catch (Exception e){
+			return false;
+		}
 	}
 }
