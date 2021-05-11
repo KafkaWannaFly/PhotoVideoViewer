@@ -26,8 +26,9 @@
             android:supportsRtl="true"
             android:theme="@style/Theme.PhotoVideoViewer">
 
-        <activity android:name=".views.SlideShowActivity"
-                android:theme="@style/Theme.PhotoVideoViewer.NoActionBar"/>
+        <activity
+                android:name=".views.SlideShowActivity"
+                android:theme="@style/Theme.PhotoVideoViewer.NoActionBar" />
 
         <activity
                 android:name=".views.VideoViewActivity"
@@ -37,7 +38,20 @@
                 android:name=".views.PhotoViewActivity"
                 android:configChanges="orientation|keyboardHidden|screenSize"
                 android:label="@string/title_activity_photo_view"
-                android:theme="@style/Theme.PhotoVideoViewer.Fullscreen" />
+                android:theme="@style/Theme.PhotoVideoViewer.Fullscreen">
+
+            <intent-filter>
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <action android:name="android.intent.action.VIEW" />
+
+                <data
+                        android:mimeType="image/*"
+                        android:scheme="content" />
+
+            </intent-filter>
+
+        </activity>
 
         <activity
                 android:name=".views.AlbumsViewActivity"

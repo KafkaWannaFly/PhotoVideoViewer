@@ -25,6 +25,21 @@ public class PhotoModel implements Parcelable {
 
 	}
 
+	@NotNull
+	@Override
+	public String toString() {
+		return "PhotoModel{" +
+				       "id=" + id +
+				       ", displayName='" + displayName + '\'' +
+				       ", size=" + size +
+				       ", dateModified=" + dateModified +
+				       ", uri='" + uri + '\'' +
+				       ", isFavorite=" + isFavorite +
+				       ", isSecret=" + isSecret +
+				       ", formerUri='" + formerUri + '\'' +
+				       ", location='" + location + '\'' +
+				       '}';
+	}
 
 	protected PhotoModel(Parcel in) {
 		id = in.readLong();

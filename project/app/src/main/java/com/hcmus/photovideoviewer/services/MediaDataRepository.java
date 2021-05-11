@@ -4,31 +4,19 @@ import android.annotation.SuppressLint;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.ImageDecoder;
 import android.net.Uri;
-import android.os.Build;
-import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 import android.util.Base64;
 import android.util.Log;
 
-import androidx.annotation.RequiresApi;
-
-import com.CodeBoy.MediaFacer.MediaFacer;
-import com.CodeBoy.MediaFacer.mediaHolders.pictureContent;
-import com.CodeBoy.MediaFacer.mediaHolders.pictureFolderContent;
-import com.CodeBoy.MediaFacer.mediaHolders.videoContent;
 import com.chaquo.python.PyObject;
 import com.chaquo.python.Python;
-import com.chaquo.python.android.AndroidPlatform;
 import com.google.gson.Gson;
 import com.hcmus.photovideoviewer.MainApplication;
-import com.hcmus.photovideoviewer.R;
 import com.hcmus.photovideoviewer.constants.FolderConstants;
 import com.hcmus.photovideoviewer.constants.PhotoPreferences;
 import com.hcmus.photovideoviewer.constants.VideoPreferences;
@@ -40,7 +28,6 @@ import com.hcmus.photovideoviewer.models.VideoModel;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileDescriptor;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -111,6 +98,53 @@ public class MediaDataRepository {
 		return this.photoModels;
 	}
 
+	public PhotoModel queryPhotoModel(Context context, Uri androidProviderUri) {
+		PhotoModel photoModel = null;
+
+		String[] projection = new String[]{
+				MediaStore.Images.Media._ID,
+				MediaStore.Images.Media.DISPLAY_NAME,
+				MediaStore.Images.Media.DATE_MODIFIED,
+				MediaStore.Images.Media.SIZE,
+				MediaStore.Images.Media.DATA,
+		};
+
+		ContentResolver contentResolver = context.getContentResolver();
+		try (Cursor cursor = contentResolver.query(androidProviderUri,
+				projection,
+				null,
+				null,
+				MediaStore.Images.Media.DATE_MODIFIED + " DESC")) {
+			int idColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID);
+			int nameColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME);
+			int sizeColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.SIZE);
+			int dateColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATE_MODIFIED);
+			int pathColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+
+
+
+			if (cursor.moveToFirst()) {
+				long _id = cursor.getLong(idColumn);
+				String name = cursor.getString(nameColumn);
+				Long _size = cursor.getLong(sizeColumn);
+				Long date = cursor.getLong(dateColumn);
+				String filePath = cursor.getString(pathColumn);
+
+				photoModel = new PhotoModel() {
+					{
+						id = _id;
+						displayName = name;
+						size = _size;
+						dateModified = new Date(date * 1000);
+//						uri = ContentUris.withAppendedId(whereToLook, id).toString();
+						uri = filePath;
+					}
+				};
+			}
+		}
+
+		return photoModel;
+	}
 
 	private ArrayList<PhotoModel> queryPhoto(Uri whereToLook) {
 		ArrayList<PhotoModel> models = new ArrayList<>();

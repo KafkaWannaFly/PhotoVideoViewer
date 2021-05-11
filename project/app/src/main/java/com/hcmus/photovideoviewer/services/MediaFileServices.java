@@ -12,12 +12,15 @@ import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 
+import com.hcmus.photovideoviewer.models.PhotoModel;
+
 import org.apache.commons.io.IOUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Date;
 
 public class MediaFileServices {
 	public static void refreshMediaStore(Context context) {

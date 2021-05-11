@@ -27,6 +27,7 @@ import com.bumptech.glide.Glide;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.hcmus.photovideoviewer.R;
 import com.hcmus.photovideoviewer.models.PhotoModel;
+import com.hcmus.photovideoviewer.services.MediaDataRepository;
 import com.hcmus.photovideoviewer.services.MediaFileServices;
 import com.hcmus.photovideoviewer.viewmodels.PhotoViewViewModel;
 
@@ -161,7 +162,7 @@ public class PhotoViewActivity extends AppCompatActivity {
 				String location = input.getText().toString();
 
 				photoViewViewModel.saveImageLocationPreference(photoModel, location);
-				
+
 				photoModel.location = location;
 
 				photoViewViewModel.getLivePhotoModel().setValue(photoModel);
@@ -224,6 +225,20 @@ public class PhotoViewActivity extends AppCompatActivity {
 //		photoModels = intent.getParcelableArrayListExtra("photoModels");
 //		currentPosition = intent.getIntExtra("currentPosition", 0);
 		photoModel = intent.getParcelableExtra("photoModel");
+
+		if (photoModel == null) {
+			// Call from other apps
+			try {
+				Uri uri = intent.getData();
+				Log.d("OpenFromOutside", String.valueOf(uri));
+
+				photoModel = MediaDataRepository.getInstance().queryPhotoModel(this, uri);
+				photoModel.uri = uri.toString();
+				Log.d("OpenFromOutside", photoModel.toString());
+			} catch (Exception exception) {
+				exception.printStackTrace();
+			}
+		}
 
 		photoViewViewModel = new PhotoViewViewModel(this, photoModel);
 
