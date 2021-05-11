@@ -30,8 +30,7 @@
                 android:name=".views.SlideShowActivity"
                 android:theme="@style/Theme.PhotoVideoViewer.NoActionBar" />
         <activity
-            android:name=".views.SettingActivity"
-            android:theme="@style/Theme.PhotoVideoViewer.NoActionBar" />
+            android:name=".views.SettingActivity"/>
         <activity
                 android:name=".views.VideoViewActivity"
                 android:theme="@style/Theme.PhotoVideoViewer.NoActionBar" />
