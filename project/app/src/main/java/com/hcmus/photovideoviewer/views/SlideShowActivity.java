@@ -39,21 +39,16 @@ public class SlideShowActivity extends AppCompatActivity {
 			@Override
 			public void onPageSelected(int position) {
 				super.onPageSelected(position);
-				handler.removeCallbacks(slideRunnable());
-				handler.postDelayed(slideRunnable(), DELAY_SLIDE);
+				handler.removeCallbacks(slideRunnable);
+				handler.postDelayed(slideRunnable, DELAY_SLIDE);
 			}
 		});
 
 	}
 
-	private Runnable slideRunnable() {
-		return new Runnable() {
-			@Override
-			public void run() {
-				viewPager2.setCurrentItem(viewPager2.getCurrentItem() + 1);
-			}
-		};
-	}
+	private final Runnable slideRunnable = () -> {
+		viewPager2.setCurrentItem((viewPager2.getCurrentItem() + 1) % photoModels.size());
+	};
 
 	@Override
 	protected void onDestroy() {
@@ -63,12 +58,12 @@ public class SlideShowActivity extends AppCompatActivity {
 	@Override
 	protected void onPause() {
 		super.onPause();
-		handler.removeCallbacks(slideRunnable());
+		handler.removeCallbacks(slideRunnable);
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
-		handler.postDelayed(slideRunnable(), DELAY_SLIDE);
+		handler.postDelayed(slideRunnable, DELAY_SLIDE);
 	}
 }
