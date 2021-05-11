@@ -272,53 +272,34 @@ public class MediaDataRepository {
 		return this.videoModels;
 	}
 
-	public ArrayList<AlbumModel> fetchAlbums(ArrayList<PhotoModel> photoModelsInput) {
+	public ArrayList<AlbumModel> fetchAlbums(ArrayList<PhotoModel> photoModelsInput, ArrayList<VideoModel> videoModelsInput) {
 		albumModels.clear();
+//		SharedPreferences sharedPrefVideo = this.context.getSharedPreferences("Videos", Context.MODE_PRIVATE);
+//		Map<String, ?> allVideo = sharedPrefVideo.getAll();
+//		SharedPreferences sharePref =  this.context.getSharedPreferences("Photos",Context.MODE_PRIVATE);
+//		Map<String, ?> allEntries = sharePref.getAll();
 
-		ArrayList<pictureContent> allPhotosAlbum;
-		ArrayList<videoContent> allVideosAlbum;
 
-//		ArrayList<pictureFolderContent> pictureFolders = new ArrayList<>(MediaFacer.withPictureContex(context).getPictureFolders());
-//		for (int i = 0; i < pictureFolders.size(); i++) {
-//			int index = i;
-//			allPhotosAlbum = MediaFacer.withPictureContex(context).getAllPictureContentByBucket_id(pictureFolders.get(index).getBucket_id());
-//			//allVideosAlbum = MediaFacer.withVideoContex(context).getAllVideoContentByBucket_id(pictureFolders.get(index).getBucket_id());
-//			ArrayList<pictureContent> finalAllPhotos = allPhotosAlbum;
-//			//ArrayList<videoContent> finalAllVideos = allVideosAlbum;
-//
-//			AlbumModel albumModel = new AlbumModel() {
-//				{
-//					albumName = pictureFolders.get(index).getFolderName();
-//					quantity = finalAllPhotos.size();// + finalAllVideos.size();
-//					imageUrl = finalAllPhotos.get(finalAllPhotos.size()-1).getPictureId();
-//				}
-//			};
-//			albumModels.add(albumModel);
-//		}
-		//mark favorite
-		SharedPreferences sharePref =  this.context.getSharedPreferences("Photos",Context.MODE_PRIVATE);
-		Map<String, ?> allEntries = sharePref.getAll();
-//		SharedPreferences sharePrefPrivate =  this.context.getSharedPreferences("Private",Context.MODE_PRIVATE);
-//		Map<String, ?> allEntriesPrivate = sharePrefPrivate.getAll();
-//		if(!allEntries.isEmpty()){
-			//ArrayList<PhotoModel> photoModelsInput = this.fetchPhotos();
-			Map<String, Integer> mapNameAlbum = new HashMap<>();
+			Map<String, Integer> mapQuantityPhoto = new HashMap<>();
 			Map<String, Long> mapIdAlbum = new HashMap<>();
+			Map<String, Integer> mapQuantityVideo = new HashMap<>();
 			ArrayList<String> ListNameAlbum = new ArrayList<String>();
 			int sizeAlbumFavorite = 0;
-			int sizeAlbumPrivate = 0;
+			int sizeVideoFavorite = 0;
 			long idAvatarFavorite = 0;
 			for(int i = 0; i < photoModelsInput.size(); i++){
 				String[] getAlbumFromPhoto = photoModelsInput.get(i).uri.split("/");
 				String newAlbum = getAlbumFromPhoto[getAlbumFromPhoto.length - 2];
 				if(!checkExistAlbum(ListNameAlbum, newAlbum)){
-					mapNameAlbum.put(newAlbum, 1);
+					mapQuantityPhoto.put(newAlbum, 1);
+					mapQuantityVideo.put(newAlbum, 0);
 					ListNameAlbum.add(newAlbum);
 					mapIdAlbum.put(newAlbum, photoModelsInput.get(i).id);
 				}
 				else{
-					int count = mapNameAlbum.get(newAlbum);
-					mapNameAlbum.put(newAlbum, ++count);
+					int count = mapQuantityPhoto.get(newAlbum);
+					mapQuantityPhoto.put(newAlbum, ++count);
+					mapQuantityVideo.put(newAlbum, 0);
 					mapIdAlbum.put(newAlbum, photoModelsInput.get(i).id);
 				}
 				if(photoModelsInput.get(i).isFavorite){
@@ -326,16 +307,39 @@ public class MediaDataRepository {
 					idAvatarFavorite = photoModelsInput.get(i).id;
 				}
 			}
+		//video
+		String debugg = "";
+		for(int i = 0; i < videoModelsInput.size(); i++){
+			String fullPath = String.valueOf(videoModelsInput.get(i).uri);
+			String[] getAlbumFromVideo = fullPath.split("/");
+			String newAlbum = getAlbumFromVideo[getAlbumFromVideo.length - 2];
+			if(!checkExistAlbum(ListNameAlbum, newAlbum)){
+				ListNameAlbum.add(newAlbum);
+				mapQuantityVideo.put(newAlbum, 1);
+				mapIdAlbum.put(newAlbum, videoModelsInput.get(i).id);
+			}
+			else{
+				int count = mapQuantityVideo.get(newAlbum);
+				mapQuantityVideo.put(newAlbum, ++count);
+			}
+			if(videoModelsInput.get(i).isFavorite){
+				sizeVideoFavorite++;
+				if(idAvatarFavorite == 0){
+					idAvatarFavorite = videoModelsInput.get(i).id;
+				}
+			}
+		}
 			int finalSizeFavorite = sizeAlbumFavorite;
-			int finalSizePrivate = sizeAlbumPrivate;
 			if(finalSizeFavorite > 0){
 				AlbumModel albumFavorite = new AlbumModel();
 				long finalIdAvatarFavorite = idAvatarFavorite;
+				int finalSizeVideoFavorite = sizeVideoFavorite;
 				albumFavorite = new AlbumModel() {
 					{
 						imageUrl = finalIdAvatarFavorite;
 						albumName = "Favourites";
-						quantity = finalSizeFavorite;
+						quantityPhoto = finalSizeFavorite;
+						quantityVideo = finalSizeVideoFavorite;
 					}
 				};
 				albumModels.add(albumFavorite);
@@ -344,7 +348,7 @@ public class MediaDataRepository {
 		//mark private
 
 		//next
-		for(int i = 0; i < mapNameAlbum.size(); i++){
+		for(int i = 0; i < mapQuantityPhoto.size(); i++){
 			String nameOfAlbum = ListNameAlbum.get(i);
 			if(nameOfAlbum.equals("app_PrivatePictures")){
 				nameOfAlbum = "Private";
@@ -354,8 +358,9 @@ public class MediaDataRepository {
 			AlbumModel albumModel = new AlbumModel() {
 				{
 					albumName = finalNameOfAlbum;
-					quantity = mapNameAlbum.get(ListNameAlbum.get(finalI));
+					quantityPhoto = mapQuantityPhoto.get(ListNameAlbum.get(finalI));
 					imageUrl = mapIdAlbum.get(ListNameAlbum.get(finalI));
+					quantityVideo = mapQuantityVideo.get(ListNameAlbum.get(finalI));
 				}
 			};
 			albumModels.add(albumModel);
@@ -380,15 +385,6 @@ public class MediaDataRepository {
 			};
 			exploreModels.add(exploreModel);
 		}
-
-//		exploreModels.add(exploreModel);
-//		exploreModels.add(exploreModel);
-//		exploreModels.add(exploreModel);
-//		exploreModels.add(exploreModel);
-//		exploreModels.add(exploreModel);
-//		exploreModels.add(exploreModel);
-//		exploreModels.add(exploreModel);
-		//recognizePerson();
 		return exploreModels;
 	}
 	public List<PyObject> recognizePerson(ArrayList<PhotoModel> photoModelsInput){
@@ -489,45 +485,7 @@ public class MediaDataRepository {
 		}
 
 		return dataFace;
-//		String sssss = dataFace.get(0).toString();
-//		String ssssss = dataFace.get(1).toString();
-//		for(int i = 0; i < dataFace.size(); i++){
-//			exploreModels.add()
-//		}
-//		System.out.println("abc");
-		//
-//		Bitmap bitmap = null;
-//		long idPerson = photoModels.get(1).id;
-//		Bitmap bitmap2 = null;
-//		long idPerson2 = photoModels.get(7).id;
-//		String uriPerson = ContentUris.withAppendedId(_uri, idPerson).toString();
-//		String uriPerson2 = ContentUris.withAppendedId(_uri, idPerson2).toString();
-//		try {
-//			bitmap = getBitmapFromUri(Uri.parse(uriPerson));
-//			bitmap2 = getBitmapFromUri(Uri.parse(uriPerson2));
-//		}
-//		catch (Exception e) {
-//		}
-//		String imageString = getStringImage(bitmap);
-//		String imageString2 = getStringImage(bitmap2);
-//
-//		PyObject obj2 = pyo.callAttr("main", imageString, imageString2);
-//		String str = obj2.toString();
-//		System.out.println("abc");
-
-//		byte data[] = android.util.Base64.decode(str, Base64.DEFAULT);
-//		Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
-//		return null;
-//		return dataRegonize;
 	}
-//	private Bitmap getBitmapFromUri(Uri uri) throws IOException {
-//		ParcelFileDescriptor parcelFileDescriptor =
-//				context.getContentResolver().openFileDescriptor(uri, "r");
-//		FileDescriptor fileDescriptor = parcelFileDescriptor.getFileDescriptor();
-//		Bitmap image = BitmapFactory.decodeFileDescriptor(fileDescriptor);
-//		parcelFileDescriptor.close();
-//		return image;
-//	}
 public static Bitmap getBitmapFormUri(Context ac, Uri uri) throws FileNotFoundException, IOException {
 	InputStream input = ac.getContentResolver().openInputStream(uri);
 	BitmapFactory.Options onlyBoundsOptions = new BitmapFactory.Options();

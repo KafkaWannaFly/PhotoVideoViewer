@@ -49,4 +49,6 @@
     <string name="detail_info">Detail Info</string>
     <string name="duration">Duration</string>
     <string name="copy_successfully">Copy successfully</string>
+    <string name="photo">Ảnh</string>
+    <string name="video">Video</string>
 </resources>

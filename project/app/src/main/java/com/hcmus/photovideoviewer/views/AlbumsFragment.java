@@ -29,14 +29,17 @@ import android.view.ViewGroup;
 import com.CodeBoy.MediaFacer.MediaFacer;
 import com.hcmus.photovideoviewer.adapters.AlbumAdapter;
 import com.hcmus.photovideoviewer.adapters.PhotosViewAdapter;
+import com.hcmus.photovideoviewer.adapters.VideoViewAdapter;
 import com.hcmus.photovideoviewer.models.AlbumModel;
 import com.hcmus.photovideoviewer.models.PhotoModel;
+import com.hcmus.photovideoviewer.models.VideoModel;
 import com.hcmus.photovideoviewer.services.MediaDataRepository;
 import com.hcmus.photovideoviewer.viewmodels.AlbumsViewModel;
 import com.hcmus.photovideoviewer.R;
 import com.hcmus.photovideoviewer.viewmodels.AppBarViewModel;
 import com.hcmus.photovideoviewer.viewmodels.PhotoViewViewModel;
 import com.hcmus.photovideoviewer.viewmodels.PhotosFragmentViewModel;
+import com.hcmus.photovideoviewer.viewmodels.VideosViewModel;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -58,7 +61,7 @@ public class AlbumsFragment extends Fragment {
 	public static AppBarViewModel appBarViewModel = null;
 	private ArrayList<AlbumModel> albumModels = new ArrayList<AlbumModel>();
 	private PhotosFragmentViewModel photosViewModel = null;
-
+	private VideosViewModel videosViewModel = null;
 	public AlbumsFragment(AppBarViewModel appBarViewModel){
 		this.appBarViewModel = appBarViewModel;
 
@@ -71,7 +74,7 @@ public class AlbumsFragment extends Fragment {
 		super.onCreate(savedInstanceState);
 		//albumsViewModel = new ViewModelProvider(this).get(AlbumsViewModel.class);
 		photosViewModel = new PhotosFragmentViewModel(MediaDataRepository.getInstance().getPhotoModels());
-
+		videosViewModel = new VideosViewModel(MediaDataRepository.getInstance().getVideoModels());
 //		albumModels = MediaDataRepository.getInstance().fetchAlbums(photoModels);
 	}
 
@@ -79,6 +82,7 @@ public class AlbumsFragment extends Fragment {
 	public void onStart() {
 		super.onStart();
 		photosViewModel.getLivePhotoModels().setValue(MediaDataRepository.getInstance().fetchPhotos());
+		videosViewModel.getLiveVideoModels().setValue(MediaDataRepository.getInstance().fetchVideos());
 //		albumModels = MediaDataRepository.getInstance().fetchAlbums(photoModels);
 //		CompletableFuture.supplyAsync(() -> {
 //			// ABC
@@ -113,16 +117,28 @@ public class AlbumsFragment extends Fragment {
 					.getSerializable("layoutManager");
 		}
 		try{
-			photosViewModel.getLivePhotoModels().observe(AlbumsFragment.this, new Observer<ArrayList<PhotoModel>>() {
-				@Override
-				public void onChanged(ArrayList<PhotoModel> photoModels) {
-					Log.d("ActivityLife", "AlbumsFragment data changed");
-					albumModels = MediaDataRepository.getInstance().fetchAlbums(photoModels);
+//			photosViewModel.getLivePhotoModels().observe(AlbumsFragment.this, new Observer<ArrayList<PhotoModel>>() {
+//				@Override
+//				public void onChanged(ArrayList<PhotoModel> photoModels) {
+//					Log.d("ActivityLife", "AlbumsFragment data changed");
+//					ArrayList<VideoModel> videoModels = new ArrayList<>();
+//					albumModels = MediaDataRepository.getInstance().fetchAlbums(photoModels, videoModels);
+//					albumAdapter = new AlbumAdapter(getContext(), albumModels);
+//					mRecyclerView.setAdapter(albumAdapter);
+//				}
+//			});
+			photosViewModel.getLivePhotoModels().observe(getViewLifecycleOwner(), photoModels -> {
+				videosViewModel.getLiveVideoModels().observe(getViewLifecycleOwner(), videoModels -> {
+					albumModels = MediaDataRepository.getInstance().fetchAlbums(photoModels, videoModels);
 					albumAdapter = new AlbumAdapter(getContext(), albumModels);
 					mRecyclerView.setAdapter(albumAdapter);
-				}
-			});
+				});
 
+			});
+//			videosViewModel.getLiveVideoModels().observe(getViewLifecycleOwner(), videoModels -> {
+//				videoViewAdapter = new VideoViewAdapter(recyclerView.getContext(), videoModels);
+//				recyclerView.setAdapter(videoViewAdapter);
+//			});
 			appBarViewModel.liveColumnSpan.observe(getViewLifecycleOwner(), columnSpan -> {
 				mLayoutManager = new GridLayoutManager(getActivity(), columnSpan);
 				mRecyclerView.setLayoutManager(mLayoutManager);

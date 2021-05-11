@@ -58,8 +58,8 @@ public class MainPagerAdapter extends FragmentStateAdapter {
 		}
 		else if (TAB_TITLES[position] == R.string.albums_tab) {
 //			fragment = AlbumsFragment.newInstance();
-//			fragment = new AlbumsFragment(appBarViewModel);
-			fragment = new PhotosFragment(appBarViewModel);
+			fragment = new AlbumsFragment(appBarViewModel);
+//			fragment = new PhotosFragment(appBarViewModel);
 		}
 		else if (TAB_TITLES[position] == R.string.explore_tab) {
 			fragment = new ExploreFragment(appBarViewModel);

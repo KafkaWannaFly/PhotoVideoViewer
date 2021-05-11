@@ -10,7 +10,8 @@ import java.util.ArrayList;
 public class AlbumModel {
     protected long imageUrl;
     protected String albumName;
-    protected int quantity;
+    protected int quantityPhoto;
+    protected int quantityVideo;
     @NotNull
     @Override
     public String toString()
@@ -18,13 +19,16 @@ public class AlbumModel {
         return "AlbumModel{" +
                 "albumName=" + albumName +
                 ", imageUrl='" + imageUrl + '\'' +
-                ", quantity='" + quantity + '\'' +
+                ", quantityPhoto='" + quantityPhoto + '\'' +
+                ", quantityVideo='" + quantityVideo + '\'' +
                '}';
     }
 
-    public int getQuantity() {
-        return quantity;
+    public int getQuantityPhoto() {
+        return quantityPhoto;
     }
+
+    public int getQuantityVideo() {return quantityVideo; }
 
     public String getAlbumName() {
         return albumName;
