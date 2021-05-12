@@ -44,6 +44,7 @@ public class ExploreFragment extends Fragment {
     ArrayList<ExploreModel> exploreModels = new ArrayList<ExploreModel>();
     protected AlbumsFragment.LayoutManagerType mCurrentLayoutManagerType;
     protected RecyclerView.LayoutManager mLayoutManager;
+    public ExploreFragment(){}
     public ExploreFragment(AppBarViewModel appBarViewModel){
         this.appBarViewModel = appBarViewModel;
     }

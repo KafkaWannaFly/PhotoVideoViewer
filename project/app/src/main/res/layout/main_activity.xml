@@ -22,7 +22,6 @@
                 app:title="Gallery"
                 app:menu="@menu/top_app_bar"
                 app:layout_scrollFlags="scroll|enterAlways|snap"
-
                 />
     </com.google.android.material.appbar.AppBarLayout>
 

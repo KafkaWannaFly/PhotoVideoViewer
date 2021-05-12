@@ -62,9 +62,9 @@ public class AlbumsFragment extends Fragment {
 	private ArrayList<AlbumModel> albumModels = new ArrayList<AlbumModel>();
 	private PhotosFragmentViewModel photosViewModel = null;
 	private VideosViewModel videosViewModel = null;
+	public AlbumsFragment(){}
 	public AlbumsFragment(AppBarViewModel appBarViewModel){
 		this.appBarViewModel = appBarViewModel;
-
 	}
 //	public static AlbumsFragment newInstance() {
 //		return new AlbumsFragment();
@@ -106,27 +106,12 @@ public class AlbumsFragment extends Fragment {
 	public void onActivityCreated(@Nullable Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 		//set live data
-//		appBarViewModel.liveColumnSpan.observe(getViewLifecycleOwner(), columnSpan -> {
-//			mLayoutManager = new GridLayoutManager(getActivity(), columnSpan);
-//			mRecyclerView.setLayoutManager(mLayoutManager);
-//		});
-
 		if (savedInstanceState != null) {
 			// Restore saved layout manager type.
 			mCurrentLayoutManagerType = (LayoutManagerType) savedInstanceState
 					.getSerializable("layoutManager");
 		}
 		try{
-//			photosViewModel.getLivePhotoModels().observe(AlbumsFragment.this, new Observer<ArrayList<PhotoModel>>() {
-//				@Override
-//				public void onChanged(ArrayList<PhotoModel> photoModels) {
-//					Log.d("ActivityLife", "AlbumsFragment data changed");
-//					ArrayList<VideoModel> videoModels = new ArrayList<>();
-//					albumModels = MediaDataRepository.getInstance().fetchAlbums(photoModels, videoModels);
-//					albumAdapter = new AlbumAdapter(getContext(), albumModels);
-//					mRecyclerView.setAdapter(albumAdapter);
-//				}
-//			});
 			photosViewModel.getLivePhotoModels().observe(getViewLifecycleOwner(), photoModels -> {
 				videosViewModel.getLiveVideoModels().observe(getViewLifecycleOwner(), videoModels -> {
 					albumModels = MediaDataRepository.getInstance().fetchAlbums(photoModels, videoModels);
@@ -135,14 +120,11 @@ public class AlbumsFragment extends Fragment {
 				});
 
 			});
-//			videosViewModel.getLiveVideoModels().observe(getViewLifecycleOwner(), videoModels -> {
-//				videoViewAdapter = new VideoViewAdapter(recyclerView.getContext(), videoModels);
-//				recyclerView.setAdapter(videoViewAdapter);
-//			});
 			appBarViewModel.liveColumnSpan.observe(getViewLifecycleOwner(), columnSpan -> {
 				mLayoutManager = new GridLayoutManager(getActivity(), columnSpan);
 				mRecyclerView.setLayoutManager(mLayoutManager);
 			});
+
 		} catch (Exception exception) {
 			Log.e("PhotosFragmentException", exception.getMessage());
 		}

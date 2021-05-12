@@ -16,7 +16,9 @@ import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.hcmus.photovideoviewer.R;
 import com.hcmus.photovideoviewer.adapters.PhotosViewAdapter;
+import com.hcmus.photovideoviewer.constants.PhotoPreferences;
 import com.hcmus.photovideoviewer.models.PhotoModel;
+import com.hcmus.photovideoviewer.services.MediaDataRepository;
 import com.hcmus.photovideoviewer.viewmodels.AppBarViewModel;
 import com.hcmus.photovideoviewer.viewmodels.PhotosFragmentViewModel;
 
@@ -99,6 +101,14 @@ AlbumsViewActivity extends AppCompatActivity{
 
                 appBarViewModel.liveSortOrder.setValue(currentOrder);
                 return true;
+            }
+            else if (item.getItemId() == R.id.slideShowButton) {
+                Intent intentSlide = new Intent(this, SlideShowActivity.class);
+                intentSlide.putExtra(PhotoPreferences.PARCEL_PHOTOS, MediaDataRepository.getInstance().fetchPhotos());
+                startActivity(intentSlide);
+            }else if(item.getItemId() == R.id.settingButton){
+                Intent intentSetting = new Intent(this, SettingActivity.class);
+                startActivity(intentSetting);
             }
             return false;
         });

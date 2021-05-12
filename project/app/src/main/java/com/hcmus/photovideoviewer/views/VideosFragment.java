@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.hcmus.photovideoviewer.MainActivity;
 import com.hcmus.photovideoviewer.R;
 import com.hcmus.photovideoviewer.adapters.VideoViewAdapter;
 import com.hcmus.photovideoviewer.services.MediaDataRepository;
@@ -23,7 +24,7 @@ public class VideosFragment extends Fragment {
 	private RecyclerView recyclerView = null;
 	private RecyclerView.LayoutManager layoutManager = null;
 	private VideoViewAdapter videoViewAdapter = null;
-	private AppBarViewModel appBarViewModel = null;
+	private AppBarViewModel appBarViewModel = MainActivity.appBarViewModel;
 
 	public VideosFragment() {
 

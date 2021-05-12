@@ -1,5 +1,6 @@
 package com.hcmus.photovideoviewer.views;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -13,6 +14,7 @@ import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.hcmus.photovideoviewer.MainActivity;
 import com.hcmus.photovideoviewer.R;
 import com.hcmus.photovideoviewer.adapters.PhotosViewAdapter;
 import com.hcmus.photovideoviewer.models.PhotoModel;
@@ -31,7 +33,7 @@ public class PhotosFragment extends Fragment {
 	private PhotosFragmentViewModel photosViewModel = null;
 	private PhotosViewAdapter photosViewAdapter = null;
 
-	private AppBarViewModel appBarViewModel = null;
+	private AppBarViewModel appBarViewModel = MainActivity.appBarViewModel;
 
 	private Function<PhotoModel, Boolean> filterFunc;
 
@@ -80,7 +82,8 @@ public class PhotosFragment extends Fragment {
 		super.onActivityCreated(savedInstanceState);
 
 		try {
-			photosViewModel.getLivePhotoModels().observe(PhotosFragment.this, new Observer<ArrayList<PhotoModel>>() {
+			photosViewModel.getLivePhotoModels().observe(getViewLifecycleOwner(), new Observer<ArrayList<PhotoModel>>() {
+				@SuppressLint("FragmentLiveDataObserve")
 				@Override
 				public void onChanged(ArrayList<PhotoModel> photoModels) {
 					Log.d("ActivityLife", "PhotoFragment data changed");
@@ -88,7 +91,7 @@ public class PhotosFragment extends Fragment {
 					if (filterFunc != null) {
 						photoModels.removeIf(photoModel -> filterFunc.apply(photoModel));
 					}
-					appBarViewModel.liveSortOrder.observe(PhotosFragment.this, order -> {
+					appBarViewModel.liveSortOrder.observe(getViewLifecycleOwner(), order -> {
 						if (order == 0) {
 							photoModels.sort((o1, o2) -> o2.dateModified.compareTo(o1.dateModified));
 						}

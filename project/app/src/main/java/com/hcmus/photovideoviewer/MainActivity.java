@@ -4,7 +4,10 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
@@ -17,8 +20,11 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.preference.Preference;
+import androidx.preference.PreferenceManager;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
@@ -44,17 +50,33 @@ public class MainActivity extends AppCompatActivity
 
 	public static final int EXTERNAL_PERMISSION_CODE = 1;
 	public static final int CAMERA_PERMISSION_CODE = 2;
-	private final AppBarViewModel appBarViewModel = new AppBarViewModel();
+	public static final AppBarViewModel appBarViewModel = new AppBarViewModel();
 	public MediaDataRepository mediaDataRepository = MediaDataRepository.getInstance();
 	private ViewPager2 pager = null;
 	private BottomNavigationView bottomNavigationView = null;
 	private FragmentStateAdapter fragmentStateAdapter = null;
-
 	@RequiresApi(api = Build.VERSION_CODES.R)
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		boolean switchPref = prefs.getBoolean("setTheme", false);
+		if(switchPref){
+			AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+		}else{
+			AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+		}
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main_activity);
+//
+//		boolean switchPref = prefs.getBoolean("setTheme", false);
+//		if(switchPref){
+//			AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+//		}
+//		else{
+//			AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+//		}
+		//set Theme
+		//AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
 
 		// Permissions
 		checkManageExternalStoragePermission();
@@ -68,6 +90,7 @@ public class MainActivity extends AppCompatActivity
 
 		bottomNavigationView = findViewById(R.id.bottomNavigationView);
 		bottomNavigationView.setOnNavigationItemSelectedListener(this);
+
 		pager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
 			@Override
 			public void onPageSelected(int position) {
