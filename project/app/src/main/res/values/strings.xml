@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">PhotoVideoViewer</string>
-
     <string name="photos_tab">Photos</string>
     <string name="videos_tab">Videos</string>
     <string name="albums_tab">Albums</string>
@@ -14,6 +13,7 @@
     <string name="more">More</string>
     <string name="slide_show">Slide Show</string>
     <string name="setting">Setting</string>
+    <string name="galley">Galley</string>
     <string name="title_activity_photo_view">FullscreenActivity</string>
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
@@ -34,9 +34,6 @@
     <string name="lorem">Lorem ipsum dolor sit amet, consectetur adipisicing elit.</string>
     <string name="location">Location:</string>
     <string name="unknown">Unknown</string>
-    <string name="people">Mọi người</string>
-    <string name="Location">Địa điểm</string>
-    <string name="peoples">Mọi người</string>
     <string name="todo">TODO</string>
     <string name="set_private_to_public">Bring this image back to public?</string>
     <string name="set_public_to_private">Are you sure to move this image to secret place?</string>
@@ -49,6 +46,14 @@
     <string name="detail_info">Detail Info</string>
     <string name="duration">Duration</string>
     <string name="copy_successfully">Copy successfully</string>
-    <string name="photo">Ảnh</string>
+    <string name="photo">Photo</string>
     <string name="video">Video</string>
+    <string name="people">People</string>
+    <string name="switch_theme">Switch theme</string>
+    <string name="switch_language">Switch language</string>
+    <string name="change_password">Change password</string>
+    <string name="summary_theme">Off is Light mode, and On is Dark mode</string>
+    <string name="summary_language">Off is Vietnamese, and On is English</string>
+    <string name="summary_change_password">Click to show a change password dialog</string>
+    <string name="title_dialog_change_pass">Change Password Of Private Album</string>
 </resources>

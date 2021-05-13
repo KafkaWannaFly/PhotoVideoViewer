@@ -3,18 +3,18 @@
     <PreferenceCategory android:title="General">
     <SwitchPreferenceCompat
         android:key="setTheme"
-        android:title="Switch Theme"
-        android:summary="Click to switch on or off"
+        android:title="@string/switch_theme"
+        android:summary="@string/summary_theme"
         android:defaultValue="true"/>
     <SwitchPreferenceCompat
         android:key="setLanguage"
-        android:title="Switch Language"
-        android:summary="Click to switch on or off"
+        android:title="@string/switch_language"
+        android:summary="@string/summary_language"
         android:defaultValue="true"/>
     <EditTextPreference
-        android:dialogTitle="Change Password Of Private Album"
+        android:dialogTitle="@string/title_dialog_change_pass"
         android:key="changePassword"
-        android:summary="Click to show a change password dialog"
-        android:title="Change Password" />
+        android:summary="@string/summary_change_password"
+        android:title="@string/change_password"/>
     </PreferenceCategory>
 </PreferenceScreen>

@@ -3,6 +3,7 @@ package com.hcmus.photovideoviewer;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -38,6 +39,7 @@ import android.view.View;
 import com.hcmus.photovideoviewer.adapters.MainPagerAdapter;
 import com.hcmus.photovideoviewer.adapters.SlideShowAdapter;
 import com.hcmus.photovideoviewer.constants.PhotoPreferences;
+import com.hcmus.photovideoviewer.services.LocaleHelper;
 import com.hcmus.photovideoviewer.services.MediaDataRepository;
 import com.hcmus.photovideoviewer.viewmodels.AppBarViewModel;
 import com.hcmus.photovideoviewer.views.SettingActivity;
@@ -55,10 +57,12 @@ public class MainActivity extends AppCompatActivity
 	private ViewPager2 pager = null;
 	private BottomNavigationView bottomNavigationView = null;
 	private FragmentStateAdapter fragmentStateAdapter = null;
+
 	@RequiresApi(api = Build.VERSION_CODES.R)
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		//LocaleHelper.setLocale(this, "vn");
 		boolean switchPref = prefs.getBoolean("setTheme", false);
 		if(switchPref){
 			AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);

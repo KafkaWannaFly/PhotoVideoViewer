@@ -18,7 +18,7 @@
             android:id="@+id/topToolBarVideoAlbum"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:title="Gallery"
+            app:title="@string/galley"
             app:menu="@menu/top_app_bar"
             app:layout_scrollFlags="scroll|enterAlways|snap"
             />

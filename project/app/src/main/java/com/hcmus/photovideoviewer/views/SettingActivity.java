@@ -2,6 +2,7 @@ package com.hcmus.photovideoviewer.views;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -18,7 +19,9 @@ import androidx.preference.SwitchPreferenceCompat;
 
 import com.hcmus.photovideoviewer.MainActivity;
 import com.hcmus.photovideoviewer.R;
+import com.hcmus.photovideoviewer.services.LocaleHelper;
 
+import java.util.Locale;
 import java.util.Objects;
 
 
@@ -26,7 +29,9 @@ public class SettingActivity extends AppCompatActivity {
     SettingFragment fragment = null;
     boolean switchPref = true;
     private int mThemeId = 0;
-    static SharedPreferences prefs = null;
+    static SharedPreferences prefsSetTheme = null;
+    static SharedPreferences prefsSetLanguage = null;
+    static SharedPreferences prefsSetPass = null;
     public SettingActivity(){}
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +59,9 @@ public class SettingActivity extends AppCompatActivity {
             // below line is to inflate our fragment.
             fragment = new SettingFragment();
             getSupportFragmentManager().beginTransaction().replace(R.id.idFrameLayout, fragment).commit();
-            prefs = PreferenceManager.getDefaultSharedPreferences(this);
+            prefsSetTheme = PreferenceManager.getDefaultSharedPreferences(this);
+            prefsSetLanguage = PreferenceManager.getDefaultSharedPreferences(this);
+            prefsSetPass = PreferenceManager.getDefaultSharedPreferences(this);
         }
     }
     @Override
@@ -64,7 +71,8 @@ public class SettingActivity extends AppCompatActivity {
         mThemeId = resid;
     }
     public static class SettingFragment extends PreferenceFragmentCompat {
-        public SettingFragment(){}
+        public SettingFragment(){
+        }
         @Override
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             setPreferencesFromResource(R.xml.main_preference_screen, rootKey);
@@ -73,12 +81,14 @@ public class SettingActivity extends AppCompatActivity {
         public void onCreate(@Nullable Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
 
-            Preference preference = (Preference) findPreference("setTheme");
-            assert preference != null;
-            preference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            Preference prefSetTheme = (Preference) findPreference("setTheme");
+            Preference prefSetLanguage = (Preference) findPreference("setLanguage");
+            Preference prefChangePass = (Preference) findPreference("changePassword");
+            assert prefSetTheme != null;
+            prefSetTheme.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 @Override
                 public boolean onPreferenceClick(Preference preference) {
-                    boolean switchPref = prefs.getBoolean("setTheme", false);
+                    boolean switchPref = prefsSetTheme.getBoolean("setTheme", false);
                     if(switchPref){
                         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
                         requireActivity().recreate();
@@ -87,6 +97,27 @@ public class SettingActivity extends AppCompatActivity {
                         requireActivity().recreate();
                     }
                     Log.d("TAG", "onCreatePreferences: " + switchPref);
+                    return false;
+                }
+            });
+            prefSetLanguage.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    boolean switchPref = prefsSetLanguage.getBoolean("setLanguage", false);
+                    Context context = (SettingActivity)getContext();
+                    if(switchPref){
+                        LocaleHelper.setLocale(context, "vi");
+                        getActivity().recreate();
+//                        Locale locale = new Locale("vi_VN");
+//                        Locale.setDefault(locale);
+//                        Configuration config = new Configuration();
+//                        config.locale = locale;
+//                        context.getResources().updateConfiguration(config,context.getResources().getDisplayMetrics());
+//                        getActivity().recreate();
+                    }else{
+                        LocaleHelper.setLocale(context, "");
+                        getActivity().recreate();
+                    }
                     return false;
                 }
             });
