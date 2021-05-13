@@ -56,4 +56,7 @@
     <string name="summary_language">Off is Vietnamese, and On is English</string>
     <string name="summary_change_password">Click to show a change password dialog</string>
     <string name="title_dialog_change_pass">Change Password Of Private Album</string>
+    <string name="textButtonChangePass">Private Album</string>
+    <string name="oldpass">Old password</string>
+    <string name="newpass">New password</string>
 </resources>

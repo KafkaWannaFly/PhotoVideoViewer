@@ -56,4 +56,7 @@
     <string name="summary_language">Tắt là tiếng Việt, và bật là tiếng Anh</string>
     <string name="summary_change_password">Nhấn để mở hộp thoại đổi mật khẩu</string>
     <string name="title_dialog_change_pass">Đổi mật khẩu thư mục riêng tư</string>
+    <string name="textButtonChangePass">Riêng tư</string>
+    <string name="oldpass">Mật khẩu cũ</string>
+    <string name="newpass">Mật khẩu mới</string>
 </resources>

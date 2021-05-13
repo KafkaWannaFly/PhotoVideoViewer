@@ -64,10 +64,17 @@ public class MainActivity extends AppCompatActivity
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		//LocaleHelper.setLocale(this, "vn");
 		boolean switchPref = prefs.getBoolean("setTheme", false);
+		boolean switchLanguage = prefs.getBoolean("setLanguage", false);
 		if(switchPref){
 			AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
 		}else{
 			AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+		}
+		if(!switchLanguage){
+			LocaleHelper.setLocale(this, "vi");
+		}
+		else{
+			LocaleHelper.setLocale(this, "");
 		}
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main_activity);

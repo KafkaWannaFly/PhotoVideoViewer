@@ -185,6 +185,19 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ViewHolder> 
                 videoModels = new ArrayList<>();
                 ArrayList<PhotoModel> dataPhotos = MediaDataRepository.getInstance().getPhotoModels();
                 ArrayList<VideoModel> dataVideos = MediaDataRepository.getInstance().getVideoModels();
+                boolean checkExistPrivate = false;
+                for(int i = 0; i < albumData.size(); i++){
+                    if(albumData.get(i).getAlbumName().equals("Private")){
+                        checkExistPrivate = true;
+                        break;
+                    }
+                }
+                if(checkExistPrivate == false){
+                    SharedPreferences sharePassPrivate = this.context.getSharedPreferences("PasswordPrivate", Context.MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharePassPrivate.edit();
+                    editor.clear();
+                    editor.apply();
+                }
                 if(albumData.get(position).getAlbumName().equals("Favourites")){
                     ArrayList<PhotoModel> dataPhotoFavourite = new ArrayList<PhotoModel>();
                     for(int i = 0; i < dataPhotos.size(); i++){

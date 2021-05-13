@@ -1,20 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory android:title="General">
-    <SwitchPreferenceCompat
-        android:key="setTheme"
-        android:title="@string/switch_theme"
-        android:summary="@string/summary_theme"
-        android:defaultValue="true"/>
-    <SwitchPreferenceCompat
-        android:key="setLanguage"
-        android:title="@string/switch_language"
-        android:summary="@string/summary_language"
-        android:defaultValue="true"/>
-    <EditTextPreference
-        android:dialogTitle="@string/title_dialog_change_pass"
-        android:key="changePassword"
-        android:summary="@string/summary_change_password"
-        android:title="@string/change_password"/>
+        <SwitchPreferenceCompat
+            android:key="setTheme"
+            android:title="@string/switch_theme"
+            android:summary="@string/summary_theme"
+            android:defaultValue="true"/>
+        <SwitchPreferenceCompat
+            android:key="setLanguage"
+            android:title="@string/switch_language"
+            android:summary="@string/summary_language"
+            android:defaultValue="true"/>
+        <com.hcmus.photovideoviewer.services.PreferenceTheme
+            android:key="pref_theme"
+            android:defaultValue="light" />
     </PreferenceCategory>
 </PreferenceScreen>

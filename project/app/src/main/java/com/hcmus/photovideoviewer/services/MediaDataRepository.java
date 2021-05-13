@@ -342,7 +342,6 @@ public class MediaDataRepository {
 				}
 			}
 		//video
-		String debugg = "";
 		for(int i = 0; i < videoModelsInput.size(); i++){
 			String fullPath = String.valueOf(videoModelsInput.get(i).uri);
 			String[] getAlbumFromVideo = fullPath.split("/");

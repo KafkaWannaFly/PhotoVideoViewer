@@ -1,17 +1,22 @@
 package com.hcmus.photovideoviewer.views;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.Log;
+import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StyleRes;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
+import androidx.preference.EditTextPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
@@ -22,6 +27,7 @@ import com.hcmus.photovideoviewer.R;
 import com.hcmus.photovideoviewer.services.LocaleHelper;
 
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 
 
@@ -83,7 +89,8 @@ public class SettingActivity extends AppCompatActivity {
 
             Preference prefSetTheme = (Preference) findPreference("setTheme");
             Preference prefSetLanguage = (Preference) findPreference("setLanguage");
-            Preference prefChangePass = (Preference) findPreference("changePassword");
+//            Preference prefChangePass = (Preference) findPreference("changePassword");
+
             assert prefSetTheme != null;
             prefSetTheme.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 @Override
@@ -105,7 +112,7 @@ public class SettingActivity extends AppCompatActivity {
                 public boolean onPreferenceClick(Preference preference) {
                     boolean switchPref = prefsSetLanguage.getBoolean("setLanguage", false);
                     Context context = (SettingActivity)getContext();
-                    if(switchPref){
+                    if(!switchPref){
                         LocaleHelper.setLocale(context, "vi");
                         getActivity().recreate();
 //                        Locale locale = new Locale("vi_VN");
@@ -121,6 +128,12 @@ public class SettingActivity extends AppCompatActivity {
                     return false;
                 }
             });
+//            ((EditTextPreference)prefChangePass).setOnBindEditTextListener(new EditTextPreference.OnBindEditTextListener() {
+//                @Override
+//                public void onBindEditText(@NonNull EditText editText) {
+//                    editText.setInputType(InputType.TYPE_CLASS_NUMBER);
+//                }
+//            });
         }
     }
 }

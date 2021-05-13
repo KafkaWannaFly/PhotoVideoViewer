@@ -4,4 +4,6 @@
     <color name="tilteAlbum">#FFFFFFFF</color>
     <color name="lineExplore">#FFFFFFFF</color>
     <color name="backgroundAlbumColor">#FF000000</color>
+    <color name="buttonChangePass">#FF000000</color>
+    <color name="bgbuttonChangePass">#FFFFFFFF</color>
 </resources>
