@@ -1,20 +1,33 @@
 package com.hcmus.photovideoviewer.views;
 
+import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.hcmus.photovideoviewer.R;
 import com.hcmus.photovideoviewer.constants.PhotoPreferences;
 import com.hcmus.photovideoviewer.models.PhotoModel;
+import com.hcmus.photovideoviewer.services.MediaFileServices;
 import com.hcmus.photovideoviewer.viewmodels.PhotoEditViewModel;
+
+import org.jetbrains.annotations.NotNull;
+
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.util.Date;
 
 import ja.burhanrashid52.photoeditor.PhotoEditor;
 import ja.burhanrashid52.photoeditor.PhotoEditorView;
@@ -32,6 +45,7 @@ public class PhotoEditActivity extends AppCompatActivity {
 
 	PhotoEditViewModel photoEditViewModel = new PhotoEditViewModel();
 
+	@RequiresApi(api = Build.VERSION_CODES.O)
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -54,6 +68,9 @@ public class PhotoEditActivity extends AppCompatActivity {
 		this.setBrushColorListener(colorContainerLayout);
 		undoText.setOnClickListener(this.undoTextListener());
 		redoText.setOnClickListener(this.redoTextListener());
+		eraserText.setOnClickListener(this.eraserTextListener());
+
+		saveText.setOnClickListener(this.saveTextListener());
 
 		try {
 			Intent intent = getIntent();
@@ -89,6 +106,45 @@ public class PhotoEditActivity extends AppCompatActivity {
 		} catch (Exception exception) {
 			exception.printStackTrace();
 		}
+	}
+
+	private View.OnClickListener eraserTextListener() {
+		return v -> {
+			photoEditor.brushEraser();
+
+			photoEditViewModel.getMutableLiveStatus().setValue(getString(R.string.eraser));
+		};
+	}
+
+	@RequiresApi(api = Build.VERSION_CODES.O)
+	@SuppressLint("MissingPermission")
+	private View.OnClickListener saveTextListener() {
+		return v -> {
+			new AlertDialog.Builder(this)
+					.setMessage(R.string.save_edited_photo)
+					.setPositiveButton(R.string.yes_im_sure, (dialog, which) -> {
+						String newName = photoModel.uri.replace(photoModel.displayName,
+								new Date().getTime() + photoModel.displayName);
+						photoEditor.saveAsFile(newName,
+								new PhotoEditor.OnSaveListener() {
+
+									@Override
+									public void onSuccess(@NonNull @NotNull String s) {
+										Log.d("PhotoEdit", "Save edited photo at: " + s);
+										MediaFileServices.refreshMediaStore(PhotoEditActivity.this);
+										PhotoEditActivity.this.finish();
+									}
+
+									@Override
+									public void onFailure(@NonNull @NotNull Exception e) {
+										e.printStackTrace();
+									}
+								});
+					})
+					.setNegativeButton(R.string.cancel, null)
+					.show();
+
+		};
 	}
 
 	private View.OnClickListener redoTextListener() {
