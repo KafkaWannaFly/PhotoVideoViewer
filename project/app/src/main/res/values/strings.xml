@@ -64,4 +64,6 @@
     <string name="emoji">Emoji</string>
     <string name="text">Text</string>
     <string name="save_edited_photo">Save edited photo?</string>
+    <string name="general">General</string>
+    <string name="settings">Settings</string>
 </resources>

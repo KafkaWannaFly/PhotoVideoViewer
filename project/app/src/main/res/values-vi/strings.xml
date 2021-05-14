@@ -59,6 +59,12 @@
     <string name="textButtonChangePass">Riêng tư</string>
     <string name="oldpass">Mật khẩu cũ</string>
     <string name="newpass">Mật khẩu mới</string>
-    <string name="brush">Brush</string>
-    <string name="eraser">Eraser</string>
+    <string name="brush">Vẽ</string>
+    <string name="eraser">Tẩy</string>
+    <string name="emoji">Biểu tượng</string>
+    <string name="text">Văn bản</string>
+    <string name="save_edited_photo">Lưu ảnh đã chỉnh sửa?</string>
+    <string name="general">Chung</string>
+    <string name="settings">Cài Đặt</string>
+
 </resources>
