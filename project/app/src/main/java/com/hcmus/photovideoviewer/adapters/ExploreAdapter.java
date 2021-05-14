@@ -127,8 +127,9 @@ public class ExploreAdapter extends RecyclerView.Adapter<ExploreAdapter.ViewHold
                     String uriPerson = ContentUris.withAppendedId(_uri, idPerson).toString();
                     try {
                         bitmap = MediaDataRepository.getBitmapFormUri(context,Uri.parse(uriPerson));
+
                     }
-                    catch (Exception e) {
+                    catch (Exception ignored) {
                     }
                     String imageString = getStringImage(bitmap);
                     PyObject obj2 = pyo.callAttr("main",faceBitmaptoString, imageString);

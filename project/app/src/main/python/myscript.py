@@ -4,8 +4,10 @@ from PIL import Image
 import base64
 import io
 import face_recognition
-#f = open("input.txt", "r")
-#data1 = f.read()
+# f = open("input.txt", "r")
+# data2 = f.read()
+# f = open("input1.txt", "r")
+# data1 = f.read()
 #allFace = set()
 allFace = []
 
@@ -93,4 +95,5 @@ def reset_data():
 #     	return ""+str(img_str, 'utf-8')
 #     return ""
 #main_test(data1)
-reset_data()
+# reset_data()
+# main(data1, data2)
