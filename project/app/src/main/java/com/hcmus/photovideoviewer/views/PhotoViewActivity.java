@@ -26,6 +26,7 @@ import androidx.documentfile.provider.DocumentFile;
 import com.bumptech.glide.Glide;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.hcmus.photovideoviewer.R;
+import com.hcmus.photovideoviewer.constants.PhotoPreferences;
 import com.hcmus.photovideoviewer.models.PhotoModel;
 import com.hcmus.photovideoviewer.services.MediaDataRepository;
 import com.hcmus.photovideoviewer.services.MediaFileServices;
@@ -174,6 +175,16 @@ public class PhotoViewActivity extends AppCompatActivity {
 			exception.printStackTrace();
 		}
 	};
+	private final View.OnClickListener editTextClickListener = v -> {
+		try {
+			Intent intent = new Intent(this, PhotoEditActivity.class);
+			intent.putExtra(PhotoPreferences.PHOTO_MODEL, photoModel);
+
+			startActivity(intent);
+		} catch (Exception exception) {
+			exception.printStackTrace();
+		}
+	};
 
 	ImageView myPhotoImageView = null;
 	TextView photoNameText, sizeText, timeText, locationText, dimensionText, pathText,
@@ -219,12 +230,13 @@ public class PhotoViewActivity extends AppCompatActivity {
 		setBackgroundText.setOnClickListener(this.setBackgroundTextClickListener);
 		copyText.setOnClickListener(this.copyTextClickListener);
 		setLocationText.setOnClickListener(this.setLocationTextClickListener);
+		editText.setOnClickListener(this.editTextClickListener);
 
 		// Get data pass from PhotosFragment
 		Intent intent = getIntent();
 //		photoModels = intent.getParcelableArrayListExtra("photoModels");
 //		currentPosition = intent.getIntExtra("currentPosition", 0);
-		photoModel = intent.getParcelableExtra("photoModel");
+		photoModel = intent.getParcelableExtra(PhotoPreferences.PHOTO_MODEL);
 
 		if (photoModel == null) {
 			// Call from other apps

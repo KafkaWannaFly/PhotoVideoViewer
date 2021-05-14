@@ -8,12 +8,15 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.hcmus.photovideoviewer.R;
+import com.hcmus.photovideoviewer.constants.PhotoPreferences;
 import com.hcmus.photovideoviewer.models.PhotoModel;
 import com.hcmus.photovideoviewer.views.PhotoViewActivity;
+import com.hcmus.photovideoviewer.views.PhotosFragment;
 
 import java.util.ArrayList;
 
@@ -42,15 +45,13 @@ public class PhotosViewAdapter extends RecyclerView.Adapter<PhotosViewAdapter.Vi
 			Intent viewPhotoIntent = new Intent(context, PhotoViewActivity.class);
 //			viewPhotoIntent.putParcelableArrayListExtra("photoModels", photoModels);
 //			viewPhotoIntent.putExtra("currentPosition", position);
-			viewPhotoIntent.putExtra("photoModel", photoModels.get(position));
+			viewPhotoIntent.putExtra(PhotoPreferences.PHOTO_MODEL, photoModels.get(position));
 			context.startActivity(viewPhotoIntent);
 		});
 
 		PhotoModel photoModel = photoModels.get(position);
 		Glide.with(context)
-				.load(photoModel.isSecret?
-						      R.drawable.ic_baseline_lock_24 :
-						      photoModel.uri)
+				.load(photoModel.uri)
 				.placeholder(R.drawable.pussy_cat)
 				.into(imageView);
 	}
@@ -62,14 +63,25 @@ public class PhotosViewAdapter extends RecyclerView.Adapter<PhotosViewAdapter.Vi
 
 	public static class ViewHolder extends RecyclerView.ViewHolder {
 		private final ImageView imageView;
+		private final ViewGroup container;
 
 		public ViewHolder(@NonNull View itemView) {
 			super(itemView);
 			imageView = itemView.findViewById(R.id.imageView);
+			container = itemView.findViewById(R.id.photoRecycleItemLayout);
 		}
 
 		public ImageView getImageView() {
 			return imageView;
+		}
+
+		public void hideItem() {
+			itemView.setVisibility(View.GONE);
+			container.setVisibility(View.GONE);
+			itemView.setVisibility(View.GONE);
+
+			imageView.setMaxHeight(0);
+			imageView.setMaxWidth(0);
 		}
 	}
 }

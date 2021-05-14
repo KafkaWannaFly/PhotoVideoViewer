@@ -41,10 +41,6 @@ public class PhotosFragment extends Fragment {
 
 	}
 
-//	public PhotosFragment(MutableLiveData<Integer> liveColumnSpan) {
-//		this.liveColumnSpan = liveColumnSpan;
-//	}
-
 	public PhotosFragment(AppBarViewModel appBarViewModel) {
 		this.appBarViewModel = appBarViewModel;
 	}
@@ -63,6 +59,9 @@ public class PhotosFragment extends Fragment {
 		super.onStart();
 
 		photosViewModel.getLivePhotoModels().setValue(MediaDataRepository.getInstance().fetchPhotos());
+		this.filterFunc = (photoModel) -> {
+			return photoModel.isSecret;
+		};
 
 //		appBarViewModel.liveSortOrder.setValue(appBarViewModel.liveSortOrder.getValue());
 		Log.d("ActivityLife", "PhotoFragment start");
@@ -82,32 +81,28 @@ public class PhotosFragment extends Fragment {
 		super.onActivityCreated(savedInstanceState);
 
 		try {
-			photosViewModel.getLivePhotoModels().observe(getViewLifecycleOwner(), new Observer<ArrayList<PhotoModel>>() {
-				@SuppressLint("FragmentLiveDataObserve")
-				@Override
-				public void onChanged(ArrayList<PhotoModel> photoModels) {
-					Log.d("ActivityLife", "PhotoFragment data changed");
+			photosViewModel.getLivePhotoModels().observe(getViewLifecycleOwner(), photoModels -> {
+				Log.d("ActivityLife", "PhotoFragment data changed");
 
-					if (filterFunc != null) {
-						photoModels.removeIf(photoModel -> filterFunc.apply(photoModel));
-					}
-					appBarViewModel.liveSortOrder.observe(getViewLifecycleOwner(), order -> {
-						if (order == 0) {
-							photoModels.sort((o1, o2) -> o2.dateModified.compareTo(o1.dateModified));
-						}
-						else if (order == 1) {
-							photoModels.sort((o1, o2) -> o1.dateModified.compareTo(o2.dateModified));
-						}
-
-						if (photosViewAdapter != null) {
-							photosViewAdapter.notifyDataSetChanged();
-						}
-					});
-
-					photosViewAdapter = new PhotosViewAdapter(recyclerView.getContext(), photoModels);
-
-					recyclerView.setAdapter(photosViewAdapter);
+				if (filterFunc != null) {
+					photoModels.removeIf(photoModel -> filterFunc.apply(photoModel));
 				}
+				appBarViewModel.liveSortOrder.observe(PhotosFragment.this.getViewLifecycleOwner(), order -> {
+					if (order == 0) {
+						photoModels.sort((o1, o2) -> o2.dateModified.compareTo(o1.dateModified));
+					}
+					else if (order == 1) {
+						photoModels.sort((o1, o2) -> o1.dateModified.compareTo(o2.dateModified));
+					}
+
+					if (photosViewAdapter != null) {
+						photosViewAdapter.notifyDataSetChanged();
+					}
+				});
+
+				photosViewAdapter = new PhotosViewAdapter(recyclerView.getContext(), photoModels);
+
+				recyclerView.setAdapter(photosViewAdapter);
 			});
 
 			appBarViewModel.liveColumnSpan.observe(getViewLifecycleOwner(), columnSpan -> {
