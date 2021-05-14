@@ -6,11 +6,18 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".views.PhotoEditActivity">
+
     <ja.burhanrashid52.photoeditor.PhotoEditorView
             android:id="@+id/photoEditorView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:photo_src="@drawable/pussy_cat"
+            />
+
+    <include layout="@layout/edit_tools_layout"
+            android:layout_gravity="bottom"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
             />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

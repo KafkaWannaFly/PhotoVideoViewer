@@ -59,4 +59,6 @@
     <string name="textButtonChangePass">Riêng tư</string>
     <string name="oldpass">Mật khẩu cũ</string>
     <string name="newpass">Mật khẩu mới</string>
+    <string name="brush">Brush</string>
+    <string name="eraser">Eraser</string>
 </resources>

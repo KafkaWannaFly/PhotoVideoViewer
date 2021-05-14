@@ -59,4 +59,8 @@
     <string name="textButtonChangePass">Private Album</string>
     <string name="oldpass">Old password</string>
     <string name="newpass">New password</string>
+    <string name="brush">Brush</string>
+    <string name="eraser">Eraser</string>
+    <string name="emoji">Emoji</string>
+    <string name="text">Text</string>
 </resources>
