@@ -3,7 +3,6 @@ package com.hcmus.photovideoviewer.views;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.VideoView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,12 +11,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.appbar.MaterialToolbar;
 import com.hcmus.photovideoviewer.R;
-import com.hcmus.photovideoviewer.adapters.PhotosViewAdapter;
 import com.hcmus.photovideoviewer.adapters.VideoViewAdapter;
+import com.hcmus.photovideoviewer.constants.PhotoPreferences;
 import com.hcmus.photovideoviewer.models.PhotoModel;
 import com.hcmus.photovideoviewer.models.VideoModel;
+import com.hcmus.photovideoviewer.services.MediaDataRepository;
 import com.hcmus.photovideoviewer.viewmodels.AppBarViewModel;
-import com.hcmus.photovideoviewer.viewmodels.PhotosFragmentViewModel;
 import com.hcmus.photovideoviewer.viewmodels.VideosViewModel;
 
 import java.util.ArrayList;
@@ -30,8 +29,25 @@ public class AlbumsVideoViewActivity extends AppCompatActivity {
     private VideosViewModel videosViewModel = null;
     private VideoViewAdapter videoViewAdapter = null;
     private RecyclerView.LayoutManager layoutManager = null;
+    private Function<VideoModel, Boolean> filterFunc;
 
     private Integer currentCol = 1;
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Intent intent = getIntent();
+        albumName = intent.getStringExtra("albumName");
+        if(albumName != null)
+        {
+            if (albumName.equals("Favourites")) {
+                videosViewModel.getLiveVideoModels().setValue(MediaDataRepository.getInstance().fetchVideos());
+                this.filterFunc = (videoModel) -> {
+                    return !videoModel.isFavorite;
+                };
+            }
+        }
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -81,6 +97,15 @@ public class AlbumsVideoViewActivity extends AppCompatActivity {
                 appBarViewModel.liveSortOrder.setValue(currentOrder);
                 return true;
             }
+            else if (item.getItemId() == R.id.slideShowButton) {
+                Intent intentSlide = new Intent(this, SlideShowActivity.class);
+                intentSlide.putExtra(PhotoPreferences.PARCEL_PHOTOS, MediaDataRepository.getInstance().fetchPhotos());
+                startActivity(intentSlide);
+            }
+            else if (item.getItemId() == R.id.settingButton) {
+                Intent intentSetting = new Intent(this, SettingActivity.class);
+                startActivity(intentSetting);
+            }
             return false;
         });
 
@@ -91,31 +116,27 @@ public class AlbumsVideoViewActivity extends AppCompatActivity {
 
         //photoModels.addAll(photoModelsFavourites);
         videosViewModel = new VideosViewModel(videoModels);
-        videosViewModel.getLiveVideoModels().setValue(videoModels);
+//        videosViewModel.getLiveVideoModels().setValue(videoModels);
         try {
-            final androidx.lifecycle.Observer<ArrayList<VideoModel>> liveObserver = new androidx.lifecycle.Observer<ArrayList<VideoModel>>() {
-                @Override
-                public void onChanged(ArrayList<VideoModel> videoActivityModels) {
-                    Log.d("ActivityLife", "PhotoFragment data changed");
-
-                    appBarViewModel.liveSortOrder.observe(AlbumsVideoViewActivity.this, order -> {
-                        if (order == 0) {
-                            videoActivityModels.sort((o1, o2) -> o2.dateModified.compareTo(o1.dateModified));
-                        }
-                        else if (order == 1) {
-                            videoActivityModels.sort((o1, o2) -> o1.dateModified.compareTo(o2.dateModified));
-                        }
-
-                        if (videoViewAdapter != null) {
-                            videoViewAdapter.notifyDataSetChanged();
-                        }
-                    });
-
-                    videoViewAdapter = new VideoViewAdapter(recyclerView.getContext(), videoModels);
-                    recyclerView.setAdapter(videoViewAdapter);
+            videosViewModel.getLiveVideoModels().observe(this, videoActivityModels -> {
+                if (filterFunc != null) {
+                    videoActivityModels.removeIf(videoModel -> filterFunc.apply(videoModel));
                 }
-            };
-            videosViewModel.getLiveVideoModels().observe(this, liveObserver);
+                appBarViewModel.liveSortOrder.observe(AlbumsVideoViewActivity.this, order -> {
+                    if (order == 0) {
+                        videoActivityModels.sort((o1, o2) -> o2.dateModified.compareTo(o1.dateModified));
+                    }
+                    else if (order == 1) {
+                        videoActivityModels.sort((o1, o2) -> o1.dateModified.compareTo(o2.dateModified));
+                    }
+
+                    if (videoViewAdapter != null) {
+                        videoViewAdapter.notifyDataSetChanged();
+                    }
+                });
+                videoViewAdapter = new VideoViewAdapter(recyclerView.getContext(), videoActivityModels);
+                recyclerView.setAdapter(videoViewAdapter);
+            });
 
             appBarViewModel.liveColumnSpan.observe(this, columnSpan -> {
                 layoutManager = new GridLayoutManager(this, columnSpan);
@@ -125,5 +146,7 @@ public class AlbumsVideoViewActivity extends AppCompatActivity {
             Log.e("PhotosFragmentException", exception.getMessage());
         }
     }
-
+    public void setFilterFunc(Function<VideoModel, Boolean> filterFunc) {
+        this.filterFunc = filterFunc;
+    }
 }

@@ -24,7 +24,6 @@ import com.hcmus.photovideoviewer.viewmodels.PhotosFragmentViewModel;
 
 import java.util.ArrayList;
 import java.util.function.Function;
-
 public class
 AlbumsViewActivity extends AppCompatActivity {
 	protected RecyclerView.LayoutManager mLayoutManager;
@@ -48,20 +47,50 @@ AlbumsViewActivity extends AppCompatActivity {
 	private int spanCount = 1;
 	private PhotosFragmentViewModel model;
 	private String albumName = "";
-
+//
 	@Override
 	public void onStart() {
 		super.onStart();
-
-//        photosViewModel.getLivePhotoModels().setValue(MediaDataRepository.getInstance().fetchPhotos());
-//
-//        this.filterFunc = (photoModel) -> {
-//          return !photoModel.isFavorite;
-//        };
-
-//		appBarViewModel.liveSortOrder.setValue(appBarViewModel.liveSortOrder.getValue());
-		Log.d("ActivityLife", "PhotoFragment start");
+		Intent intent = getIntent();
+		albumName = intent.getStringExtra("albumName");
+		if(albumName != null)
+		{
+			if (albumName.equals("Private")) {
+				photosViewModel.getLivePhotoModels().setValue(MediaDataRepository.getInstance().fetchPhotos());
+				this.filterFunc = (photoModel) -> {
+					return !photoModel.isSecret;
+				};
+			}
+			if (albumName.equals("Favourites")) {
+				photosViewModel.getLivePhotoModels().setValue(MediaDataRepository.getInstance().fetchPhotos());
+				this.filterFunc = (photoModel) -> {
+					return !photoModel.isFavorite;
+				};
+			}
+		}
 	}
+
+//	@Override
+//	public void onWindowFocusChanged(boolean hasFocus) {
+//		super.onWindowFocusChanged(hasFocus);
+//		Intent intent = getIntent();
+//		albumName = intent.getStringExtra("albumName");
+//		if(albumName != null)
+//		{
+//			if (albumName.equals("Private")) {
+//				photosViewModel.getLivePhotoModels().setValue(MediaDataRepository.getInstance().fetchPhotos());
+//				this.filterFunc = (photoModel) -> {
+//					return photoModel.isSecret;
+//				};
+//			}
+//			if (albumName.equals("Favourites")) {
+//				photosViewModel.getLivePhotoModels().setValue(MediaDataRepository.getInstance().fetchPhotos());
+//				this.filterFunc = (photoModel) -> {
+//					return photoModel.isFavorite;
+//				};
+//			}
+//		}
+//	}
 
 	@Override
 	public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -79,6 +108,7 @@ AlbumsViewActivity extends AppCompatActivity {
 		appBarViewModel = new AppBarViewModel();
 		MaterialToolbar materialToolbar = findViewById(R.id.topToolBarAlbum);
 		materialToolbar.setTitle(albumName);
+
 		materialToolbar.setOnMenuItemClickListener(item -> {
 			if (item.getItemId() == R.id.layoutButton) {
 				currentCol = appBarViewModel.liveColumnSpan.getValue();
@@ -109,7 +139,7 @@ AlbumsViewActivity extends AppCompatActivity {
 				currentOrder = currentOrder ^ 1;
 
 				item.setIcon(currentOrder == 1 ?
-						             R.drawable.ic_baseline_arrow_upward_24 : R.drawable.ic_baseline_arrow_downward_24);
+						R.drawable.ic_baseline_arrow_upward_24 : R.drawable.ic_baseline_arrow_downward_24);
 
 				appBarViewModel.liveSortOrder.setValue(currentOrder);
 				return true;
@@ -158,9 +188,7 @@ AlbumsViewActivity extends AppCompatActivity {
 			Log.e("PhotosFragmentException", exception.getMessage());
 		}
 
-
 	}
-
 	public void setFilterFunc(Function<PhotoModel, Boolean> filterFunc) {
 		this.filterFunc = filterFunc;
 	}
