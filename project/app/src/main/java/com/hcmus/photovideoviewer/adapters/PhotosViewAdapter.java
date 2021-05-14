@@ -50,10 +50,16 @@ public class PhotosViewAdapter extends RecyclerView.Adapter<PhotosViewAdapter.Vi
 		});
 
 		PhotoModel photoModel = photoModels.get(position);
-		Glide.with(context)
-				.load(photoModel.uri)
-				.placeholder(R.drawable.pussy_cat)
-				.into(imageView);
+		if(!photoModel.isSecret) {
+			Glide.with(context)
+					.load(photoModel.uri)
+					.placeholder(R.drawable.pussy_cat)
+					.into(imageView);
+		}
+		else {
+			holder.hideItem();
+		}
+
 	}
 
 	@Override
