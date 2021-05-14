@@ -50,6 +50,9 @@ public class PhotosFragment extends Fragment {
 		super.onCreate(savedInstanceState);
 
 		photosViewModel = new PhotosFragmentViewModel(MediaDataRepository.getInstance().getPhotoModels());
+		this.filterFunc = (photoModel) -> {
+			return photoModel.isSecret;
+		};
 
 		Log.d("ActivityLife", "PhotoFragment created");
 	}
@@ -59,9 +62,6 @@ public class PhotosFragment extends Fragment {
 		super.onStart();
 
 		photosViewModel.getLivePhotoModels().setValue(MediaDataRepository.getInstance().fetchPhotos());
-		this.filterFunc = (photoModel) -> {
-			return photoModel.isSecret;
-		};
 
 //		appBarViewModel.liveSortOrder.setValue(appBarViewModel.liveSortOrder.getValue());
 		Log.d("ActivityLife", "PhotoFragment start");
@@ -84,9 +84,6 @@ public class PhotosFragment extends Fragment {
 			photosViewModel.getLivePhotoModels().observe(getViewLifecycleOwner(), photoModels -> {
 				Log.d("ActivityLife", "PhotoFragment data changed");
 
-				if (filterFunc != null) {
-					photoModels.removeIf(photoModel -> filterFunc.apply(photoModel));
-				}
 				appBarViewModel.liveSortOrder.observe(PhotosFragment.this.getViewLifecycleOwner(), order -> {
 					if (order == 0) {
 						photoModels.sort((o1, o2) -> o2.dateModified.compareTo(o1.dateModified));
@@ -95,11 +92,18 @@ public class PhotosFragment extends Fragment {
 						photoModels.sort((o1, o2) -> o1.dateModified.compareTo(o2.dateModified));
 					}
 
+					if (filterFunc != null) {
+						photoModels.removeIf(photoModel -> filterFunc.apply(photoModel));
+					}
+
 					if (photosViewAdapter != null) {
 						photosViewAdapter.notifyDataSetChanged();
 					}
 				});
 
+				if (filterFunc != null) {
+					photoModels.removeIf(photoModel -> filterFunc.apply(photoModel));
+				}
 				photosViewAdapter = new PhotosViewAdapter(recyclerView.getContext(), photoModels);
 
 				recyclerView.setAdapter(photosViewAdapter);
